@@ -1,0 +1,16 @@
+{
+  "name": "simply-manage-backend",
+  "version": "0.1.0",
+  "description": "Backend to handle database interaction for the SimplyManage Digital Library System",
+  "license": "ISC",
+  "author": "CSCI441 2026 Group 7",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "pg": "^8.17.2"
+  }
+}
