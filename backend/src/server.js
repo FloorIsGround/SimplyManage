@@ -3,6 +3,8 @@ import express from 'express';
 
 dotenv.config();
 
+import { createApp } from "./app.js";
+
 const { testConnection } = await import('./config/db.js');
 
 const PORT = process.env.PORT || 3000;
@@ -20,5 +22,7 @@ try {
     console.log(error);
     process.exit(1);
 }
+
+const app = createApp();
 
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
