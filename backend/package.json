@@ -3,14 +3,16 @@
   "version": "0.1.0",
   "description": "Backend to handle database interaction for the SimplyManage Digital Library System",
   "license": "ISC",
-  "author": "CSCI441 2026 Group 7",
+  "author": "CSCI441 SP 2026 Group 7",
   "type": "module",
-  "main": "server.js",
+  "main": "src/server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/server.js",
     "dev": "nodemon src/server.js"
   },
   "dependencies": {
+    "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "nodemon": "^3.1.11",
