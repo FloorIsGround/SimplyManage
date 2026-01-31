@@ -1,3 +1,5 @@
+import type { Book } from "../Book/Book";
+
 export interface User {
   id: number;                     // Unique identifier for the user
   name: string;                   // Full name of the user
@@ -5,7 +7,7 @@ export interface User {
   password: string;               // Hashed password 
   role: Role;                     // User's system role
   membership: Membership;         // User's membership level
-  borrowedBooks: number[];        // Array of book or borrow IDs currently checked out
+  borrowedBooks: Book[];          // Array of books currently checked out
 }
 
 // Possible system roles a user can have within the application
