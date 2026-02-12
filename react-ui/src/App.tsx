@@ -3,6 +3,9 @@ import './App.css'
 import Header from './Components/Header/Header'
 import { Outlet } from 'react-router-dom';
 
+// Global MUI theme configuration for the entire application.
+// This centralizes color palette, typography, and component overrides
+// so the UI stays visually consistent across all pages.
 const theme = createTheme({
   palette: {
     primary: {
@@ -10,6 +13,7 @@ const theme = createTheme({
     },
   },
   components: {
+    // Global button styling — removes automatic uppercase text
     MuiButton: {
       styleOverrides: {
         root: {
@@ -17,6 +21,7 @@ const theme = createTheme({
         }
       }
     },
+    // Ensures IconButtons also avoid forced uppercase styling
     MuiIconButton: {
       styleOverrides: {
         root: {
@@ -36,8 +41,11 @@ const theme = createTheme({
 
 function App() {
   return (
+    // ThemeProvider applies the custom MUI theme to the entire app
     <ThemeProvider theme={theme}>
+      {/* Persistent header displayed on all pages */}
       <Header/>
+      {/* Outlet renders the active child route inside App */}
       <Outlet />
     </ThemeProvider>
   )

@@ -7,63 +7,59 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 function Header() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [loginAnchorEl, setLoginAnchorEl] = useState<null | HTMLElement>(null);
+  const [searchQuery, setSearchQuery] = useState(""); // Stores the user's search input from the search bar
+
+  // Anchor elements determine where popovers attach on the screen
+  const [loginAnchorEl, setLoginAnchorEl] = useState<null | HTMLElement>(null); 
   const [helpAnchorEl, setHelpAnchorEl] = useState<null | HTMLElement>(null);
+
+  // Boolean flags for popover visibility
   const loginOpen = Boolean(loginAnchorEl);
   const helpOpen = Boolean(helpAnchorEl);
+
   const navigate = useNavigate();
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setLoginAnchorEl(event.currentTarget);};
   
-  const handleClose = () => {
-    setLoginAnchorEl(null);
-  };
+  const open = (setter: any) => (e: any) => setter(e.currentTarget); // Generic open handler for any popover
+  
+  const close = (setter: any) => () => setter(null); // Generic close handler for any popover
 
-  const helpHandleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setHelpAnchorEl(event.currentTarget);
-  };
-
-  const helpHandleClose = () => {
-    setHelpAnchorEl(null);
-  };
   return(
     <>
-      {/* Logo / Log In AppBar */}
-      <AppBar 
-        position='static' 
-        elevation={0} 
-        sx={{ backgroundColor: 'white', borderBottom: '4px solid #4E780C', height: 65 }}
-      >
+      {/* Primary header bar: branding + navigation actions */}
+      <AppBar position='static' elevation={0} sx={{ backgroundColor: 'white', borderBottom: '4px solid #4E780C', height: 65 }}>
         <Toolbar>
+          {/* Library icon used as a visual brand marker */}
           <LocalLibraryIcon sx={{ fontSize: 50, color: '#4E780C' }}/>
-          <Typography sx={{ ml: 2, color: '#4E780C', fontSize: 17, cursor: "pointer" }} onClick={() => {
-            navigate("/")
-          }} component="span">
+
+          {/* App title that doubles as a home navigation link */}
+          <Typography sx={{ ml: 2, color: '#4E780C', fontSize: 17, cursor: "pointer" }} onClick={() => { navigate("/") }} component="span">
             SimplyManage Public Library
           </Typography>
+
+          {/* Right-aligned navigation buttons */}
           <Box sx={{ ml: 'auto', display: 'flex', gap: 2, alignItems: 'center' }}>
-            <Button 
-              variant="text" 
-              size="large" 
-              startIcon={<LocationOnIcon />} 
-              onClick={() => {
-                navigate("/hours-locations")
-              }}>
+
+            {/* Hours & Locations page link */}
+            <Button variant="text" size="large" startIcon={<LocationOnIcon />} onClick={() => { navigate("/hours-locations") }}>
               Hours & Locations
             </Button>
-            <Button variant="text" size="large" endIcon={<ExpandMoreIcon />} onClick={helpHandleClick}>
+
+            {/* Help popover trigger */}
+            <Button variant="text" size="large" endIcon={<ExpandMoreIcon />} onClick={ open(setHelpAnchorEl) }>
               Help
             </Button>
-            <Button variant="contained" size="large" onClick={handleClick} sx={{lineHeight: 'normal'}}>
+
+            {/* Login popover trigger */}
+            <Button variant="contained" size="large" onClick={ open(setLoginAnchorEl) } sx={{ lineHeight: 'normal' }}>
               Log In
             </Button>
           </Box>
+
           {/* Help Popover */}
           <Popover
-            open={helpOpen}
-            anchorEl={helpAnchorEl}
-            onClose={helpHandleClose}
+            open={ helpOpen }
+            anchorEl={ helpAnchorEl }
+            onClose={ close }
             anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
             transformOrigin={{ vertical: 'top', horizontal: 'right' }}
           >
@@ -77,19 +73,18 @@ function Header() {
                 </Typography>
               </CardContent>
               <CardActions>
-                <Button size="small" onClick={() => {
-                  navigate("/faqs")
-                }}>
+                <Button size="small" onClick={() => { navigate("/faqs") }}> {/* Navigates to FAQ page */}
                   Learn More
                 </Button>
               </CardActions>
             </Card>
           </Popover>
+
           {/* Login Popover */}
           <Popover
-            open={loginOpen}
-            anchorEl={loginAnchorEl}
-            onClose={handleClose}
+            open={ loginOpen }
+            anchorEl={ loginAnchorEl }
+            onClose={ close }
             anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
             transformOrigin={{ vertical: 'top', horizontal: 'right' }}
           >
@@ -98,6 +93,8 @@ function Header() {
                 <Typography gutterBottom sx={{ color: 'text.secondary', fontSize: 14 }}>
                   Log In to Your Account
                 </Typography>
+
+                {/* Username input */}
                 <TextField 
                   id="username" 
                   label="Username" 
@@ -105,6 +102,8 @@ function Header() {
                   fullWidth size="small" 
                   sx={{ mt: 1, mb: 0.5 }} 
                   />
+
+                {/* Password input */}
                 <TextField 
                   id="password" 
                   label="Password" 
@@ -114,13 +113,13 @@ function Header() {
                   sx={{ mb: 0 }} 
                   />
               </CardContent>
+
+              {/* Login + Sign Up actions */}
               <CardActions sx={{ flexDirection: 'column', gap: 0.5, pt: 0 }}>
                 <Button size="medium" variant="contained" fullWidth>
                   Log In
                 </Button>
-                <Button size="medium" variant="text" fullWidth onClick={() => {
-                  navigate("/sign-up")
-                }}>
+                <Button size="medium" variant="text" fullWidth onClick={() => { navigate("/sign-up") }}>
                   Sign Up
                 </Button>
               </CardActions>
@@ -129,9 +128,11 @@ function Header() {
         </Toolbar>
       </AppBar>
 
-      {/* Search AppBar */}
-      <AppBar position="static" elevation={0} sx={{ backgroundColor: 'white', height: 35 }}>
+      {/* Secondary header bar: search functionality */}
+      <AppBar position="static" elevation={ 0 } sx={{ backgroundColor: 'white', height: 35 }}>
         <Toolbar sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+
+          {/* Search input field */}
           <TextField 
             id="filled-basic" 
             placeholder="Search" 
@@ -140,6 +141,8 @@ function Header() {
               setSearchQuery(event.target.value);
             }} 
             sx={{ width: 400, '& .MuiInputBase-root': { height: 36 } }}/>
+
+          {/* Search button — will eventually trigger backend search */}
           <IconButton 
             aria-label="search" 
             onClick={async() => {
