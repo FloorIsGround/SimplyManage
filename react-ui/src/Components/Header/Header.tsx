@@ -4,6 +4,7 @@ import LocalLibraryIcon from "@mui/icons-material/LocalLibrary";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function Header() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -11,6 +12,7 @@ function Header() {
   const [helpAnchorEl, setHelpAnchorEl] = useState<null | HTMLElement>(null);
   const loginOpen = Boolean(loginAnchorEl);
   const helpOpen = Boolean(helpAnchorEl);
+  const navigate = useNavigate();
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setLoginAnchorEl(event.currentTarget);};
   
@@ -35,11 +37,19 @@ function Header() {
       >
         <Toolbar>
           <LocalLibraryIcon sx={{ fontSize: 50, color: '#4E780C' }}/>
-          <Typography sx={{ ml: 2, color: '#4E780C', fontSize: 17 }}>
+          <Typography sx={{ ml: 2, color: '#4E780C', fontSize: 17, cursor: "pointer" }} onClick={() => {
+            navigate("/")
+          }} component="span">
             SimplyManage Public Library
           </Typography>
           <Box sx={{ ml: 'auto', display: 'flex', gap: 2, alignItems: 'center' }}>
-            <Button variant="text" size="large" startIcon={<LocationOnIcon />}>
+            <Button 
+              variant="text" 
+              size="large" 
+              startIcon={<LocationOnIcon />} 
+              onClick={() => {
+                navigate("/hours-locations")
+              }}>
               Hours & Locations
             </Button>
             <Button variant="text" size="large" endIcon={<ExpandMoreIcon />} onClick={helpHandleClick}>
@@ -67,7 +77,9 @@ function Header() {
                 </Typography>
               </CardContent>
               <CardActions>
-                <Button size="small">
+                <Button size="small" onClick={() => {
+                  navigate("/faqs")
+                }}>
                   Learn More
                 </Button>
               </CardActions>
@@ -106,7 +118,9 @@ function Header() {
                 <Button size="medium" variant="contained" fullWidth>
                   Log In
                 </Button>
-                <Button size="medium" variant="text" fullWidth>
+                <Button size="medium" variant="text" fullWidth onClick={() => {
+                  navigate("/sign-up")
+                }}>
                   Sign Up
                 </Button>
               </CardActions>
