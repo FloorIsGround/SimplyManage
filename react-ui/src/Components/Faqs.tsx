@@ -8,11 +8,8 @@ import {
   Box,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import type { FAQ } from "../Models/LibraryInfo/Faq";
 
-interface FAQ {
-  question: string;
-  answer: string;
-}
 
 // Sample library FAQ data
 const faqsData: FAQ[] = [
