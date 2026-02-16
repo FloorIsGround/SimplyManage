@@ -59,7 +59,7 @@ function Header() {
           <Popover
             open={ helpOpen }
             anchorEl={ helpAnchorEl }
-            onClose={ close }
+            onClose={close(setHelpAnchorEl)} 
             anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
             transformOrigin={{ vertical: 'top', horizontal: 'right' }}
           >
@@ -84,7 +84,7 @@ function Header() {
           <Popover
             open={ loginOpen }
             anchorEl={ loginAnchorEl }
-            onClose={ close }
+            onClose={close(setHelpAnchorEl)} 
             anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
             transformOrigin={{ vertical: 'top', horizontal: 'right' }}
           >
@@ -159,7 +159,6 @@ function Header() {
 }
 
 export default Header
-
 
 
 
