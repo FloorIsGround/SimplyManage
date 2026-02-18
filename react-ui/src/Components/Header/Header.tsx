@@ -84,7 +84,7 @@ function Header() {
           <Popover
             open={ loginOpen }
             anchorEl={ loginAnchorEl }
-            onClose={close(setHelpAnchorEl)} 
+            onClose={close(setLoginAnchorEl)} 
             anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
             transformOrigin={{ vertical: 'top', horizontal: 'right' }}
           >
