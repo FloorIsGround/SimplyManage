@@ -142,7 +142,6 @@ CREATE TABLE public.faqs (
     CONSTRAINT faqs_pkey PRIMARY KEY (faq_id)
 );
 
-
 --
 -- Name: books books_isbn_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
