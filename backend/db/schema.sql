@@ -132,6 +132,16 @@ CREATE TABLE public.users (
     CONSTRAINT users_status_check CHECK ((status = ANY (ARRAY['ACTIVE'::text, 'SUSPENDED'::text])))
 );
 
+CREATE TABLE public.faqs (
+    faq_id uuid DEFAULT gen_random_uuid() NOT NULL,
+    question text NOT NULL,
+    answer text NOT NULL,
+    category text,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT faqs_pkey PRIMARY KEY (faq_id)
+);
+
 
 --
 -- Name: books books_isbn_key; Type: CONSTRAINT; Schema: public; Owner: -
