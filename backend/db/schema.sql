@@ -132,6 +132,10 @@ CREATE TABLE public.users (
     CONSTRAINT users_status_check CHECK ((status = ANY (ARRAY['ACTIVE'::text, 'SUSPENDED'::text])))
 );
 
+--
+-- Name: faqs; Type: TABLE; Schema: public; Owner: -
+--
+
 CREATE TABLE public.faqs (
     faq_id uuid DEFAULT gen_random_uuid() NOT NULL,
     question text NOT NULL,
