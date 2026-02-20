@@ -118,7 +118,7 @@ function Header() {
           {/* Search input field */}
           <TextField 
             id="filled-basic" 
-            placeholder="Search" 
+            placeholder="Search Catalog" 
             variant="outlined" 
             onChange={ (event) => {
               setSearchQuery(event.target.value);
