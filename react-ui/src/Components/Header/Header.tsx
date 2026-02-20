@@ -8,7 +8,6 @@ import { useNavigate } from "react-router-dom";
 
 function Header() {
   const [searchQuery, setSearchQuery] = useState(""); // Stores the user's search input from the search bar
-
   // Anchor elements determine where popovers attach on the screen
   const [loginAnchorEl, setLoginAnchorEl] = useState<null | HTMLElement>(null); 
   const [helpAnchorEl, setHelpAnchorEl] = useState<null | HTMLElement>(null);
@@ -18,10 +17,6 @@ function Header() {
   const helpOpen = Boolean(helpAnchorEl);
 
   const navigate = useNavigate();
-  
-  const open = (setter: any) => (e: any) => setter(e.currentTarget); // Generic open handler for any popover
-  
-  const close = (setter: any) => () => setter(null); // Generic close handler for any popover
 
   return(
     <>
@@ -30,36 +25,30 @@ function Header() {
         <Toolbar>
           {/* Library icon used as a visual brand marker */}
           <LocalLibraryIcon sx={{ fontSize: 50, color: '#4E780C' }}/>
-
           {/* App title that doubles as a home navigation link */}
           <Typography sx={{ ml: 2, color: '#4E780C', fontSize: 17, cursor: "pointer" }} onClick={() => { navigate("/") }} component="span">
             SimplyManage Public Library
           </Typography>
-
           {/* Right-aligned navigation buttons */}
           <Box sx={{ ml: 'auto', display: 'flex', gap: 2, alignItems: 'center' }}>
-
             {/* Hours & Locations page link */}
-            <Button variant="text" size="large" startIcon={<LocationOnIcon />} onClick={() => { navigate("/hours-locations") }}>
+            <Button variant="text" size="large" startIcon={<LocationOnIcon />} onClick={ () => { navigate("/hours-locations") }}>
               Hours & Locations
             </Button>
-
             {/* Help popover trigger */}
-            <Button variant="text" size="large" endIcon={<ExpandMoreIcon />} onClick={ open(setHelpAnchorEl) }>
+            <Button variant="text" size="large" endIcon={<ExpandMoreIcon />} onClick={ (e) => { setHelpAnchorEl(e.currentTarget) }}>
               Help
             </Button>
-
             {/* Login popover trigger */}
-            <Button variant="contained" size="large" onClick={ open(setLoginAnchorEl) } sx={{ lineHeight: 'normal' }}>
+            <Button variant="contained" size="large" onClick={ (e) => { setLoginAnchorEl(e.currentTarget) } } sx={{ lineHeight: 'normal' }}>
               Log In
             </Button>
           </Box>
-
           {/* Help Popover */}
           <Popover
             open={ helpOpen }
             anchorEl={ helpAnchorEl }
-            onClose={close(setHelpAnchorEl)} 
+            onClose={ () => { setHelpAnchorEl(null) }} 
             anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
             transformOrigin={{ vertical: 'top', horizontal: 'right' }}
           >
@@ -73,18 +62,17 @@ function Header() {
                 </Typography>
               </CardContent>
               <CardActions>
-                <Button size="small" onClick={() => { navigate("/faqs") }}> {/* Navigates to FAQ page */}
+                <Button size="small" onClick={ () => { navigate("/faqs") }}> {/* Navigates to FAQ page */}
                   Learn More
                 </Button>
               </CardActions>
             </Card>
           </Popover>
-
           {/* Login Popover */}
           <Popover
             open={ loginOpen }
             anchorEl={ loginAnchorEl }
-            onClose={close(setHelpAnchorEl)} 
+            onClose={() => { setLoginAnchorEl(null)} } 
             anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
             transformOrigin={{ vertical: 'top', horizontal: 'right' }}
           >
@@ -93,7 +81,6 @@ function Header() {
                 <Typography gutterBottom sx={{ color: 'text.secondary', fontSize: 14 }}>
                   Log In to Your Account
                 </Typography>
-
                 {/* Username input */}
                 <TextField 
                   id="username" 
@@ -102,7 +89,6 @@ function Header() {
                   fullWidth size="small" 
                   sx={{ mt: 1, mb: 0.5 }} 
                   />
-
                 {/* Password input */}
                 <TextField 
                   id="password" 
@@ -113,13 +99,12 @@ function Header() {
                   sx={{ mb: 0 }} 
                   />
               </CardContent>
-
               {/* Login + Sign Up actions */}
               <CardActions sx={{ flexDirection: 'column', gap: 0.5, pt: 0 }}>
                 <Button size="medium" variant="contained" fullWidth>
                   Log In
                 </Button>
-                <Button size="medium" variant="text" fullWidth onClick={() => { navigate("/sign-up") }}>
+                <Button size="medium" variant="text" fullWidth onClick={ () => { navigate("/sign-up") }}>
                   Sign Up
                 </Button>
               </CardActions>
@@ -127,25 +112,22 @@ function Header() {
           </Popover>
         </Toolbar>
       </AppBar>
-
       {/* Secondary header bar: search functionality */}
       <AppBar position="static" elevation={ 0 } sx={{ backgroundColor: 'white', height: 35 }}>
         <Toolbar sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-
           {/* Search input field */}
           <TextField 
             id="filled-basic" 
             placeholder="Search" 
             variant="outlined" 
-            onChange={(event) => {
+            onChange={ (event) => {
               setSearchQuery(event.target.value);
             }} 
             sx={{ width: 400, '& .MuiInputBase-root': { height: 36 } }}/>
-
           {/* Search button — will eventually trigger backend search */}
           <IconButton 
             aria-label="search" 
-            onClick={async() => {
+            onClick={ async() => {
               console.log(searchQuery); 
               // when connected to backend will look like const result = await post('/searchBooks', searchQuery);
             }} 
@@ -159,6 +141,3 @@ function Header() {
 }
 
 export default Header
-
-
-
