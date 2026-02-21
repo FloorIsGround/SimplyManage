@@ -45,7 +45,6 @@ function Faqs() {
       >
         Frequently Asked Questions
       </Typography>
-
       {/* Search bar */}
       <Box sx={{ display: "flex", mb: 4 }}>
         <TextField
@@ -56,7 +55,6 @@ function Faqs() {
           onChange={(e) => setSearchQuery(e.target.value)}
         />
       </Box>
-
       {/* Accordion list */}
       {filteredFaqs.length ? (
         filteredFaqs.map((faq, index) => (

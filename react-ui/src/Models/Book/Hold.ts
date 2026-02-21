@@ -1,9 +1,9 @@
-export interface Holds {
+export interface Hold {
   id: number;                 // Unique ID for this hold/reservation
   userId: number;             // ID of the user who placed the hold
   bookId: number;             // ID of the book being held
-  reservationDate: Date;      // Date the hold was created
-  expirationDate: Date;       // Date the hold expires if not picked up
+  placedAt: Date;      // Date the hold was created
+  readyExpiresAt: Date;       // Date the hold expires if not picked up
   status: HoldStatus;         // Current state of the hold
 }
 

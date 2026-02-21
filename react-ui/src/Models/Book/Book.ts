@@ -1,19 +1,20 @@
 export interface Book {
   id: string;               // Unique identifier for the book 
+  isbn: number;
   title: string;            // Title of the book
-  authorId: number;         // ID of the author who wrote the book
-  categoryId: number;       // ID of the category/genre this book belongs to
+  author: string;         // ID of the author who wrote the book
+  genre: string;       // ID of the category/genre this book belongs to
+  description: string;
   publicationYear: number;  // Year the book was published
-  publisher: string;        // Name of the publishing company
-  copiesAvailable: number;  // Number of copies currently available for borrowing
-  totalCopies: number;      // Total number of copies the library owns
-  holds: number;            // Number of active holds placed on this book
+  createdAt: Date;
   reviews: Review[];        // Array of review objects
 }
 
 export interface Review {
-  userId: number;         // ID of the user who left the review
-  rating: number;         // Rating value (e.g., 1–5 stars)
-  comment: string;        // Review text
-  date: string;           // Date the review was submitted
+  id: number;             // Unique ID for this review
+  userId: number;     // ID of the user who wrote the review
+  bookId: number;     // ID of the book being reviewed
+  rating: number;     // Rating value (e.g., 1–5 stars)
+  comment: string;    // Written review text
+  createdAt: Date;    // Timestamp when the review was created
 }
