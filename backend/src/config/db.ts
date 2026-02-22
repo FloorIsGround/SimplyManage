@@ -1,4 +1,5 @@
 import { Pool, type QueryResult, type QueryResultRow } from "pg";
+import { Faq } from "../models/libraryInfo/faqs.js";
 
 // Use a global pool to prevent creating a new pool on every reload (dev).
 type GlobalWithPool = typeof globalThis & { pgPool?: Pool };
@@ -32,4 +33,9 @@ export async function query<T extends QueryResultRow = any>(
 export async function testConnection(): Promise<{ now: string }> {
   const res = await pool.query<{ now: string }>("SELECT now() AS now");
   return res.rows[0];
+}
+
+export async function getFaqs(): Promise<Faq[]> {
+  const res = await pool.query<Faq>("SELECT * FROM faqs");
+  return res.rows;
 }

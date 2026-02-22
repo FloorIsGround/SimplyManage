@@ -23,23 +23,17 @@ function Header() {
       {/* Primary header bar: branding + navigation actions */}
       <AppBar position='static' elevation={0} sx={{ backgroundColor: 'white', borderBottom: '4px solid #4E780C', height: 65 }}>
         <Toolbar>
-          {/* Library icon used as a visual brand marker */}
           <LocalLibraryIcon sx={{ fontSize: 50, color: '#4E780C' }}/>
-          {/* App title that doubles as a home navigation link */}
           <Typography sx={{ ml: 2, color: '#4E780C', fontSize: 17, cursor: "pointer" }} onClick={() => { navigate("/") }} component="span">
             SimplyManage Public Library
           </Typography>
-          {/* Right-aligned navigation buttons */}
           <Box sx={{ ml: 'auto', display: 'flex', gap: 2, alignItems: 'center' }}>
-            {/* Hours & Locations page link */}
             <Button variant="text" size="large" startIcon={<LocationOnIcon />} onClick={ () => { navigate("/hours-locations") }}>
               Hours & Locations
             </Button>
-            {/* Help popover trigger */}
             <Button variant="text" size="large" endIcon={<ExpandMoreIcon />} onClick={ (e) => { setHelpAnchorEl(e.currentTarget) }}>
               Help
             </Button>
-            {/* Login popover trigger */}
             <Button variant="contained" size="large" onClick={ (e) => { setLoginAnchorEl(e.currentTarget) } } sx={{ lineHeight: 'normal' }}>
               Log In
             </Button>
@@ -99,7 +93,6 @@ function Header() {
                   sx={{ mb: 0 }} 
                   />
               </CardContent>
-              {/* Login + Sign Up actions */}
               <CardActions sx={{ flexDirection: 'column', gap: 0.5, pt: 0 }}>
                 <Button size="medium" variant="contained" fullWidth>
                   Log In
@@ -118,13 +111,12 @@ function Header() {
           {/* Search input field */}
           <TextField 
             id="filled-basic" 
-            placeholder="Search" 
+            placeholder="Search Catalog" 
             variant="outlined" 
             onChange={ (event) => {
               setSearchQuery(event.target.value);
             }} 
             sx={{ width: 400, '& .MuiInputBase-root': { height: 36 } }}/>
-          {/* Search button — will eventually trigger backend search */}
           <IconButton 
             aria-label="search" 
             onClick={ async() => {

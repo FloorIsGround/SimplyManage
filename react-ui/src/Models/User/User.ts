@@ -2,11 +2,13 @@ import type { Book } from "../Book/Book";
 
 export interface User {
   id: number;                     // Unique identifier for the user
-  name: string;                   // Full name of the user
   email: string;                  // User's email address
+  firstName: string;
+  lastName: string;
   password: string;               // Hashed password 
   role: Role;                     // User's system role
-  membership: Membership;         // User's membership level
+  status: UserStatus;
+  createdAt: Date;
   borrowedBooks: Book[];          // Array of books currently checked out
 }
 
@@ -17,9 +19,7 @@ export enum Role {
   patron      // Regular user who can borrow books, place holds, and leave reviews
 }
 
-// Possible membership levels for a library user
-export enum Membership {
-  standard,   // Basic access with standard borrowing limits
-  premium,    // Higher limits and extended borrowing privileges
-  staff       // Internal use for employees (optional)
+export enum UserStatus {
+  active,     // Hold is currently active and waiting to be fulfilled
+  suspended
 }
