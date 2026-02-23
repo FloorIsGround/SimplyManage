@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import axios from '../utils/axios-api';
 import {
   Accordion,
   AccordionSummary,
@@ -18,7 +18,7 @@ function Faqs() {
   // Fetch FAQs from backend
   useEffect(() => {
     axios
-      .get("http://localhost:3003/api/faqs")
+      .get("/faqs")
       .then((res) => {
         console.log("FAQ response:", res.data);
         setFaqs(res.data);
