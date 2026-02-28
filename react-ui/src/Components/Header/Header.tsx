@@ -1,16 +1,27 @@
-import { AppBar, Box, Button, Card, CardActions, CardContent, IconButton, Popover, TextField, Toolbar, Typography } from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
+import { AppBar, Box, Button, Card, CardActions, CardContent, Popover, TextField, Toolbar, Typography, useTheme } from "@mui/material";
 import LocalLibraryIcon from "@mui/icons-material/LocalLibrary";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import BookSearchResult from "../BookSearchResult";
+import CatalogSearchBar from "./CatalogSearchBar";
+import type { Book } from "../../Models/Book/Book";
+
 
 function Header() {
-  const [searchQuery, setSearchQuery] = useState(""); // Stores the user's search input from the search bar
-  // Anchor elements determine where popovers attach on the screen
+  const [drawerOpen, setDrawerOpen] = useState(false);
+    // Anchor elements determine where popovers attach on the screen
   const [loginAnchorEl, setLoginAnchorEl] = useState<null | HTMLElement>(null); 
   const [helpAnchorEl, setHelpAnchorEl] = useState<null | HTMLElement>(null);
+  const [searchResults, setSearchResults] = useState<Book[]>([]);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [searchFailue, setSearchFailure] = useState<string | undefined>(undefined);
+
+  const handleDrawerClose = () => {
+    setDrawerOpen(false);
+  };
+  const theme = useTheme();
 
   // Boolean flags for popover visibility
   const loginOpen = Boolean(loginAnchorEl);
@@ -21,10 +32,10 @@ function Header() {
   return(
     <>
       {/* Primary header bar: branding + navigation actions */}
-      <AppBar position='static' elevation={0} sx={{ backgroundColor: 'white', borderBottom: '4px solid #4E780C', height: 65 }}>
+      <AppBar position='static' elevation={0} sx={{ backgroundColor: 'white', borderBottom: `2px solid ${theme.palette.primary.main}`, height: 65 }}>
         <Toolbar>
-          <LocalLibraryIcon sx={{ fontSize: 50, color: '#4E780C' }}/>
-          <Typography sx={{ ml: 2, color: '#4E780C', fontSize: 17, cursor: "pointer" }} onClick={() => { navigate("/") }} component="span">
+          <LocalLibraryIcon sx={{ fontSize: 50, color: theme.palette.primary.main }}/>
+          <Typography sx={{ ml: 2, color: theme.palette.primary.main, fontSize: 17, cursor: "pointer" }} onClick={() => { navigate("/") }} component="span">
             SimplyManage Public Library
           </Typography>
           <Box sx={{ ml: 'auto', display: 'flex', gap: 2, alignItems: 'center' }}>
@@ -109,25 +120,17 @@ function Header() {
       <AppBar position="static" elevation={ 0 } sx={{ backgroundColor: 'white', height: 35 }}>
         <Toolbar sx={{ display: 'flex', justifyContent: 'flex-end' }}>
           {/* Search input field */}
-          <TextField 
-            id="filled-basic" 
-            placeholder="Search Catalog" 
-            variant="outlined" 
-            onChange={ (event) => {
-              setSearchQuery(event.target.value);
-            }} 
-            sx={{ width: 400, '& .MuiInputBase-root': { height: 36 } }}/>
-          <IconButton 
-            aria-label="search" 
-            onClick={ async() => {
-              console.log(searchQuery); 
-              // when connected to backend will look like const result = await post('/searchBooks', searchQuery);
-            }} 
-            sx={{ backgroundColor: '#4E780C', borderRadius: 1}}>
-            <SearchIcon sx={{ fontSize: 20, color: 'white' }}/>
-          </IconButton>
+          <CatalogSearchBar 
+            onSearchSucess={(results) => { setSearchResults(results)}}
+            onSearchLoading={(loading) => {
+              setSearchLoading(loading);
+              setDrawerOpen(true);
+            }}
+            onSearchFailure={(error) => {setSearchFailure(error)}}
+          />
         </Toolbar>
       </AppBar>
+      <BookSearchResult loading={searchLoading} error={searchFailue} results={searchResults} open={drawerOpen} onClose={handleDrawerClose} />
     </>
   )
 }
