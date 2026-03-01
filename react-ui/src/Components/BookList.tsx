@@ -11,14 +11,16 @@ import {
   useTheme,
   Button,
   Divider,
-  Dialog
+  Dialog,
+  Rating,
+  TextField
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import CatalogSearchBar from './Header/CatalogSearchBar';
 import type { Book } from '../Models/Book/Book';
-import BookRating from './BookRating';
+import BookCover from './BookCover';
 
-export interface BookSearchResultProps {
+export interface BookListProps {
   results: Book[];
   loading: boolean;
   error?: string | undefined;
@@ -26,7 +28,14 @@ export interface BookSearchResultProps {
   onClose: () => void;
 }
 
-const BookSearchResult: React.FC<BookSearchResultProps> = ({
+enum ActiveTabEnum {
+  details = 'Details',
+  copiesAvailable = 'Copies Available',
+  reviews = 'Reviews',
+  writeAReview = 'Write a Review'
+}
+
+const BookList: React.FC<BookListProps> = ({
   results,
   loading,
   error,
@@ -37,7 +46,9 @@ const BookSearchResult: React.FC<BookSearchResultProps> = ({
 
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'details' | 'copies' | 'reviews'>('details');
+  const [activeTab, setActiveTab] = useState<ActiveTabEnum>(ActiveTabEnum.details);
+  const [reviewName, setReviewName] = useState('');
+  const [reviewText, setReviewText] = useState('');
 
   const handleBookClick = (book: Book) => {
     setSelectedBook(book);
@@ -47,8 +58,10 @@ const BookSearchResult: React.FC<BookSearchResultProps> = ({
   const handleModalClose = () => {
     setModalOpen(false);
     setSelectedBook(null);
-    setActiveTab('details');
-  };
+    setActiveTab(ActiveTabEnum.details);
+    setReviewName('');
+    setReviewText('');
+  }
 
   function renderResults() {
     if (loading) {
@@ -150,40 +163,43 @@ const BookSearchResult: React.FC<BookSearchResultProps> = ({
               }}
             >
               {/* Book Cover */}
-              <img
-                src={`https://covers.openlibrary.org/b/isbn/${selectedBook.isbn}-L.jpg`}
-                alt="Curious George Book Cover"
-                style={{
-                  width: '100%',
-                  borderRadius: 4,
-                  objectFit: 'cover',
-                  display: 'block'
-                }}
-              />
+              <BookCover isbn={selectedBook.isbn} alt={selectedBook.title + ' Book Cover'} />
               {/* Rating */}
-              <BookRating averageRating={selectedBook.averageRating} />
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.25 }}>
+                <Typography variant="subtitle2" sx={{ color: (theme) => theme.palette.primary.main, textAlign: 'center', mb: 0 }}>
+                  Average Rating
+                </Typography>
+                <Rating defaultValue={selectedBook.averageRating} readOnly />
+              </Box>
               {/* Navigation */}
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, width: '100%', alignSelf: 'flex-start', mt: 3 }}>
                 <Button
-                  variant={activeTab === 'details' ? 'contained' : 'text'}
-                  onClick={() => setActiveTab('details')}
+                  variant={activeTab === ActiveTabEnum.details ? 'contained' : 'text'}
+                  onClick={() => setActiveTab(ActiveTabEnum.details)}
                   sx={{ justifyContent: 'flex-start', textAlign: 'left', width: '100%', minWidth: 0, px: 1 }}
                 >
-                  Details
+                  {ActiveTabEnum.details}
                 </Button>
                 <Button
-                  variant={activeTab === 'copies' ? 'contained' : 'text'}
-                  onClick={() => setActiveTab('copies')}
+                  variant={activeTab === ActiveTabEnum.copiesAvailable ? 'contained' : 'text'}
+                  onClick={() => setActiveTab(ActiveTabEnum.copiesAvailable)}
                   sx={{ justifyContent: 'flex-start', textAlign: 'left', width: '100%', minWidth: 0, px: 1 }}
                 >
-                  Copies Available
+                  {ActiveTabEnum.copiesAvailable}
                 </Button>
                 <Button
-                  variant={activeTab === 'reviews' ? 'contained' : 'text'}
-                  onClick={() => setActiveTab('reviews')}
+                  variant={activeTab === ActiveTabEnum.reviews ? 'contained' : 'text'}
+                  onClick={() => setActiveTab(ActiveTabEnum.reviews)}
                   sx={{ justifyContent: 'flex-start', textAlign: 'left', width: '100%', minWidth: 0, px: 1 }}
                 >
-                  Reviews
+                  {ActiveTabEnum.reviews}
+                </Button>
+                <Button
+                  variant={activeTab === ActiveTabEnum.writeAReview ? 'contained' : 'text'}
+                  onClick={() => setActiveTab(ActiveTabEnum.writeAReview)}
+                  sx={{ justifyContent: 'flex-start', textAlign: 'left', width: '100%', minWidth: 0, px: 1 }}
+                >
+                  {ActiveTabEnum.writeAReview}
                 </Button>
               </Box>
             </Box>
@@ -206,7 +222,7 @@ const BookSearchResult: React.FC<BookSearchResultProps> = ({
               </Box>
               <Divider sx={{ my: 2 }} />
               {/* Content */}
-              {activeTab === 'details' && (
+              {activeTab === ActiveTabEnum.details && (
                 <Box>
                   <Typography variant="body1" sx={{ mb: 2 }}>
                     Summary
@@ -220,7 +236,7 @@ const BookSearchResult: React.FC<BookSearchResultProps> = ({
                   </Typography>
                 </Box>
               )}
-              {activeTab === 'copies' && (
+              {activeTab === ActiveTabEnum.copiesAvailable && (
                 <Box>
                   <Typography variant="body1" sx={{ mb: 2 }}>
                     Copies Available
@@ -229,7 +245,7 @@ const BookSearchResult: React.FC<BookSearchResultProps> = ({
                   <Typography variant="body2">East Branch — 1 available</Typography>
                 </Box>
               )}
-              {activeTab === 'reviews' && (
+              {activeTab === ActiveTabEnum.reviews && (
                 <Box>
                   <Typography variant="body1" sx={{ mb: 2 }}>
                     Reviews
@@ -242,6 +258,53 @@ const BookSearchResult: React.FC<BookSearchResultProps> = ({
                   </Typography>
                 </Box>
               )}
+              {activeTab === ActiveTabEnum.writeAReview && (
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                  <Typography variant="body1">
+                    Write a Review
+                  </Typography>
+                  <Box>
+                    <Rating defaultValue={0} precision={0.5} size='large'/>
+                  </Box>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                    <Typography variant="subtitle2">
+                      Name
+                    </Typography>
+                    <TextField
+                      variant="outlined"
+                      fullWidth
+                      value={reviewName}
+                      onChange={e => setReviewName(e.target.value)}
+                      placeholder="Enter your name"
+                      size="small"
+                      slotProps={{ input: { style: { fontSize: 16 } } }}
+                    />
+                  </Box>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                    <Typography variant="subtitle2">
+                      Review
+                    </Typography>
+                    <TextField
+                      variant="outlined"
+                      fullWidth
+                      multiline
+                      minRows={4}
+                      value={reviewText}
+                      onChange={e => setReviewText(e.target.value)}
+                      placeholder="Write your review here..."
+                      slotProps={{ input: { style: { fontSize: 16 } } }}
+                    />
+                  </Box>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    sx={{ alignSelf: 'flex-start' }}
+                    // onClick={handleSubmitReview} // Implement this to save review
+                  >
+                    Submit Review
+                  </Button>
+                </Box>
+              )}
             </Box>
           </>
         )}
@@ -250,4 +313,4 @@ const BookSearchResult: React.FC<BookSearchResultProps> = ({
   );
 };
 
-export default BookSearchResult;
+export default BookList;

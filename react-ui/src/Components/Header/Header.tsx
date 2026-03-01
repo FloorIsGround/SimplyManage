@@ -4,7 +4,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import BookSearchResult from "../BookSearchResult";
+import BookList from "../BookList";
 import CatalogSearchBar from "./CatalogSearchBar";
 import type { Book } from "../../Models/Book/Book";
 
@@ -127,7 +127,7 @@ function Header() {
           />
         </Toolbar>
       </AppBar>
-      <BookSearchResult loading={searchLoading} error={searchFailue} results={searchResults} open={drawerOpen} onClose={handleDrawerClose} />
+      <BookList loading={searchLoading} error={searchFailue} results={searchResults} open={drawerOpen} onClose={handleDrawerClose} />
     </>
   )
 }
