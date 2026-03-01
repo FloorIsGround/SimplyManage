@@ -1,18 +1,18 @@
 export interface Book {
-  id: string;               // Unique identifier for the book 
+  id: string;
   isbn: number;
-  title: string;            // Title of the book
-  author: string;         // ID of the author who wrote the book
-  genre: string;       // ID of the category/genre this book belongs to
+  title: string;
+  author: string;
+  genre: string;
   description: string;
-  publicationYear: number;  // Year the book was published
+  publicationYear: number;
   createdAt: Date;
   averageRating: number;
-  reviews: Review[];        // Array of review objects
+  reviews: Review[];
 }
 
 export interface Review {
-  id: number;             // Unique ID for this review
+  id: number;         // Unique ID for this review
   userId: number;     // ID of the user who wrote the review
   bookId: number;     // ID of the book being reviewed
   rating: number;     // Rating value (e.g., 1–5 stars)

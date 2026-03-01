@@ -80,7 +80,7 @@ const BookSearchResult: React.FC<BookSearchResultProps> = ({
 
   return (
     <>
-      {/* Drawer for search results */}
+      {/* Search Results */}
       <Drawer
         anchor="right"
         open={open}
@@ -95,7 +95,6 @@ const BookSearchResult: React.FC<BookSearchResultProps> = ({
           >
             <CloseIcon />
           </IconButton>
-
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', width: '100%' }}>
             <CatalogSearchBar
               onSearchFailure={() => {}}
@@ -103,7 +102,6 @@ const BookSearchResult: React.FC<BookSearchResultProps> = ({
               onSearchSucess={() => {}}
             />
           </Box>
-
           <Box
             sx={{
               width: '100%',
@@ -115,14 +113,12 @@ const BookSearchResult: React.FC<BookSearchResultProps> = ({
               Search Results
             </Typography>
           </Box>
-
           <Box sx={{ p: 2, overflowY: 'auto', maxHeight: 'calc(100vh - 180px)' }}>
             {renderResults()}
           </Box>
         </Box>
       </Drawer>
-
-      {/* Book Details Dialog */}
+      {/* Book Details */}
       <Dialog
         open={modalOpen}
         onClose={handleModalClose}
@@ -143,7 +139,6 @@ const BookSearchResult: React.FC<BookSearchResultProps> = ({
       >
         {selectedBook && (
           <>
-            {/* LEFT COLUMN */}
             <Box
               sx={{
                 width: 160,
@@ -154,8 +149,6 @@ const BookSearchResult: React.FC<BookSearchResultProps> = ({
                 gap: 2
               }}
             >
-
-
               {/* Book Cover */}
               <img
                 src={`https://covers.openlibrary.org/b/isbn/${selectedBook.isbn}-L.jpg`}
@@ -167,10 +160,8 @@ const BookSearchResult: React.FC<BookSearchResultProps> = ({
                   display: 'block'
                 }}
               />
-
               {/* Rating */}
               <BookRating averageRating={selectedBook.averageRating} />
-
               {/* Navigation */}
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, width: '100%', alignSelf: 'flex-start', mt: 3 }}>
                 <Button
@@ -196,8 +187,6 @@ const BookSearchResult: React.FC<BookSearchResultProps> = ({
                 </Button>
               </Box>
             </Box>
-
-            {/* RIGHT COLUMN */}
             <Box sx={{ flex: 1, p: 3, overflowY: 'auto', position: 'relative' }}>
               <IconButton
                 sx={{ position: 'absolute', top: 8, right: 8 }}
@@ -205,8 +194,7 @@ const BookSearchResult: React.FC<BookSearchResultProps> = ({
               >
                 <CloseIcon />
               </IconButton>
-
-              {/* Title + Author */}
+              {/* Title & Author */}
               <Box>
                 <Typography variant="h4">{selectedBook.title}</Typography>
                 <Typography variant="h6" color="text.secondary">
@@ -216,10 +204,8 @@ const BookSearchResult: React.FC<BookSearchResultProps> = ({
                   Place Hold
                 </Button>
               </Box>
-
               <Divider sx={{ my: 2 }} />
-
-              {/* TAB CONTENT */}
+              {/* Content */}
               {activeTab === 'details' && (
                 <Box>
                   <Typography variant="body1" sx={{ mb: 2 }}>
@@ -234,7 +220,6 @@ const BookSearchResult: React.FC<BookSearchResultProps> = ({
                   </Typography>
                 </Box>
               )}
-
               {activeTab === 'copies' && (
                 <Box>
                   <Typography variant="body1" sx={{ mb: 2 }}>
@@ -244,7 +229,6 @@ const BookSearchResult: React.FC<BookSearchResultProps> = ({
                   <Typography variant="body2">East Branch — 1 available</Typography>
                 </Box>
               )}
-
               {activeTab === 'reviews' && (
                 <Box>
                   <Typography variant="body1" sx={{ mb: 2 }}>

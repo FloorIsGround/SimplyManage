@@ -11,7 +11,7 @@ export interface CatalogSearchProps {
 }
 
 function CatalogSearchBar({ onSearchSucess, onSearchLoading, onSearchFailure }: CatalogSearchProps) {
-  const [searchQuery, setSearchQuery] = useState(""); // Stores the user's search input from the search bar
+  const [searchQuery, setSearchQuery] = useState("");
   const theme = useTheme();
 
   const handleSearch = () => {
@@ -95,7 +95,7 @@ function CatalogSearchBar({ onSearchSucess, onSearchLoading, onSearchFailure }: 
         ml: 1,
         transition: 'background-color 0.2s',
         '&:hover': {
-          backgroundColor: theme.palette.primary.dark // matches MUI button hover by default
+          backgroundColor: theme.palette.primary.dark
         }
       }}>
       <SearchIcon sx={{ fontSize: 20, color: 'white' }}/>
