@@ -7,6 +7,7 @@ export interface Book {
   description: string;
   publicationYear: number;  // Year the book was published
   createdAt: Date;
+  averageRating: number;
   reviews: Review[];        // Array of review objects
 }
 

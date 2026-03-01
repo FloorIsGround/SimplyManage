@@ -24,25 +24,27 @@ function CatalogSearchBar({ onSearchSucess, onSearchLoading, onSearchFailure }: 
         if (searchQuery === "book") {
           onSearchSucess([{
             id: "rgf45gf4w",
-            isbn: 5,
+            isbn: 9780590353427,
             title: "Harry Potter",
             author: "J.K Rowling",
             genre: "Fantasy",
             description: "A boy learns magic",
             publicationYear: 2001,
             createdAt: new Date(),
+            averageRating: 5,
             reviews: []
           }])
         } else {
           onSearchSucess([{
             id: "fvgsrg876",
-            isbn: 6,
-            title: "Curious Geroge",
-            author: "Jon Smith",
+            isbn: 	9780395150238,
+            title: "Curious George",
+            author: "H. A. Rey",
             genre: "Child",
             description: "A curious monkey named George",
             publicationYear: 2001,
             createdAt: new Date(),
+            averageRating: 3,
             reviews: []
           }])
         }
@@ -87,7 +89,15 @@ function CatalogSearchBar({ onSearchSucess, onSearchLoading, onSearchFailure }: 
         // when connected to backend will look like const result = await post('/searchBooks', searchQuery);
         handleSearch();
       }}
-      sx={{ backgroundColor: theme.palette.primary.main, borderRadius: 1, ml: 1 }}>
+      sx={{ 
+        backgroundColor: theme.palette.primary.main, 
+        borderRadius: 1, 
+        ml: 1,
+        transition: 'background-color 0.2s',
+        '&:hover': {
+          backgroundColor: theme.palette.primary.dark // matches MUI button hover by default
+        }
+      }}>
       <SearchIcon sx={{ fontSize: 20, color: 'white' }}/>
     </IconButton>
     </>
