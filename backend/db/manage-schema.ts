@@ -62,7 +62,7 @@ BEGIN
 END $$;
 `;
 
-async function resetDatabase(): Promise<void> {
+async function runSchema({ dropFirst }: { dropFirst: boolean }): Promise<void> {
   const dbHost = requireEnv("DB_HOST");
   const dbPort = parsePort(requireEnv("DB_PORT"));
   const dbUser = requireEnv("DB_USER");
@@ -85,18 +85,33 @@ async function resetDatabase(): Promise<void> {
 
   try {
     await client.connect();
-    await client.query(DROP_PUBLIC_TABLES_AND_SEQUENCES_SQL);
+    if (dropFirst) {
+      await client.query(DROP_PUBLIC_TABLES_AND_SEQUENCES_SQL);
+    }
     await client.query(cleanedSql);
-    console.log(
-      `DB reset complete (${dbName}): dropped public tables/sequences, then applied ${sqlPath}`
-    );
   } finally {
     await client.end().catch(() => undefined);
   }
 }
 
-resetDatabase().catch((err) => {
-  console.error("DB reset failed:");
+function printUsageAndExit() {
+  console.log("Usage: node manage-schema.js [--reset|--update]\n  --reset: Drop all tables and re-apply schema (DANGEROUS, destructive)\n  --update: Apply schema.sql without dropping tables (default)");
+  process.exit(1);
+}
+
+// Determine mode from command-line args
+const arg = process.argv[2]?.toLowerCase();
+let dropFirst: boolean = false;
+if (!arg || arg === "--update") {
+  dropFirst = false;
+} else if (arg === "--reset") {
+  dropFirst = true;
+} else {
+  printUsageAndExit();
+}
+
+runSchema({ dropFirst }).catch((err) => {
+  console.error("Error running manage-schema:");
   console.error(err);
   process.exit(1);
 });

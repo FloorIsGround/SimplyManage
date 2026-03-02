@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Drawer,
   Box,
@@ -49,6 +49,16 @@ const BookList: React.FC<BookListProps> = ({
   const [activeTab, setActiveTab] = useState<ActiveTabEnum>(ActiveTabEnum.details);
   const [reviewName, setReviewName] = useState('');
   const [reviewText, setReviewText] = useState('');
+  const [resultsLoading, setResultsLoading] = useState(loading);
+  const [resultsError, setResultsError] = useState(error);
+  const [searchResults, setSearchResults] = useState(results);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setResultsLoading(loading);
+    setSearchResults(results);
+    setResultsError(error);
+  }, [results, loading, error])
 
   const handleBookClick = (book: Book) => {
     setSelectedBook(book);
@@ -64,7 +74,7 @@ const BookList: React.FC<BookListProps> = ({
   }
 
   function renderResults() {
-    if (loading) {
+    if (resultsLoading) {
       return (
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '40vh' }}>
           <CircularProgress />
@@ -72,17 +82,25 @@ const BookList: React.FC<BookListProps> = ({
       );
     }
 
-    if (error) {
-      return <Typography color="error" sx={{ textAlign: 'center' }}>{error}</Typography>;
+    if (resultsError) {
+      return (
+        <Typography color="error" sx={{ textAlign: 'center' }}>
+          {typeof resultsError === 'string'
+            ? resultsError
+            : resultsError && typeof resultsError === 'object' && 'message' in resultsError
+              ? (resultsError as any).message
+              : String(resultsError)}
+        </Typography>
+      );
     }
 
-    if (results.length === 0) {
+    if (searchResults.length === 0) {
       return <Typography variant="body2" sx={{ textAlign: 'center' }}>No results found.</Typography>;
     }
 
     return (
       <List>
-        {results.map((book) => (
+        {searchResults.map((book) => (
           <ListItemButton key={book.id} onClick={() => handleBookClick(book)}>
             <ListItemText primary={book.title} secondary={book.author} />
           </ListItemButton>
@@ -110,9 +128,9 @@ const BookList: React.FC<BookListProps> = ({
           </IconButton>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', width: '100%' }}>
             <CatalogSearchBar
-              onSearchFailure={() => {}}
-              onSearchLoading={() => {}}
-              onSearchSucess={() => {}}
+              onSearchFailure={(err) => {setResultsError(err)}}
+              onSearchLoading={(isLoading) => {setResultsLoading(isLoading)}}
+              onSearchSucess={(results) => {setSearchResults(results)}}
             />
           </Box>
           <Box

@@ -17,38 +17,38 @@ function CatalogSearchBar({ onSearchSucess, onSearchLoading, onSearchFailure }: 
   const handleSearch = () => {
     onSearchLoading(true);
     axios
-      //.get(`/books/search/${searchQuery}`)
-      .get("/faqs")
+      .get(`/books/search/${searchQuery}`)
+      //.get("/faqs")
       .then((res) => {
         console.log("book search response:", res.data);
-        if (searchQuery === "book") {
-          onSearchSucess([{
-            id: "rgf45gf4w",
-            isbn: 9780590353427,
-            title: "Harry Potter",
-            author: "J.K Rowling",
-            genre: "Fantasy",
-            description: "A boy learns magic",
-            publicationYear: 2001,
-            createdAt: new Date(),
-            averageRating: 5,
-            reviews: []
-          }])
-        } else {
-          onSearchSucess([{
-            id: "fvgsrg876",
-            isbn: 	9780395150238,
-            title: "Curious George",
-            author: "H. A. Rey",
-            genre: "Child",
-            description: "A curious monkey named George",
-            publicationYear: 2001,
-            createdAt: new Date(),
-            averageRating: 3,
-            reviews: []
-          }])
-        }
-        // onSearchSucess(res.data);
+        // if (searchQuery === "book") {
+        //   onSearchSucess([{
+        //     id: "rgf45gf4w",
+        //     isbn: 9780590353427,
+        //     title: "Harry Potter",
+        //     author: "J.K Rowling",
+        //     genre: "Fantasy",
+        //     description: "A boy learns magic",
+        //     publicationYear: 2001,
+        //     createdAt: new Date(),
+        //     averageRating: 5,
+        //     reviews: []
+        //   }])
+        // } else {
+        //   onSearchSucess([{
+        //     id: "fvgsrg876",
+        //     isbn: 	9780395150238,
+        //     title: "Curious George",
+        //     author: "H. A. Rey",
+        //     genre: "Child",
+        //     description: "A curious monkey named George",
+        //     publicationYear: 2001,
+        //     createdAt: new Date(),
+        //     averageRating: 3,
+        //     reviews: []
+        //   }])
+        // }
+        onSearchSucess(res.data);
         onSearchLoading(false);
         setSearchQuery("");
       })
@@ -86,7 +86,6 @@ function CatalogSearchBar({ onSearchSucess, onSearchLoading, onSearchFailure }: 
     <IconButton 
       aria-label="search" 
       onClick={() => {
-        // when connected to backend will look like const result = await post('/searchBooks', searchQuery);
         handleSearch();
       }}
       sx={{ 

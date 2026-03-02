@@ -1,5 +1,43 @@
+// Search books by title, author, or genre
+export async function searchBooks(query: string): Promise<Book[]> {
+  const res = await pool.query(
+    `SELECT * FROM books WHERE 
+      LOWER(title) LIKE LOWER($1) OR 
+      LOWER(author) LIKE LOWER($1) OR 
+      LOWER(genre) LIKE LOWER($1)`,
+    [`%${query}%`]
+  );
+  return res.rows.map((row: any) => ({
+    id: row.book_id,
+    isbn: row.isbn ? Number(row.isbn) : 0,
+    title: row.title,
+    author: row.author,
+    genre: row.genre,
+    description: row.description,
+    publicationYear: row.publication_year,
+    createdAt: row.created_at,
+    averageRating: row.average_rating !== null && row.average_rating !== undefined ? Number(row.average_rating) : 0,
+    audience: row.audience ?? '',
+  }));
+}
 import { Pool, type QueryResult, type QueryResultRow } from "pg";
 import { Faq } from "../models/libraryInfo/faqs.js";
+import { Book } from "../models/libraryInfo/books.js";
+export async function getBooks(): Promise<Book[]> {
+  const res = await pool.query("SELECT * FROM books");
+  return res.rows.map((row: any) => ({
+    id: row.book_id,
+    isbn: row.isbn ? Number(row.isbn) : 0,
+    title: row.title,
+    author: row.author,
+    genre: row.genre,
+    description: row.description,
+    publicationYear: row.publication_year,
+    createdAt: row.created_at,
+    averageRating: row.average_rating !== null && row.average_rating !== undefined ? Number(row.average_rating) : 0,
+    audience: row.audience ?? '',
+  }));
+}
 
 // Use a global pool to prevent creating a new pool on every reload (dev).
 type GlobalWithPool = typeof globalThis & { pgPool?: Pool };

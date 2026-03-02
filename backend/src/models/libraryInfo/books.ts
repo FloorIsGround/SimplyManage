@@ -3,9 +3,9 @@ export interface Book {
   isbn: number;
   title: string;
   author: string;
-  genre: string | null;
-  description: string | null;
-  publicationYear: number | null;
+  genre: string;
+  description: string;
+  publicationYear: number;
   createdAt: string;
   averageRating: number;
   audience: string;
