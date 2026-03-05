@@ -3,12 +3,13 @@ export interface Book {
   isbn: number;
   title: string;
   author: string;
-  genre: string;
-  description: string;
-  publicationYear: number;
+  genre: string | null;
+  description: string | null;
+  publicationYear: number | null;
   createdAt: string;
   averageRating: number;
   audience: string;
+  reviews: Review[];
 }
 
 export interface Review {
