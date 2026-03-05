@@ -1,3 +1,5 @@
+-- Ensure average_rating column exists on books
+ALTER TABLE public.books ADD COLUMN IF NOT EXISTS average_rating numeric;
 --
 -- PostgreSQL database dump
 --
@@ -40,14 +42,27 @@ SET default_table_access_method = heap;
 -- Name: books; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.books (
+CREATE TABLE IF NOT EXISTS public.books (
     book_id uuid DEFAULT gen_random_uuid() NOT NULL,
     isbn text,
     title text NOT NULL,
     author text NOT NULL,
     genre text,
+    audience text,
     description text,
     publication_year integer,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    average_rating numeric
+);
+--
+-- Reviews table for book reviews
+--
+CREATE TABLE IF NOT EXISTS public.reviews (
+    id serial PRIMARY KEY,
+    user_id uuid NOT NULL,
+    book_id uuid NOT NULL REFERENCES public.books(book_id) ON DELETE CASCADE,
+    rating integer NOT NULL CHECK (rating >= 1 AND rating <= 5),
+    comment text,
     created_at timestamp with time zone DEFAULT now() NOT NULL
 );
 
@@ -56,7 +71,7 @@ CREATE TABLE public.books (
 -- Name: copies; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.copies (
+CREATE TABLE IF NOT EXISTS public.copies (
     copy_id uuid DEFAULT gen_random_uuid() NOT NULL,
     book_id uuid NOT NULL,
     barcode text,
@@ -71,7 +86,7 @@ CREATE TABLE public.copies (
 -- Name: fees; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.fees (
+CREATE TABLE IF NOT EXISTS public.fees (
     fee_id uuid DEFAULT gen_random_uuid() NOT NULL,
     user_id uuid NOT NULL,
     loan_id uuid,
@@ -89,7 +104,7 @@ CREATE TABLE public.fees (
 -- Name: holds; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.holds (
+CREATE TABLE IF NOT EXISTS public.holds (
     hold_id uuid DEFAULT gen_random_uuid() NOT NULL,
     user_id uuid NOT NULL,
     book_id uuid NOT NULL,
@@ -104,7 +119,7 @@ CREATE TABLE public.holds (
 -- Name: loans; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.loans (
+CREATE TABLE IF NOT EXISTS public.loans (
     loan_id uuid DEFAULT gen_random_uuid() NOT NULL,
     user_id uuid NOT NULL,
     copy_id uuid NOT NULL,
@@ -119,7 +134,7 @@ CREATE TABLE public.loans (
 -- Name: users; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.users (
+CREATE TABLE IF NOT EXISTS public.users (
     user_id uuid DEFAULT gen_random_uuid() NOT NULL,
     email text NOT NULL,
     password_hash text NOT NULL,
@@ -136,7 +151,7 @@ CREATE TABLE public.users (
 -- Name: faqs; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.faqs (
+CREATE TABLE IF NOT EXISTS public.faqs (
     faq_id uuid DEFAULT gen_random_uuid() NOT NULL,
     question text NOT NULL,
     answer text NOT NULL,
@@ -150,184 +165,213 @@ CREATE TABLE public.faqs (
 -- Name: books books_isbn_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.books
-    ADD CONSTRAINT books_isbn_key UNIQUE (isbn);
+-- ALTER TABLE ONLY public.books
+--     ADD CONSTRAINT books_isbn_key UNIQUE (isbn);
+
+
+
+-- ALTER TABLE ONLY public.books
+--     ADD CONSTRAINT books_pkey PRIMARY KEY (book_id);
 
 
 --
--- Name: books books_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Seed data for books
+-- Clear books and users tables before seeding to avoid unique constraint errors
+DELETE FROM public.reviews;
+DELETE FROM public.books;
+DELETE FROM public.users;
 --
+INSERT INTO public.books (isbn, title, author, genre, audience, description, publication_year)
+VALUES
+    ('9780143127741', 'The Martian', 'Andy Weir', 'Science Fiction', 'Adult', 'A stranded astronaut must survive on Mars.', 2014),
+    ('9780062316097', 'The Alchemist', 'Paulo Coelho', 'Adventure', 'Young Adult', 'A shepherd boy pursues his dreams across the desert.', 1988),
+    ('9780439139601', 'Harry Potter and the Goblet of Fire', 'J.K. Rowling', 'Fantasy', 'Juvenile', 'The fourth year at Hogwarts brings new challenges.', 2000),
+    ('9780553386790', 'A Game of Thrones', 'George R.R. Martin', 'Fantasy', 'Young Adult', 'Noble families vie for control of the Iron Throne.', 1996),
+    ('9780385472579', 'Zen and the Art of Motorcycle Maintenance', 'Robert M. Pirsig', 'Philosophy', 'Adult', 'A philosophical journey across America.', 1974);
 
-ALTER TABLE ONLY public.books
-    ADD CONSTRAINT books_pkey PRIMARY KEY (book_id);
+
+-- Seed data for users
+INSERT INTO public.users (user_id, email, password_hash, first_name, last_name, role, status)
+VALUES
+    ('11111111-1111-1111-1111-111111111111', 'admin@example.com', '$2b$10$adminhash', 'Alice', 'Admin', 'ADMIN', 'ACTIVE'),
+    ('22222222-2222-2222-2222-222222222222', 'librarian@example.com', '$2b$10$librarianhash', 'Bob', 'Librarian', 'LIBRARIAN', 'ACTIVE'),
+    ('33333333-3333-3333-3333-333333333333', 'patron@example.com', '$2b$10$patronhash', 'Carol', 'Patron', 'PATRON', 'ACTIVE');
+
+-- Seed data for reviews
+-- (Assumes book_ids exist from books table; replace with actual UUIDs if needed)
+INSERT INTO public.reviews (user_id, book_id, rating, comment)
+VALUES
+    ('33333333-3333-3333-3333-333333333333', (SELECT book_id FROM public.books WHERE title = 'The Martian' LIMIT 1), 5, 'Amazing and realistic science!'),
+    ('22222222-2222-2222-2222-222222222222', (SELECT book_id FROM public.books WHERE title = 'The Alchemist' LIMIT 1), 4, 'Inspirational journey.'),
+    ('11111111-1111-1111-1111-111111111111', (SELECT book_id FROM public.books WHERE title = 'A Game of Thrones' LIMIT 1), 5, 'Epic fantasy and intrigue.');
 
 
 --
 -- Name: copies copies_barcode_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.copies
-    ADD CONSTRAINT copies_barcode_key UNIQUE (barcode);
+-- ALTER TABLE ONLY public.copies
+--     ADD CONSTRAINT copies_barcode_key UNIQUE (barcode);
 
 
 --
 -- Name: copies copies_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.copies
-    ADD CONSTRAINT copies_pkey PRIMARY KEY (copy_id);
+-- ALTER TABLE ONLY public.copies
+--     ADD CONSTRAINT copies_pkey PRIMARY KEY (copy_id);
 
 
 --
 -- Name: fees fees_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.fees
-    ADD CONSTRAINT fees_pkey PRIMARY KEY (fee_id);
+-- ALTER TABLE ONLY public.fees
+--     ADD CONSTRAINT fees_pkey PRIMARY KEY (fee_id);
 
 
 --
 -- Name: holds holds_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.holds
-    ADD CONSTRAINT holds_pkey PRIMARY KEY (hold_id);
+-- ALTER TABLE ONLY public.holds
+--     ADD CONSTRAINT holds_pkey PRIMARY KEY (hold_id);
 
 
 --
 -- Name: loans loans_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.loans
-    ADD CONSTRAINT loans_pkey PRIMARY KEY (loan_id);
+-- ALTER TABLE ONLY public.loans
+--     ADD CONSTRAINT loans_pkey PRIMARY KEY (loan_id);
 
 
 --
 -- Name: users users_email_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.users
-    ADD CONSTRAINT users_email_key UNIQUE (email);
+-- ALTER TABLE ONLY public.users
+--     ADD CONSTRAINT users_email_key UNIQUE (email);
 
 
 --
 -- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.users
-    ADD CONSTRAINT users_pkey PRIMARY KEY (user_id);
+-- ALTER TABLE ONLY public.users
+--     ADD CONSTRAINT users_pkey PRIMARY KEY (user_id);
 
 
 --
 -- Name: copies_book_id_idx; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX copies_book_id_idx ON public.copies USING btree (book_id);
+-- CREATE INDEX copies_book_id_idx ON public.copies USING btree (book_id);
 
 
 --
 -- Name: fees_loan_id_idx; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX fees_loan_id_idx ON public.fees USING btree (loan_id);
+-- CREATE INDEX fees_loan_id_idx ON public.fees USING btree (loan_id);
 
 
 --
 -- Name: fees_user_id_idx; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX fees_user_id_idx ON public.fees USING btree (user_id);
+-- CREATE INDEX fees_user_id_idx ON public.fees USING btree (user_id);
 
 
 --
 -- Name: holds_book_id_idx; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX holds_book_id_idx ON public.holds USING btree (book_id);
+-- CREATE INDEX holds_book_id_idx ON public.holds USING btree (book_id);
 
 
 --
 -- Name: holds_user_id_idx; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX holds_user_id_idx ON public.holds USING btree (user_id);
+-- CREATE INDEX holds_user_id_idx ON public.holds USING btree (user_id);
 
 
 --
 -- Name: loans_copy_id_idx; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX loans_copy_id_idx ON public.loans USING btree (copy_id);
+-- CREATE INDEX loans_copy_id_idx ON public.loans USING btree (copy_id);
 
 
 --
 -- Name: loans_one_active_per_copy; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX loans_one_active_per_copy ON public.loans USING btree (copy_id) WHERE (returned_at IS NULL);
+-- CREATE UNIQUE INDEX loans_one_active_per_copy ON public.loans USING btree (copy_id) WHERE (returned_at IS NULL);
 
 
 --
 -- Name: loans_user_id_idx; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX loans_user_id_idx ON public.loans USING btree (user_id);
+-- CREATE INDEX loans_user_id_idx ON public.loans USING btree (user_id);
 
 
 --
 -- Name: copies copies_book_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.copies
-    ADD CONSTRAINT copies_book_id_fkey FOREIGN KEY (book_id) REFERENCES public.books(book_id) ON DELETE RESTRICT;
+-- ALTER TABLE ONLY public.copies
+--     ADD CONSTRAINT copies_book_id_fkey FOREIGN KEY (book_id) REFERENCES public.books(book_id) ON DELETE RESTRICT;
 
 
 --
 -- Name: fees fees_loan_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.fees
-    ADD CONSTRAINT fees_loan_id_fkey FOREIGN KEY (loan_id) REFERENCES public.loans(loan_id) ON DELETE SET NULL;
+-- ALTER TABLE ONLY public.fees
+--     ADD CONSTRAINT fees_loan_id_fkey FOREIGN KEY (loan_id) REFERENCES public.loans(loan_id) ON DELETE SET NULL;
 
 
 --
 -- Name: fees fees_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.fees
-    ADD CONSTRAINT fees_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(user_id) ON DELETE RESTRICT;
+-- ALTER TABLE ONLY public.fees
+--     ADD CONSTRAINT fees_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(user_id) ON DELETE RESTRICT;
 
 
 --
 -- Name: holds holds_book_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.holds
-    ADD CONSTRAINT holds_book_id_fkey FOREIGN KEY (book_id) REFERENCES public.books(book_id) ON DELETE RESTRICT;
+-- ALTER TABLE ONLY public.holds
+--     ADD CONSTRAINT holds_book_id_fkey FOREIGN KEY (book_id) REFERENCES public.books(book_id) ON DELETE RESTRICT;
 
 
 --
 -- Name: holds holds_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.holds
-    ADD CONSTRAINT holds_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(user_id) ON DELETE RESTRICT;
+-- ALTER TABLE ONLY public.holds
+--     ADD CONSTRAINT holds_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(user_id) ON DELETE RESTRICT;
 
 
 --
 -- Name: loans loans_copy_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.loans
-    ADD CONSTRAINT loans_copy_id_fkey FOREIGN KEY (copy_id) REFERENCES public.copies(copy_id) ON DELETE RESTRICT;
+-- ALTER TABLE ONLY public.loans
+--     ADD CONSTRAINT loans_copy_id_fkey FOREIGN KEY (copy_id) REFERENCES public.copies(copy_id) ON DELETE RESTRICT;
 
 
 --
 -- Name: loans loans_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.loans
-    ADD CONSTRAINT loans_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(user_id) ON DELETE RESTRICT;
+-- ALTER TABLE ONLY public.loans
+--     ADD CONSTRAINT loans_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(user_id) ON DELETE RESTRICT;
 
 
 --

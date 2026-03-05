@@ -1,7 +1,7 @@
 import type { Book } from "../Book/Book";
 
 export interface User {
-  id: number;                     // Unique identifier for the user
+  id: string;                     // Unique identifier for the user
   email: string;                  // User's email address
   firstName: string;
   lastName: string;

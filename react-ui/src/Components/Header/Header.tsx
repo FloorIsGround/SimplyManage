@@ -4,14 +4,13 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import BookSearchResult from "../BookSearchResult";
+import BookList from "../BookList";
 import CatalogSearchBar from "./CatalogSearchBar";
 import type { Book } from "../../Models/Book/Book";
 
 
 function Header() {
   const [drawerOpen, setDrawerOpen] = useState(false);
-    // Anchor elements determine where popovers attach on the screen
   const [loginAnchorEl, setLoginAnchorEl] = useState<null | HTMLElement>(null); 
   const [helpAnchorEl, setHelpAnchorEl] = useState<null | HTMLElement>(null);
   const [searchResults, setSearchResults] = useState<Book[]>([]);
@@ -21,17 +20,16 @@ function Header() {
   const handleDrawerClose = () => {
     setDrawerOpen(false);
   };
-  const theme = useTheme();
 
-  // Boolean flags for popover visibility
+  const theme = useTheme();
+  const navigate = useNavigate();
+
   const loginOpen = Boolean(loginAnchorEl);
   const helpOpen = Boolean(helpAnchorEl);
 
-  const navigate = useNavigate();
-
   return(
     <>
-      {/* Primary header bar: branding + navigation actions */}
+      {/* Primary Header Bar */}
       <AppBar position='static' elevation={0} sx={{ backgroundColor: 'white', borderBottom: `2px solid ${theme.palette.primary.main}`, height: 65 }}>
         <Toolbar>
           <LocalLibraryIcon sx={{ fontSize: 50, color: theme.palette.primary.main }}/>
@@ -67,7 +65,7 @@ function Header() {
                 </Typography>
               </CardContent>
               <CardActions>
-                <Button size="small" onClick={ () => { navigate("/faqs") }}> {/* Navigates to FAQ page */}
+                <Button size="small" onClick={ () => { navigate("/faqs") }}>
                   Learn More
                 </Button>
               </CardActions>
@@ -86,7 +84,7 @@ function Header() {
                 <Typography gutterBottom sx={{ color: 'text.secondary', fontSize: 14 }}>
                   Log In to Your Account
                 </Typography>
-                {/* Username input */}
+                {/* Username Input */}
                 <TextField 
                   id="username" 
                   label="Username" 
@@ -94,7 +92,7 @@ function Header() {
                   fullWidth size="small" 
                   sx={{ mt: 1, mb: 0.5 }} 
                   />
-                {/* Password input */}
+                {/* Password Input */}
                 <TextField 
                   id="password" 
                   label="Password" 
@@ -116,10 +114,9 @@ function Header() {
           </Popover>
         </Toolbar>
       </AppBar>
-      {/* Secondary header bar: search functionality */}
+      {/* Secondary Header Bar */}
       <AppBar position="static" elevation={ 0 } sx={{ backgroundColor: 'white', height: 35 }}>
         <Toolbar sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-          {/* Search input field */}
           <CatalogSearchBar 
             onSearchSucess={(results) => { setSearchResults(results)}}
             onSearchLoading={(loading) => {
@@ -130,7 +127,7 @@ function Header() {
           />
         </Toolbar>
       </AppBar>
-      <BookSearchResult loading={searchLoading} error={searchFailue} results={searchResults} open={drawerOpen} onClose={handleDrawerClose} />
+      <BookList loading={searchLoading} error={searchFailue} results={searchResults} open={drawerOpen} onClose={handleDrawerClose} />
     </>
   )
 }
