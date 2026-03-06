@@ -1,7 +1,7 @@
 import { Router, type Request, type Response } from "express";
 
 import { getFaqs, getBooks, searchBooks } from "../config/db.js";
-
+import { getHoursLocations } from "../config/db.js";
 
 const router = Router();
 
@@ -26,6 +26,9 @@ router.get("/faqs", async (_req: Request, res: Response) => {
   res.json(faqs);
 });
 
-// Routers placeholder
+router.get("/hourslocations", async (_req: Request, res: Response) => {
+  const libraries = await getHoursLocations();
+  res.json({ libraries });
+});
 
 export default router;

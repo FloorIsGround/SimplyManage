@@ -1,3 +1,62 @@
+-- Library table
+CREATE TABLE IF NOT EXISTS public.library (
+    id serial PRIMARY KEY,
+    name text NOT NULL,
+    address text NOT NULL,
+    phone_number text NOT NULL
+);
+
+-- Library hours table
+CREATE TABLE IF NOT EXISTS public.library_hours (
+    id serial PRIMARY KEY,
+    library_id integer NOT NULL REFERENCES public.library(id) ON DELETE CASCADE,
+    day text NOT NULL,
+    open text NOT NULL,
+    close text NOT NULL
+);
+
+-- Seed data for libraries
+INSERT INTO public.library (name, address, phone_number) VALUES
+    ('Central Library', '100 Main St', '555-1000'),
+    ('West Branch', '200 West St', '555-2000'),
+    ('East Branch', '300 East St', '555-3000'),
+    ('South Branch', '400 South St', '555-4000');
+
+-- Seed data for library_hours
+INSERT INTO public.library_hours (library_id, day, open, close) VALUES
+    -- Central Library
+    (1, 'Sunday', '08:00', '16:00'),
+    (1, 'Monday', '08:00', '18:00'),
+    (1, 'Tuesday', '08:00', '18:00'),
+    (1, 'Wednesday', '08:00', '18:00'),
+    (1, 'Thursday', '08:00', '18:00'),
+    (1, 'Friday', '08:00', '19:00'),
+    (1, 'Saturday', '08:00', '19:00'),
+    -- West Branch
+    (2, 'Sunday', '08:00', '16:00'),
+    (2, 'Monday', '08:00', '18:00'),
+    (2, 'Tuesday', '08:00', '18:00'),
+    (2, 'Wednesday', '08:00', '18:00'),
+    (2, 'Thursday', '08:00', '18:00'),
+    (2, 'Friday', '08:00', '19:00'),
+    (2, 'Saturday', '08:00', '19:00'),
+    -- East Branch
+    (3, 'Sunday', '08:00', '16:00'),
+    (3, 'Monday', '08:00', '18:00'),
+    (3, 'Tuesday', '08:00', '18:00'),
+    (3, 'Wednesday', '08:00', '18:00'),
+    (3, 'Thursday', '08:00', '18:00'),
+    (3, 'Friday', '08:00', '19:00'),
+    (3, 'Saturday', '08:00', '19:00'),
+    -- South Branch
+    (4, 'Sunday', '08:00', '16:00'),
+    (4, 'Monday', '08:00', '18:00'),
+    (4, 'Tuesday', '08:00', '18:00'),
+    (4, 'Wednesday', '08:00', '18:00'),
+    (4, 'Thursday', '08:00', '18:00'),
+    (4, 'Friday', '08:00', '19:00'),
+    (4, 'Saturday', '08:00', '19:00');
+
 -- Ensure average_rating column exists on books
 ALTER TABLE public.books ADD COLUMN IF NOT EXISTS average_rating numeric;
 --

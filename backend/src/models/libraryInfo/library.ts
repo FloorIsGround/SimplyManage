@@ -1,4 +1,5 @@
-import type { Book } from "../Book/Book";
+import type { Book } from "../book/book.js";
+
 
 export interface Library {
   id: number;          // Unique identifier for the library branch
@@ -9,8 +10,10 @@ export interface Library {
   hours: Hours[];      // Array of hours objects for each day
 }
 
+
 export interface Hours {
   day: string;
   open: string;
   close: string;
 }
+
