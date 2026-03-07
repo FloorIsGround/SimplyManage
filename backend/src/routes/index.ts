@@ -1,9 +1,24 @@
 import { Router, type Request, type Response } from "express";
-
-import { getFaqs, getBooks, searchBooks } from "../config/db.js";
-import { getHoursLocations } from "../config/db.js";
+import { createUser, getFaqs, getBooks, searchBooks, getHoursLocations } from "../config/db.js";
 
 const router = Router();
+
+router.post("/signup", async (req: Request, res: Response) => {
+  try {
+    const { email, password, firstName, lastName } = req.body;
+    if (!email || !password || !firstName || !lastName) {
+      return res.status(400).json({ error: "All fields are required." });
+    }
+    const user = await createUser({ email, password, firstName, lastName });
+    res.status(201).json({ user });
+  } catch (err: any) {
+    // Handle duplicate email error
+    if (err && typeof err === "object" && err.code === "23505") {
+      return res.status(409).json({ error: "Email already exists." });
+    }
+    res.status(500).json({ error: err.message || "Signup failed." });
+  }
+});
 
 router.get("/books/search/:searchQuery", async (req: Request, res: Response) => {
   let { searchQuery } = req.params;

@@ -86,8 +86,8 @@ function Header() {
                 </Typography>
                 {/* Username Input */}
                 <TextField 
-                  id="username" 
-                  label="Username" 
+                  id="email" 
+                  label="Email" 
                   variant="outlined" 
                   fullWidth size="small" 
                   sx={{ mt: 1, mb: 0.5 }} 
