@@ -1,3 +1,24 @@
+// Event interface for type safety
+export interface Event {
+  id: number;
+  title: string;
+  description: string;
+  date: string;
+  location: string;
+  startTime: string;
+  endTime: string;
+}
+
+// Get events for /events endpoint
+export async function getEvents(): Promise<Event[]> {
+  const res = await pool.query("SELECT id, title, description, date, location, start_time AS startTime, end_time AS endTime FROM events ORDER BY date, start_time");
+  return res.rows.map((event: any) => ({
+    ...event,
+    date: event.date instanceof Date ? event.date.toISOString().split("T")[0] : event.date,
+    startTime: event.startTime,
+    endTime: event.endTime
+  }));
+}
 import bcrypt from "bcryptjs";
 
 // Create user for signup
@@ -134,6 +155,7 @@ if (!g.pgPool) {
   });
 }
 
+//export const pool = g.pgPool!;
 const pool = g.pgPool!;
 
 export async function query<T extends QueryResultRow = any>(

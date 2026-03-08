@@ -1,7 +1,14 @@
+
+//import { pool } from "../config/db.js";
 import { Router, type Request, type Response } from "express";
-import { createUser, getFaqs, getBooks, searchBooks, getHoursLocations } from "../config/db.js";
+import { createUser, getFaqs, getBooks, searchBooks, getHoursLocations, getEvents } from "../config/db.js";
 
 const router = Router();
+
+router.get("/events", async (_req: Request, res: Response) => {
+  const events = await getEvents();
+  res.json(events);
+});
 
 router.post("/signup", async (req: Request, res: Response) => {
   try {

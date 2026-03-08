@@ -1,3 +1,21 @@
+-- Events table
+CREATE TABLE IF NOT EXISTS public.events (
+    id serial PRIMARY KEY,
+    title text NOT NULL,
+    description text NOT NULL,
+    date date NOT NULL,
+    location text NOT NULL,
+    start_time text NOT NULL,
+    end_time text NOT NULL
+);
+
+-- Seed data for events
+INSERT INTO public.events (title, description, date, location, start_time, end_time) VALUES
+    ('Book Club: Mystery Night', 'Join us for a discussion of classic mystery novels.', '2026-03-15', 'Central Library', '18:00', '20:00'),
+    ('Children''s Story Hour', 'Stories and crafts for ages 3-7.', '2026-03-10', 'West Branch', '10:00', '11:00'),
+    ('Tech Workshop: Intro to Python', 'Beginner-friendly coding workshop.', '2026-03-20', 'East Branch', '14:00', '16:00'),
+    ('Local Author Reading', 'Meet local authors and hear their latest works.', '2026-03-25', 'South Branch', '17:00', '19:00'),
+    ('Spring Gardening Seminar', 'Tips and tricks for your spring garden.', '2026-03-12', 'Central Library', '15:00', '17:00');
 -- Library table
 CREATE TABLE IF NOT EXISTS public.library (
     id serial PRIMARY KEY,

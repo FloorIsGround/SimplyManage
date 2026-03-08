@@ -4,6 +4,6 @@ export interface Event {
   description: string;
   date: string; // ISO date string
   location: string;
-  startTime: string; // e.g. "14:00"
-  endTime: string; // e.g. "16:00"
+  starttime: string; // e.g. "14:00"
+  endtime: string; // e.g. "16:00"
 }
