@@ -1,9 +1,9 @@
 import { createBrowserRouter } from "react-router";
 import App from "../App";
-import HoursLocations from "../Components/HoursLocations";
-import SignUp from "../Components/SignUp";
+import HoursLocations from "../Components/Header/HoursLocations";
+import SignUp from "../Components/SignUp/SignUp";
 import Faqs from "../Components/Faqs";
-import Homepage from "../Components/Homepage";
+import Homepage from "../Components/Homepage/Homepage";
 
 // Main application router configuration.
 //  This defines all navigable paths in the app and which component should render for each. 
