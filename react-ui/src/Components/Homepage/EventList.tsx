@@ -2,13 +2,7 @@ import { Box, Typography, Button, useTheme, CircularProgress } from "@mui/materi
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import axiosServices from "../../utils/axios-api";
 import { useEffect, useState } from "react";
-
-export interface Event {
-  title: string;
-  date: string;
-  time: string;
-  description: string;
-}
+import type { Event } from "../../Models/LibraryInfo/Event";
 
 const EventList: React.FC = () => {
   const theme = useTheme();
@@ -41,7 +35,7 @@ const EventList: React.FC = () => {
 
   return (
     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3, justifyContent: 'center' }}>
-      {events.map((event, idx) => (
+      {events.map((event: Event, idx: number) => (
         <Box
           key={idx}
           sx={{
@@ -72,7 +66,7 @@ const EventList: React.FC = () => {
             </Typography>
           </Box>
           <Typography sx={{ fontSize: 15, fontFamily: 'inherit', mb: 1 }}>
-            {event.date} &bull; {event.time}
+            {event.date} &bull; {event.startTime} - {event.endTime}
           </Typography>
           <Typography sx={{ fontSize: 15, fontFamily: 'inherit', mb: 2 }}>{event.description}</Typography>
           <Button variant="outlined" color="primary" size="small" sx={{ alignSelf: 'flex-end', mt: 'auto' }}>
