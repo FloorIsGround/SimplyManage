@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import { Role, UserStatus } from "../Models/User/User";
-import type { User } from "../Models/User/User";
-import axios from "../utils/axios-api";
-import { validateFields, signUpValidationRules } from "../utils/validation";
+import { Role, UserStatus } from "../../Models/User/User";
+import type { User } from "../../Models/User/User";
+import axios from "../../utils/axios-api";
+import { validateFields, signUpValidationRules } from "../../utils/validation";
 
 const initialForm: User = {
   id: "",
