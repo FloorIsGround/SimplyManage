@@ -2,6 +2,7 @@ import { createTheme, ThemeProvider } from '@mui/material';
 import './App.css'
 import Header from './Components/Header/Header'
 import { Outlet } from 'react-router-dom';
+import Footer from './Components/Footer';
 
 // Global MUI theme configuration for the entire application.
 // This centralizes color palette, typography, and component overrides
@@ -47,6 +48,7 @@ function App() {
       <Header/>
       {/* Outlet renders the active child route inside App */}
       <Outlet />
+      <Footer />
     </ThemeProvider>
   )
 }
