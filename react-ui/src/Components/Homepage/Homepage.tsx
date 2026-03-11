@@ -170,7 +170,47 @@ function Homepage() {
             <Typography variant="h4" sx={{ color: 'white', fontWeight: 400, fontFamily: 'inherit', mb: 0 }}>{"Upcoming Events"}</Typography>
           </Box>
           <Box sx={{ minHeight: 120, borderRadius: 3, p: 0 }}>
-            <EventList />
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3, justifyContent: 'center' }}>
+              {events.map((event, idx) => (
+                <Box
+                  key={idx}
+                  sx={{
+                    minWidth: 260,
+                    maxWidth: 320,
+                    flex: '1 1 260px',
+                    bgcolor: 'background.paper',
+                    borderRadius: 3,
+                    boxShadow: 2,
+                    p: 2,
+                    borderLeft: '6px solid',
+                    borderColor: 'primary.main',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    mb: 1,
+                    minHeight: 180,
+                    justifyContent: 'space-between',
+                    '&:hover': {
+                      boxShadow: 5,
+                      transform: 'translateY(-2px) scale(1.02)',
+                    },
+                  }}
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                    <CalendarTodayIcon sx={{ fontSize: 18, color: 'primary.main', mr: 1 }} />
+                    <Typography variant="h6" sx={{ color: 'primary.main', fontWeight: 700, fontFamily: 'inherit' }}>
+                      {event.title}
+                    </Typography>
+                  </Box>
+                  <Typography sx={{ fontSize: 15, fontFamily: 'inherit', mb: 1 }}>
+                    {event.date} &bull; {event.time}
+                  </Typography>
+                  <Typography sx={{ fontSize: 15, fontFamily: 'inherit', mb: 2 }}>{event.description}</Typography>
+                  <Button variant="outlined" color="primary" size="small" sx={{ alignSelf: 'flex-end', mt: 'auto' }}>
+                    Learn More
+                  </Button>
+                </Box>
+              ))}
+            </Box>
           </Box>
         </Box>
       </Box>
