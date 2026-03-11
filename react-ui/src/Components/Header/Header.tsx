@@ -4,28 +4,26 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import BookList from "../BookList";
+import BookList from "../Book/BookList";
 import CatalogSearchBar from "./CatalogSearchBar";
 import type { Book } from "../../Models/Book/Book";
 
-
 function Header() {
+  const theme = useTheme();
+  const navigate = useNavigate();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [loginAnchorEl, setLoginAnchorEl] = useState<null | HTMLElement>(null); 
   const [helpAnchorEl, setHelpAnchorEl] = useState<null | HTMLElement>(null);
   const [searchResults, setSearchResults] = useState<Book[]>([]);
   const [searchLoading, setSearchLoading] = useState(false);
-  const [searchFailue, setSearchFailure] = useState<string | undefined>(undefined);
+  const [searchFailure, setSearchFailure] = useState<string | undefined>(undefined);
+
+  const loginOpen = Boolean(loginAnchorEl);
+  const helpOpen = Boolean(helpAnchorEl);
 
   const handleDrawerClose = () => {
     setDrawerOpen(false);
   };
-
-  const theme = useTheme();
-  const navigate = useNavigate();
-
-  const loginOpen = Boolean(loginAnchorEl);
-  const helpOpen = Boolean(helpAnchorEl);
 
   return(
     <>
@@ -86,8 +84,8 @@ function Header() {
                 </Typography>
                 {/* Username Input */}
                 <TextField 
-                  id="username" 
-                  label="Username" 
+                  id="email" 
+                  label="Email" 
                   variant="outlined" 
                   fullWidth size="small" 
                   sx={{ mt: 1, mb: 0.5 }} 
@@ -118,16 +116,16 @@ function Header() {
       <AppBar position="static" elevation={ 0 } sx={{ backgroundColor: 'white', height: 35 }}>
         <Toolbar sx={{ display: 'flex', justifyContent: 'flex-end' }}>
           <CatalogSearchBar 
-            onSearchSucess={(results) => { setSearchResults(results)}}
-            onSearchLoading={(loading) => {
+            onSearchSuccess={(results: Book[]) => { setSearchResults(results)}}
+            onSearchLoading={(loading: boolean) => {
               setSearchLoading(loading);
               setDrawerOpen(true);
             }}
-            onSearchFailure={(error) => {setSearchFailure(error)}}
+            onSearchFailure={(error: string) => {setSearchFailure(error)}}
           />
         </Toolbar>
       </AppBar>
-      <BookList loading={searchLoading} error={searchFailue} results={searchResults} open={drawerOpen} onClose={handleDrawerClose} />
+      <BookList loading={searchLoading} error={searchFailure} results={searchResults} open={drawerOpen} onClose={handleDrawerClose} />
     </>
   )
 }

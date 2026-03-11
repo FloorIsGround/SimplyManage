@@ -1,3 +1,80 @@
+-- Events table
+CREATE TABLE IF NOT EXISTS public.events (
+    id serial PRIMARY KEY,
+    title text NOT NULL,
+    description text NOT NULL,
+    date date NOT NULL,
+    location text NOT NULL,
+    start_time text NOT NULL,
+    end_time text NOT NULL
+);
+
+-- Seed data for events
+INSERT INTO public.events (title, description, date, location, start_time, end_time) VALUES
+    ('Book Club: Mystery Night', 'Join us for a discussion of classic mystery novels.', '2026-03-15', 'Central Library', '18:00', '20:00'),
+    ('Children''s Story Hour', 'Stories and crafts for ages 3-7.', '2026-03-10', 'West Branch', '10:00', '11:00'),
+    ('Tech Workshop: Intro to Python', 'Beginner-friendly coding workshop.', '2026-03-20', 'East Branch', '14:00', '16:00'),
+    ('Local Author Reading', 'Meet local authors and hear their latest works.', '2026-03-25', 'South Branch', '17:00', '19:00'),
+    ('Spring Gardening Seminar', 'Tips and tricks for your spring garden.', '2026-03-12', 'Central Library', '15:00', '17:00');
+-- Library table
+CREATE TABLE IF NOT EXISTS public.library (
+    id serial PRIMARY KEY,
+    name text NOT NULL,
+    address text NOT NULL,
+    phone_number text NOT NULL
+);
+
+-- Library hours table
+CREATE TABLE IF NOT EXISTS public.library_hours (
+    id serial PRIMARY KEY,
+    library_id integer NOT NULL REFERENCES public.library(id) ON DELETE CASCADE,
+    day text NOT NULL,
+    open text NOT NULL,
+    close text NOT NULL
+);
+
+-- Seed data for libraries
+INSERT INTO public.library (name, address, phone_number) VALUES
+    ('Central Library', '100 Main St', '555-1000'),
+    ('West Branch', '200 West St', '555-2000'),
+    ('East Branch', '300 East St', '555-3000'),
+    ('South Branch', '400 South St', '555-4000');
+
+-- Seed data for library_hours
+INSERT INTO public.library_hours (library_id, day, open, close) VALUES
+    -- Central Library
+    (1, 'Sunday', '08:00', '16:00'),
+    (1, 'Monday', '08:00', '18:00'),
+    (1, 'Tuesday', '08:00', '18:00'),
+    (1, 'Wednesday', '08:00', '18:00'),
+    (1, 'Thursday', '08:00', '18:00'),
+    (1, 'Friday', '08:00', '19:00'),
+    (1, 'Saturday', '08:00', '19:00'),
+    -- West Branch
+    (2, 'Sunday', '08:00', '16:00'),
+    (2, 'Monday', '08:00', '18:00'),
+    (2, 'Tuesday', '08:00', '18:00'),
+    (2, 'Wednesday', '08:00', '18:00'),
+    (2, 'Thursday', '08:00', '18:00'),
+    (2, 'Friday', '08:00', '19:00'),
+    (2, 'Saturday', '08:00', '19:00'),
+    -- East Branch
+    (3, 'Sunday', '08:00', '16:00'),
+    (3, 'Monday', '08:00', '18:00'),
+    (3, 'Tuesday', '08:00', '18:00'),
+    (3, 'Wednesday', '08:00', '18:00'),
+    (3, 'Thursday', '08:00', '18:00'),
+    (3, 'Friday', '08:00', '19:00'),
+    (3, 'Saturday', '08:00', '19:00'),
+    -- South Branch
+    (4, 'Sunday', '08:00', '16:00'),
+    (4, 'Monday', '08:00', '18:00'),
+    (4, 'Tuesday', '08:00', '18:00'),
+    (4, 'Wednesday', '08:00', '18:00'),
+    (4, 'Thursday', '08:00', '18:00'),
+    (4, 'Friday', '08:00', '19:00'),
+    (4, 'Saturday', '08:00', '19:00');
+
 -- Ensure average_rating column exists on books
 ALTER TABLE public.books ADD COLUMN IF NOT EXISTS average_rating numeric;
 --

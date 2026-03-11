@@ -5,6 +5,7 @@ export interface User {
   email: string;                  // User's email address
   firstName: string;
   lastName: string;
+  dateOfBirth?: string;          // User's date of birth
   password: string;               // Hashed password 
   role: Role;                     // User's system role
   status: UserStatus;

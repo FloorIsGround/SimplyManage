@@ -1,3 +1,70 @@
+// Event interface for type safety
+export interface Event {
+  id: number;
+  title: string;
+  description: string;
+  date: string;
+  location: string;
+  startTime: string;
+  endTime: string;
+}
+
+// Get events for /events endpoint
+export async function getEvents(): Promise<Event[]> {
+  const res = await pool.query("SELECT id, title, description, date, location, start_time AS startTime, end_time AS endTime FROM events ORDER BY date, start_time");
+  return res.rows.map((event: any) => ({
+    ...event,
+    date: event.date instanceof Date ? event.date.toISOString().split("T")[0] : event.date,
+    startTime: event.startTime,
+    endTime: event.endTime
+  }));
+}
+import bcrypt from "bcryptjs";
+
+// Create user for signup
+export async function createUser({ email, password, firstName, lastName }: { email: string; password: string; firstName: string; lastName: string }): Promise<any> {
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const res = await pool.query(
+    `INSERT INTO users (email, password_hash, first_name, last_name, role, status, created_at)
+     VALUES ($1, $2, $3, $4, 'PATRON', 'ACTIVE', NOW()) RETURNING user_id, email, first_name, last_name, role, status`,
+    [email, hashedPassword, firstName, lastName]
+  );
+  return res.rows[0];
+}
+// Get libraries with hours for /hourslocations endpoint
+export async function getHoursLocations(): Promise<any[]> {
+  // Join libraries and hours in one query
+  const res = await pool.query(`
+    SELECT l.id, l.name, l.address, l.phone_number,
+           h.day, h.open, h.close
+    FROM library l
+    LEFT JOIN library_hours h ON l.id = h.library_id
+    ORDER BY l.id, h.id
+  `);
+
+  // Group results by library
+  const librariesMap: { [key: number]: any } = {};
+  for (const row of res.rows) {
+    if (!librariesMap[row.id]) {
+      librariesMap[row.id] = {
+        id: row.id,
+        name: row.name,
+        address: row.address,
+        phoneNumber: row.phone_number,
+        hours: []
+      };
+    }
+    if (row.day) {
+      librariesMap[row.id].hours.push({
+        day: row.day,
+        open: row.open,
+        close: row.close
+      });
+    }
+  }
+  return Object.values(librariesMap);
+}
+
 // Search books by title, author, or genre
 export async function searchBooks(query: string): Promise<Book[]> {
   const res = await pool.query(
@@ -7,7 +74,7 @@ export async function searchBooks(query: string): Promise<Book[]> {
       LOWER(genre) LIKE LOWER($1)`,
     [`%${query}%`]
   );
-  const books = await Promise.all(res.rows.map(async (row: any) => {
+  return await Promise.all(res.rows.map(async (row: any) => {
     const reviewsRes = await pool.query(
       'SELECT * FROM reviews WHERE book_id = $1',
       [row.book_id]
@@ -33,14 +100,14 @@ export async function searchBooks(query: string): Promise<Book[]> {
       })),
     };
   }));
-  return books;
 }
 import { Pool, type QueryResult, type QueryResultRow } from "pg";
+import { Book } from "../models/book/book.js";
 import { Faq } from "../models/libraryInfo/faqs.js";
-import { Book } from "../models/libraryInfo/book.js";
+
 export async function getBooks(): Promise<Book[]> {
   const res = await pool.query("SELECT * FROM books");
-  const books = await Promise.all(res.rows.map(async (row: any) => {
+  return await Promise.all(res.rows.map(async (row: any) => {
     const reviewsRes = await pool.query(
       'SELECT * FROM reviews WHERE book_id = $1',
       [row.book_id]
@@ -66,7 +133,6 @@ export async function getBooks(): Promise<Book[]> {
       })),
     };
   }));
-  return books;
 }
 
 // Use a global pool to prevent creating a new pool on every reload (dev).
@@ -89,6 +155,7 @@ if (!g.pgPool) {
   });
 }
 
+//export const pool = g.pgPool!;
 const pool = g.pgPool!;
 
 export async function query<T extends QueryResultRow = any>(

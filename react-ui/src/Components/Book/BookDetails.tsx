@@ -1,7 +1,7 @@
 import { TextField, IconButton, useTheme, Box, Button, Dialog, Divider, Rating, Typography } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
 import BookCover from "./BookCover";
-import type { Book } from "../Models/Book/Book";
+import type { Book } from "../../Models/Book/Book";
 import { useState } from "react";
 
 export interface BookDetailsProps {
@@ -22,7 +22,6 @@ function BookDetails({modalOpen, onModalClose, selectedBook}: BookDetailsProps) 
   const [activeTab, setActiveTab] = useState<ActiveTabEnum>(ActiveTabEnum.details);
   const [reviewName, setReviewName] = useState('');
   const [reviewText, setReviewText] = useState('');
-
 
   const handleModalClose = () => {
     setActiveTab(ActiveTabEnum.details);
