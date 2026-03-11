@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Box, Typography, Paper, useTheme } from "@mui/material";
-import axios from "../utils/axios-api";
-import type { Library } from "../Models/LibraryInfo/Library";
+import axios from "../../utils/axios-api";
+import type { Library } from "../../Models/LibraryInfo/Library";
 
 function HoursLocations() {
   const theme = useTheme();

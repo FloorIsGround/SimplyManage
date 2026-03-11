@@ -1,94 +1,12 @@
 import { useEffect, useState } from "react";
-import { Box, Typography, CircularProgress, Button, IconButton, useTheme } from "@mui/material";
-import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+import { Box, Typography, CircularProgress, Button, IconButton } from "@mui/material";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import BookCover from "./BookCover";
-import axiosServices from "../utils/axios-api";
-import type { Book } from "../Models/Book/Book";
-import BookDetails from "./BookDetails";
-
-const events = [
-  {
-    title: "Storytime for Toddlers",
-    date: "March 5, 2026",
-    time: "10:00 AM",
-    description: "Join us for stories, songs, and fun for ages 1-3!"
-  },
-  {
-    title: "Storytime for School Age",
-    date: "March 6, 2026",
-    time: "4:00 PM",
-    description: "Stories and crafts for ages 6-10."
-  },
-  {
-    title: "Book Club: Mystery Lovers",
-    date: "March 10, 2026",
-    time: "6:30 PM",
-    description: "Discuss this month's mystery pick with fellow fans."
-  },
-  {
-    title: "Resume Workshop",
-    date: "March 12, 2026",
-    time: "2:00 PM",
-    description: "Get tips and feedback on your resume from local experts."
-  },
-  {
-    title: "Community Game Night",
-    date: "March 15, 2026",
-    time: "5:00 PM",
-    description: "Board games and snacks for all ages!"
-  }
-];
-
-
-function EventList() {
-  const theme = useTheme();
-  return (
-    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3, justifyContent: 'center' }}>
-      {events.map((event, idx) => (
-        <Box
-          key={idx}
-          sx={{
-            minWidth: 260,
-            maxWidth: 320,
-            flex: '1 1 260px',
-            bgcolor: 'background.paper',
-            borderRadius: 3,
-            boxShadow: 2,
-            p: 2,
-            borderLeft: '6px solid',
-            borderColor: theme.palette.primary.main,
-            display: 'flex',
-            flexDirection: 'column',
-            mb: 1,
-            minHeight: 180,
-            justifyContent: 'space-between',
-            '&:hover': {
-              boxShadow: 5,
-              transform: 'translateY(-2px) scale(1.02)',
-            },
-          }}
-        >
-          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-            <CalendarTodayIcon sx={{ fontSize: 18, color: theme.palette.primary.main, mr: 1 }} />
-            <Typography variant="h6" sx={{ color: theme.palette.primary.main, fontWeight: 700, fontFamily: 'inherit' }}>
-              {event.title}
-            </Typography>
-          </Box>
-          <Typography sx={{ fontSize: 15, fontFamily: 'inherit', mb: 1 }}>
-            {event.date} &bull; {event.time}
-          </Typography>
-          <Typography sx={{ fontSize: 15, fontFamily: 'inherit', mb: 2 }}>{event.description}</Typography>
-          <Button variant="outlined" color="primary" size="small" sx={{ alignSelf: 'flex-end', mt: 'auto' }}>
-            Learn More
-          </Button>
-        </Box>
-      ))}
-    </Box>
-  );
-}
-
+import BookCover from "../Book/BookCover";
+import BookDetails from "../Book/BookDetails";
+import axiosServices from "../../utils/axios-api";
+import type { Book } from "../../Models/Book/Book";
+import EventList from "./EventList";
 
 function Homepage() {
   const [books, setBooks] = useState<Book[]>([]);
@@ -234,7 +152,7 @@ function Homepage() {
         </Box>
       </Box>
         <BookDetails 
-        modalOpen={openBookDetails}
+          modalOpen={openBookDetails}
         selectedBook={selectedBook}
         onModalClose={() => {
           setOpenBookDetails(false);

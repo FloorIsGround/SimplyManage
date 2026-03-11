@@ -1,3 +1,36 @@
+// Event interface for type safety
+export interface Event {
+  id: number;
+  title: string;
+  description: string;
+  date: string;
+  location: string;
+  startTime: string;
+  endTime: string;
+}
+
+// Get events for /events endpoint
+export async function getEvents(): Promise<Event[]> {
+  const res = await pool.query("SELECT id, title, description, date, location, start_time AS startTime, end_time AS endTime FROM events ORDER BY date, start_time");
+  return res.rows.map((event: any) => ({
+    ...event,
+    date: event.date instanceof Date ? event.date.toISOString().split("T")[0] : event.date,
+    startTime: event.startTime,
+    endTime: event.endTime
+  }));
+}
+import bcrypt from "bcryptjs";
+
+// Create user for signup
+export async function createUser({ email, password, firstName, lastName }: { email: string; password: string; firstName: string; lastName: string }): Promise<any> {
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const res = await pool.query(
+    `INSERT INTO users (email, password_hash, first_name, last_name, role, status, created_at)
+     VALUES ($1, $2, $3, $4, 'PATRON', 'ACTIVE', NOW()) RETURNING user_id, email, first_name, last_name, role, status`,
+    [email, hashedPassword, firstName, lastName]
+  );
+  return res.rows[0];
+}
 // Get libraries with hours for /hourslocations endpoint
 export async function getHoursLocations(): Promise<any[]> {
   // Join libraries and hours in one query
@@ -70,7 +103,7 @@ export async function searchBooks(query: string): Promise<Book[]> {
 }
 import { Pool, type QueryResult, type QueryResultRow } from "pg";
 import { Book } from "../models/book/book.js";
-import { Faq } from "../models/libraryInfo/Faqs.js";
+import { Faq } from "../models/libraryInfo/faqs.js";
 
 export async function getBooks(): Promise<Book[]> {
   const res = await pool.query("SELECT * FROM books");
@@ -122,6 +155,7 @@ if (!g.pgPool) {
   });
 }
 
+//export const pool = g.pgPool!;
 const pool = g.pgPool!;
 
 export async function query<T extends QueryResultRow = any>(

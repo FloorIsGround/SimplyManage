@@ -11,8 +11,8 @@ import {
   useTheme
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import CatalogSearchBar from './Header/CatalogSearchBar';
-import type { Book } from '../Models/Book/Book';
+import CatalogSearchBar from '../Header/CatalogSearchBar';
+import type { Book } from '../../Models/Book/Book';
 import BookDetails from './BookDetails';
 
 export interface BookListProps {
@@ -31,11 +31,8 @@ const BookList: React.FC<BookListProps> = ({
   onClose
 }) => {
   const theme = useTheme();
-
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
-  
-  
   const [resultsLoading, setResultsLoading] = useState(loading);
   const [resultsError, setResultsError] = useState(error);
   const [searchResults, setSearchResults] = useState(results);
@@ -114,7 +111,7 @@ const BookList: React.FC<BookListProps> = ({
             <CatalogSearchBar
               onSearchFailure={(err) => {setResultsError(err)}}
               onSearchLoading={(isLoading) => {setResultsLoading(isLoading)}}
-              onSearchSucess={(results) => {setSearchResults(results)}}
+              onSearchSuccess={(results: Book[]) => {setSearchResults(results)}}
             />
           </Box>
           <Box
