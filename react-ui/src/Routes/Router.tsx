@@ -4,6 +4,7 @@ import HoursLocations from "../Components/Header/HoursLocations";
 import SignUp from "../Components/SignUp/SignUp";
 import Faqs from "../Components/Faqs";
 import Homepage from "../Components/Homepage/Homepage";
+import PatronDashboard from "../Components/Dashboard/PatronDashboard";
 
 // Main application router configuration.
 //  This defines all navigable paths in the app and which component should render for each. 
@@ -30,6 +31,10 @@ export const Router = createBrowserRouter([
             {
                 path: "/faqs",
                 element: <Faqs />
+            },
+            {
+                path: "/patron-dashboard",
+                element: <PatronDashboard />
             }
         ]
     }
