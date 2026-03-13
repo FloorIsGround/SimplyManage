@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Box, Typography, Paper, useTheme } from "@mui/material";
+import { Box, Typography, Paper, useTheme, CircularProgress } from "@mui/material";
 import axios from "../../utils/axios-api";
 import type { Library } from "../../Models/LibraryInfo/Library";
 
@@ -23,7 +23,11 @@ function HoursLocations() {
   }, []);
 
   if (loading) {
-    return <Typography>Loading...</Typography>;
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 180 }}>
+        <CircularProgress size={40} />
+      </Box>
+    );
   }
   if (error) {
     return <Typography color="error">{error}</Typography>;
