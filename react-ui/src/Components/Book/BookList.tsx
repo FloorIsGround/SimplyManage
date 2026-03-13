@@ -14,6 +14,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import CatalogSearchBar from '../Header/CatalogSearchBar';
 import type { Book } from '../../Models/Book/Book';
 import BookDetails from './BookDetails';
+import BookCover from './BookCover';
 
 export interface BookListProps {
   results: Book[];
@@ -54,7 +55,7 @@ const BookList: React.FC<BookListProps> = ({
     setSelectedBook(null);
   }
 
-  function renderResults() {
+  function BookList() {
     if (resultsLoading) {
       return (
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '40vh' }}>
@@ -82,7 +83,10 @@ const BookList: React.FC<BookListProps> = ({
     return (
       <List>
         {searchResults.map((book) => (
-          <ListItemButton key={book.id} onClick={() => handleBookClick(book)}>
+          <ListItemButton key={book.id} onClick={() => handleBookClick(book)} sx={{ display: 'flex', alignItems: 'center' }}>
+            <Box sx={{ width: 48, height: 72, mr: 2, flexShrink: 0 }}>
+              <BookCover isbn={book.isbn} alt={book.title} />
+            </Box>
             <ListItemText primary={book.title} secondary={book.author} />
           </ListItemButton>
         ))}
@@ -126,7 +130,7 @@ const BookList: React.FC<BookListProps> = ({
             </Typography>
           </Box>
           <Box sx={{ p: 2, overflowY: 'auto', maxHeight: 'calc(100vh - 180px)' }}>
-            {renderResults()}
+            {BookList()}
           </Box>
         </Box>
       </Drawer>
