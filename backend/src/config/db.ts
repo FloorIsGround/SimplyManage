@@ -26,17 +26,27 @@ export async function createUser({ email, password, firstName, lastName }: { ema
   const hashedPassword = await bcrypt.hash(password, 10);
   const res = await pool.query(
     `INSERT INTO users (email, password_hash, first_name, last_name, role, status, created_at)
-     VALUES ($1, $2, $3, $4, 'PATRON', 'ACTIVE', NOW()) RETURNING user_id, email, first_name, last_name, role, status`,
+    VALUES ($1, $2, $3, $4, 'PATRON', 'ACTIVE', NOW()) RETURNING user_id, email, first_name, last_name, role, status`,
     [email, hashedPassword, firstName, lastName]
   );
   return res.rows[0];
 }
+
+// Get user by email for login
+export async function getUserByEmail(email: string): Promise<any | null> {
+  const res = await pool.query(
+    `SELECT user_id, email, password_hash, role, status FROM users WHERE email = $1`,
+    [email]
+  );
+  return res.rows[0] || null;
+}
+
 // Get libraries with hours for /hourslocations endpoint
 export async function getHoursLocations(): Promise<any[]> {
   // Join libraries and hours in one query
   const res = await pool.query(`
     SELECT l.id, l.name, l.address, l.phone_number,
-           h.day, h.open, h.close
+    h.day, h.open, h.close
     FROM library l
     LEFT JOIN library_hours h ON l.id = h.library_id
     ORDER BY l.id, h.id

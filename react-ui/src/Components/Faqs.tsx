@@ -7,6 +7,7 @@ import {
   Typography,
   TextField,
   Box,
+  CircularProgress
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import type { FAQ } from "../Models/LibraryInfo/Faq";
@@ -14,17 +15,20 @@ import type { FAQ } from "../Models/LibraryInfo/Faq";
 function Faqs() {
   const [faqs, setFaqs] = useState<FAQ[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(true);
 
   // Fetch FAQs from backend
   useEffect(() => {
     axios
       .get("/faqs")
       .then((res) => {
-        console.log("FAQ response:", res.data);
         setFaqs(res.data);
       })
       .catch((err) => {
         console.error("Error fetching FAQs:", err);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   }, []);
 
@@ -34,6 +38,14 @@ function Faqs() {
       faq.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
       faq.answer.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 180 }}>
+        <CircularProgress size={40} />
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ maxWidth: 800, mx: "auto", my: 6, px: 2 }}>

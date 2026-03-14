@@ -1,8 +1,9 @@
-import { AppBar, Box, Button, Card, CardActions, CardContent, Popover, TextField, Toolbar, Typography, useTheme } from "@mui/material";
+import { AppBar, Box, Button, Card, CardActions, CardContent, Popover, Toolbar, Typography, useTheme } from "@mui/material";
 import LocalLibraryIcon from "@mui/icons-material/LocalLibrary";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import { useState } from "react";
+import Login from "./Login";
 import { useNavigate } from "react-router-dom";
 import BookList from "../Book/BookList";
 import CatalogSearchBar from "./CatalogSearchBar";
@@ -63,53 +64,14 @@ function Header() {
                 </Typography>
               </CardContent>
               <CardActions>
-                <Button size="small" onClick={ () => { navigate("/faqs") }}>
+                <Button size="small" onClick={ () => { setHelpAnchorEl(null); navigate("/faqs") }}>
                   Learn More
                 </Button>
               </CardActions>
             </Card>
           </Popover>
-          {/* Login Popover */}
-          <Popover
-            open={ loginOpen }
-            anchorEl={ loginAnchorEl }
-            onClose={() => { setLoginAnchorEl(null)} } 
-            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-            transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-          >
-            <Card sx={{ minWidth: 275 }}>
-              <CardContent>
-                <Typography gutterBottom sx={{ color: 'text.secondary', fontSize: 14 }}>
-                  Log In to Your Account
-                </Typography>
-                {/* Username Input */}
-                <TextField 
-                  id="email" 
-                  label="Email" 
-                  variant="outlined" 
-                  fullWidth size="small" 
-                  sx={{ mt: 1, mb: 0.5 }} 
-                  />
-                {/* Password Input */}
-                <TextField 
-                  id="password" 
-                  label="Password" 
-                  type="password" 
-                  variant="outlined" 
-                  fullWidth size="small" 
-                  sx={{ mb: 0 }} 
-                  />
-              </CardContent>
-              <CardActions sx={{ flexDirection: 'column', gap: 0.5, pt: 0 }}>
-                <Button size="medium" variant="contained" fullWidth>
-                  Log In
-                </Button>
-                <Button size="medium" variant="text" fullWidth onClick={ () => { navigate("/sign-up") }}>
-                  Sign Up
-                </Button>
-              </CardActions>
-            </Card>
-          </Popover>
+          {/* Login component */}
+          <Login open={loginOpen} anchorEl={loginAnchorEl} onClose={() => setLoginAnchorEl(null)} redirectPath="/patron-dashboard" />
         </Toolbar>
       </AppBar>
       {/* Secondary Header Bar */}
