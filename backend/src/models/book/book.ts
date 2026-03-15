@@ -19,4 +19,6 @@ export interface Review {
   rating: number;
   comment: string;
   createdAt: string;
+  firstName?: string;  // <-- add this
+  lastName?: string;   // <-- add this
 }
