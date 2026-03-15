@@ -14,7 +14,39 @@ export interface Event {
   endTime: string;
 }
 
-// Get events for /events endpoint
+// Use a global pool to prevent creating a new pool on every reload (dev)
+type GlobalWithPool = typeof globalThis & { pgPool?: Pool };
+const sslEnabled = String(process.env.DB_SSL || "").toLowerCase() === "true";
+const g = globalThis as GlobalWithPool;
+
+if (!g.pgPool) {
+  g.pgPool = new Pool({
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT ? Number(process.env.DB_PORT) : undefined,
+    user: process.env.DB_USER,
+    password: String(process.env.DB_PASSWORD ?? ""),
+    database: process.env.DB_NAME,
+    ssl: sslEnabled ? { rejectUnauthorized: false } : false,
+  });
+}
+
+const pool = g.pgPool!;
+
+// Query helper
+export async function query<T extends QueryResultRow = any>(
+  text: string,
+  params?: unknown[]
+): Promise<QueryResult<T>> {
+  return pool.query<T>(text, params);
+}
+
+// Test DB connection
+export async function testConnection(): Promise<{ now: string }> {
+  const res = await pool.query<{ now: string }>("SELECT now() AS now");
+  return res.rows[0];
+}
+
+// Get events
 export async function getEvents(): Promise<Event[]> {
   const res = await pool.query(
     "SELECT id, title, description, date, location, start_time AS startTime, end_time AS endTime FROM events ORDER BY date, start_time"
@@ -31,7 +63,7 @@ export async function getEvents(): Promise<Event[]> {
   }));
 }
 
-// Create user for signup
+// Create user
 export async function createUser({
   email,
   password,
@@ -55,17 +87,16 @@ export async function createUser({
   return res.rows[0];
 }
 
-// Get user by email for login
+// Get user by email
 export async function getUserByEmail(email: string): Promise<any | null> {
   const res = await pool.query(
     `SELECT user_id, email, password_hash, role, status FROM users WHERE email = $1`,
     [email]
   );
-
   return res.rows[0] || null;
 }
 
-// Get libraries with hours for /hourslocations endpoint
+// Get libraries with hours
 export async function getHoursLocations(): Promise<any[]> {
   const res = await pool.query(`
     SELECT l.id, l.name, l.address, l.phone_number,
@@ -100,7 +131,7 @@ export async function getHoursLocations(): Promise<any[]> {
   return Object.values(librariesMap);
 }
 
-// Search books by title, author, or genre
+// Search books
 export async function searchBooks(query: string): Promise<Book[]> {
   const res = await pool.query(
     `SELECT * FROM books WHERE 
@@ -114,9 +145,9 @@ export async function searchBooks(query: string): Promise<Book[]> {
     res.rows.map(async (row: any) => {
       const reviewsRes = await pool.query(
         `SELECT r.*, u.first_name, u.last_name
-        FROM reviews r
-        LEFT JOIN users u ON r.user_id = u.user_id
-        WHERE r.book_id = $1`,
+         FROM reviews r
+         LEFT JOIN users u ON r.user_id = u.user_id
+         WHERE r.book_id = $1`,
         [row.book_id]
       );
 
@@ -129,15 +160,18 @@ export async function searchBooks(query: string): Promise<Book[]> {
         description: row.description,
         publicationYear: row.publication_year,
         createdAt: row.created_at,
-        averageRating: row.average_rating !== null && row.average_rating !== undefined ? Number(row.average_rating) : 0,
+        averageRating:
+          row.average_rating !== null && row.average_rating !== undefined
+            ? Number(row.average_rating)
+            : 0,
         audience: row.audience ?? "",
-        reviews: reviewsRes.rows.map(mapReviewRow)
+        reviews: reviewsRes.rows.map(mapReviewRow),
       };
     })
   );
 }
 
-// Map a row to a Review including the user's first and last name
+// Map Review row
 function mapReviewRow(row: any): Review {
   return {
     id: row.id,
@@ -147,7 +181,7 @@ function mapReviewRow(row: any): Review {
     comment: row.comment,
     createdAt: row.created_at,
     firstName: row.first_name ?? undefined,
-    lastName: row.last_name ?? undefined,  // <-- add last name here
+    lastName: row.last_name ?? undefined,
   };
 }
 
@@ -159,12 +193,12 @@ export async function getBooks(): Promise<Book[]> {
     res.rows.map(async (row: any) => {
       const reviewsRes = await pool.query(
         `SELECT r.*, u.first_name, u.last_name
-        FROM reviews r
-        LEFT JOIN users u ON r.user_id = u.user_id
-        WHERE r.book_id = $1`,
+         FROM reviews r
+         LEFT JOIN users u ON r.user_id = u.user_id
+         WHERE r.book_id = $1`,
         [row.book_id]
       );
-      
+
       return {
         id: row.book_id,
         isbn: row.isbn ? Number(row.isbn) : 0,
@@ -174,16 +208,18 @@ export async function getBooks(): Promise<Book[]> {
         description: row.description,
         publicationYear: row.publication_year,
         createdAt: row.created_at,
-        averageRating: row.average_rating !== null && row.average_rating !== undefined ? Number(row.average_rating) : 0,
+        averageRating:
+          row.average_rating !== null && row.average_rating !== undefined
+            ? Number(row.average_rating)
+            : 0,
         audience: row.audience ?? "",
-        reviews: reviewsRes.rows.map(mapReviewRow)
+        reviews: reviewsRes.rows.map(mapReviewRow),
       };
     })
   );
 }
 
-
-// Create a new review
+// Create a review
 export async function createReview({
   bookId,
   userId,
@@ -205,38 +241,7 @@ export async function createReview({
   return res.rows[0];
 }
 
-// Use a global pool to prevent creating a new pool on every reload (dev)
-type GlobalWithPool = typeof globalThis & { pgPool?: Pool };
-
-const sslEnabled = String(process.env.DB_SSL || "").toLowerCase() === "true";
-
-const g = globalThis as GlobalWithPool;
-
-if (!g.pgPool) {
-  g.pgPool = new Pool({
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT ? Number(process.env.DB_PORT) : undefined,
-    user: process.env.DB_USER,
-    password: String(process.env.DB_PASSWORD ?? ""),
-    database: process.env.DB_NAME,
-    ssl: sslEnabled ? { rejectUnauthorized: false } : false,
-  });
-}
-
-const pool = g.pgPool!;
-
-export async function query<T extends QueryResultRow = any>(
-  text: string,
-  params?: unknown[]
-): Promise<QueryResult<T>> {
-  return pool.query<T>(text, params);
-}
-
-export async function testConnection(): Promise<{ now: string }> {
-  const res = await pool.query<{ now: string }>("SELECT now() AS now");
-  return res.rows[0];
-}
-
+// Get FAQs
 export async function getFaqs(): Promise<Faq[]> {
   const res = await pool.query<Faq>("SELECT * FROM faqs");
   return res.rows;
