@@ -1,3 +1,5 @@
+import type { Review } from "../review/review.js";
+
 export interface Book {
   id: string;
   isbn: number;
@@ -10,13 +12,4 @@ export interface Book {
   averageRating: number;
   audience: string;
   reviews: Review[];
-}
-
-export interface Review {
-  id: number;
-  userId: string;
-  bookId: string;
-  rating: number;
-  comment: string;
-  createdAt: string;
 }
