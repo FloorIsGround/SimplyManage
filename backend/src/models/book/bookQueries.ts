@@ -125,3 +125,13 @@ export async function updateBook(bookId: string, input: UpdateBookInput): Promis
   if (res.rows.length === 0) return null;
   return mapBookRow(res.rows[0]);
 }
+
+// Deletes a book by UUID and returns true if a row was removed.
+export async function deleteBook(bookId: string): Promise<boolean> {
+  const res = await query<{ book_id: string }>(
+    `DELETE FROM books WHERE book_id = $1 RETURNING book_id`,
+    [bookId]
+  );
+
+  return res.rows.length > 0;
+}

@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
-import { getBookById, getBookByIsbn, createBook, updateBook } from "../models/book/bookQueries.js";
+import { getBookById, getBookByIsbn, createBook, updateBook, deleteBook } from "../models/book/bookQueries.js";
 import { createHttpError, requireUuid, requirePositiveInt } from "./controllerHelpers.js";
 import type { CreateBookInput, UpdateBookInput } from "../models/book/bookQueries.js";
 
@@ -78,6 +78,25 @@ export async function patchBook(req: Request, res: Response, next: NextFunction)
   } catch (err: any) {
     if (err?.code === "23505") {
       return next(createHttpError(409, "A book with that ISBN already exists."));
+    }
+    next(err);
+  }
+}
+
+// Deletes a book by its UUID.
+export async function removeBook(req: Request, res: Response, next: NextFunction) {
+  try {
+    const bookId = requireUuid(req.params.bookId, "bookId");
+    const deleted = await deleteBook(bookId);
+
+    if (!deleted) {
+      throw createHttpError(404, "Book not found.");
+    }
+
+    return res.json({ message: "Book deleted successfully." });
+  } catch (err: any) {
+    if (err?.code === "23503") {
+      return next(createHttpError(409, "Cannot delete book with existing copies."));
     }
     next(err);
   }
