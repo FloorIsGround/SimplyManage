@@ -9,6 +9,7 @@ import {
 } from "../config/db.js";
 import reviewsRouter from "./reviews.js";
 import booksRouter from "./books.js";
+import copiesRouter from "./copies.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
@@ -54,6 +55,9 @@ router.get("/hourslocations", async (_req: Request, res: Response) => {
 
 // Reviews routes
 router.use("/reviews", reviewsRouter);
+
+// Copies routes
+router.use("/copies", copiesRouter);
 
 // Login route
 router.post("/users/login", async (req: Request, res: Response) => {
