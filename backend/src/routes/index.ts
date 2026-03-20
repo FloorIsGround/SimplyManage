@@ -10,6 +10,7 @@ import {
   getUserByEmail,
 } from "../config/db.js";
 import reviewsRouter from "./reviews.js";
+import booksRouter from "./books.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
@@ -48,6 +49,8 @@ router.get("/books", async (_req: Request, res: Response) => {
   const books = await getBooks();
   res.json(books);
 });
+
+router.use("/books", booksRouter);
 
 router.get("/", (_req: Request, res: Response) => {
   res.json({ ok: true, message: "SimplyManage API" });
