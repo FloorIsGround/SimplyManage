@@ -19,14 +19,6 @@ export async function getEvents(): Promise<Event[]> {
     endTime: event.endTime
   }));
 }
-// Get user by email for login
-export async function getUserByEmail(email: string): Promise<any | null> {
-  const res = await pool.query(
-    `SELECT user_id, email, password_hash, role, status FROM users WHERE email = $1`,
-    [email]
-  );
-  return res.rows[0] || null;
-}
 
 // Get libraries with hours for /hourslocations endpoint
 export async function getHoursLocations(): Promise<any[]> {

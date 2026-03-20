@@ -4,15 +4,12 @@ import {
   getFaqs,
   getHoursLocations,
   getEvents,
-  getUserByEmail,
 } from "../config/db.js";
 import { createStaffUser } from "../models/user/userQueries.js";
 import reviewsRouter from "./reviews.js";
 import booksRouter from "./books.js";
 import copiesRouter from "./copies.js";
 import usersRouter from "./users.js";
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
 
 const router = Router();
 
@@ -63,55 +60,5 @@ router.use("/copies", copiesRouter);
 // Users routes
 router.use("/users", usersRouter);
 
-// Login route
-router.post("/users/login", async (req: Request, res: Response) => {
-  try {
-    const { email, password } = req.body;
-    if (!email || !password) {
-      return res.status(400).json({
-        error: {
-          code: "MISSING_FIELDS",
-          message: "Email and password are required.",
-        },
-      });
-    }
-
-    const user = await getUserByEmail(email);
-    if (!user) {
-      return res.status(401).json({
-        error: {
-          code: "INVALID_CREDENTIALS",
-          message: "Email or password is incorrect.",
-        },
-      });
-    }
-
-    const passwordMatch = await bcrypt.compare(password, user.password_hash);
-    if (!passwordMatch) {
-      return res.status(401).json({
-        error: {
-          code: "INVALID_CREDENTIALS",
-          message: "Email or password is incorrect.",
-        },
-      });
-    }
-
-    // Generate JWT token
-    const token = jwt.sign(
-      { userId: user.user_id, email: user.email, role: user.role },
-      process.env.JWT_SECRET || "changeme",
-      { expiresIn: "1d" }
-    );
-
-    return res.json({ token });
-  } catch (err: any) {
-    res.status(500).json({
-      error: {
-        code: "LOGIN_ERROR",
-        message: err.message || "Login failed.",
-      },
-    });
-  }
-});
 
 export default router;

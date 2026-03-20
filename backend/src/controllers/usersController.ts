@@ -1,8 +1,41 @@
 import type { NextFunction, Request, Response } from "express";
-import { createStaffUser, updateUser, updateUserStatus, updateUserPassword, verifyUserPassword, deleteUser } from "../models/user/userQueries.js";
+import { getUserByEmail, createStaffUser, updateUser, updateUserStatus, updateUserPassword, verifyUserPassword, deleteUser } from "../models/user/userQueries.js";
 import { createHttpError, requireUuid } from "./controllerHelpers.js";
 import { USER_ROLES, USER_STATUSES } from "../models/user/user.js";
 import type { CreateUserInput, UpdateUserInput } from "../models/user/userQueries.js";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+
+// Logs in a user by email and password, returning a signed JWT.
+export async function postLogin(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      throw createHttpError(400, "Email and password are required.");
+    }
+
+    const user = await getUserByEmail(email);
+    if (!user) {
+      throw createHttpError(401, "Email or password is incorrect.");
+    }
+
+    const passwordMatch = await bcrypt.compare(password, user.password_hash);
+    if (!passwordMatch) {
+      throw createHttpError(401, "Email or password is incorrect.");
+    }
+
+    const token = jwt.sign(
+      { userId: user.user_id, email: user.email, role: user.role },
+      process.env.JWT_SECRET || "changeme",
+      { expiresIn: "1d" }
+    );
+
+    return res.json({ token });
+  } catch (err) {
+    next(err);
+  }
+}
 
 // Creates a new user (staff-initiated).
 export async function postUser(req: Request, res: Response, next: NextFunction) {

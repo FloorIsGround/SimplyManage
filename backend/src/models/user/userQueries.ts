@@ -53,6 +53,15 @@ export async function getUserById(userId: string): Promise<User | null> {
   return mapUserRow(res.rows[0]);
 }
 
+// Get user by email for login
+export async function getUserByEmail(email: string): Promise<any | null> {
+  const res = await query(
+    `SELECT user_id, email, password_hash, role, status FROM users WHERE email = $1`,
+    [email]
+  );
+  return res.rows[0] || null;
+}
+
 // Creates a new user (staff-initiated). Defaults role to PATRON if not provided.
 export async function createStaffUser(input: CreateUserInput): Promise<User> {
   const passwordHash = await bcrypt.hash(input.password, 10);

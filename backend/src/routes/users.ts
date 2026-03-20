@@ -1,8 +1,9 @@
 import { Router } from "express";
-import { postUser, patchUser, patchUserStatus, patchUserPassword, postVerifyPassword, removeUser } from "../controllers/usersController.js";
+import { postLogin, postUser, patchUser, patchUserStatus, patchUserPassword, postVerifyPassword, removeUser } from "../controllers/usersController.js";
 
 const router = Router();
 
+router.post("/login", postLogin);
 router.post("/", postUser);
 router.patch("/:userId", patchUser);
 router.patch("/:userId/status", patchUserStatus);
