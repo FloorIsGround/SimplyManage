@@ -75,75 +75,8 @@ export async function getHoursLocations(): Promise<any[]> {
   return Object.values(librariesMap);
 }
 
-// Search books by title, author, or genre
-export async function searchBooks(query: string): Promise<Book[]> {
-  const res = await pool.query(
-    `SELECT * FROM books WHERE 
-      LOWER(title) LIKE LOWER($1) OR 
-      LOWER(author) LIKE LOWER($1) OR 
-      LOWER(genre) LIKE LOWER($1)`,
-    [`%${query}%`]
-  );
-  return await Promise.all(res.rows.map(async (row: any) => {
-    const reviewsRes = await pool.query(
-      'SELECT * FROM reviews WHERE book_id = $1',
-      [row.book_id]
-    );
-    return {
-      id: row.book_id,
-      isbn: row.isbn ? Number(row.isbn) : 0,
-      title: row.title,
-      author: row.author,
-      genre: row.genre,
-      description: row.description,
-      publicationYear: row.publication_year,
-      createdAt: row.created_at,
-      averageRating: row.average_rating !== null && row.average_rating !== undefined ? Number(row.average_rating) : 0,
-      audience: row.audience ?? '',
-      reviews: reviewsRes.rows.map((review: any) => ({
-        id: review.id,
-        userId: review.user_id,
-        bookId: review.book_id,
-        rating: review.rating,
-        comment: review.comment,
-        createdAt: review.created_at,
-      })),
-    };
-  }));
-}
 import { Pool, type QueryResult, type QueryResultRow } from "pg";
-import { Book } from "../models/book/book.js";
 import { Faq } from "../models/libraryInfo/faqs.js";
-
-export async function getBooks(): Promise<Book[]> {
-  const res = await pool.query("SELECT * FROM books");
-  return await Promise.all(res.rows.map(async (row: any) => {
-    const reviewsRes = await pool.query(
-      'SELECT * FROM reviews WHERE book_id = $1',
-      [row.book_id]
-    );
-    return {
-      id: row.book_id,
-      isbn: row.isbn ? Number(row.isbn) : 0,
-      title: row.title,
-      author: row.author,
-      genre: row.genre,
-      description: row.description,
-      publicationYear: row.publication_year,
-      createdAt: row.created_at,
-      averageRating: row.average_rating !== null && row.average_rating !== undefined ? Number(row.average_rating) : 0,
-      audience: row.audience ?? '',
-      reviews: reviewsRes.rows.map((review: any) => ({
-        id: review.id,
-        userId: review.user_id,
-        bookId: review.book_id,
-        rating: review.rating,
-        comment: review.comment,
-        createdAt: review.created_at,
-      })),
-    };
-  }));
-}
 
 // Use a global pool to prevent creating a new pool on every reload (dev).
 type GlobalWithPool = typeof globalThis & { pgPool?: Pool };

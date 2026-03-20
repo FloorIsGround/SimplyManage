@@ -55,6 +55,28 @@ function mapBookRow(row: BookRow): Book {
 
 const BOOK_COLUMNS = `book_id, isbn, title, author, genre, description, publication_year, created_at, average_rating, audience`;
 
+// Gets all books.
+export async function getAllBooks(): Promise<Book[]> {
+  const res = await query<BookRow>(
+    `SELECT ${BOOK_COLUMNS} FROM books ORDER BY title`
+  );
+
+  return res.rows.map(mapBookRow);
+}
+
+// Searches books by title, author, or genre.
+export async function searchBooksByQuery(searchQuery: string): Promise<Book[]> {
+  const res = await query<BookRow>(
+    `SELECT ${BOOK_COLUMNS} FROM books
+     WHERE LOWER(title) LIKE LOWER($1)
+        OR LOWER(author) LIKE LOWER($1)
+        OR LOWER(genre) LIKE LOWER($1)`,
+    [`%${searchQuery}%`]
+  );
+
+  return res.rows.map(mapBookRow);
+}
+
 // Gets a single book by its UUID.
 export async function getBookById(bookId: string): Promise<Book | null> {
   const res = await query<BookRow>(

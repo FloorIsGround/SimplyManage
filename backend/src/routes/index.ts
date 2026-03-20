@@ -3,8 +3,6 @@ import { Router, type Request, type Response } from "express";
 import {
   createUser,
   getFaqs,
-  getBooks,
-  searchBooks,
   getHoursLocations,
   getEvents,
   getUserByEmail,
@@ -36,18 +34,6 @@ router.post("/signup", async (req: Request, res: Response) => {
     }
     res.status(500).json({ error: err.message || "Signup failed." });
   }
-});
-
-router.get("/books/search/:searchQuery", async (req: Request, res: Response) => {
-  let { searchQuery } = req.params;
-  if (Array.isArray(searchQuery)) searchQuery = searchQuery[0];
-  const books = await searchBooks(searchQuery);
-  res.json(books);
-});
-
-router.get("/books", async (_req: Request, res: Response) => {
-  const books = await getBooks();
-  res.json(books);
 });
 
 router.use("/books", booksRouter);

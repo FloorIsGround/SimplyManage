@@ -1,7 +1,29 @@
 import type { NextFunction, Request, Response } from "express";
-import { getBookById, getBookByIsbn, createBook, updateBook, deleteBook } from "../models/book/bookQueries.js";
+import { getAllBooks, searchBooksByQuery, getBookById, getBookByIsbn, createBook, updateBook, deleteBook } from "../models/book/bookQueries.js";
 import { createHttpError, requireUuid, requirePositiveInt } from "./controllerHelpers.js";
 import type { CreateBookInput, UpdateBookInput } from "../models/book/bookQueries.js";
+
+// Gets all books.
+export async function getBooks(_req: Request, res: Response, next: NextFunction) {
+  try {
+    const books = await getAllBooks();
+    return res.json(books);
+  } catch (err) {
+    next(err);
+  }
+}
+
+// Searches books by title, author, or genre.
+export async function searchBooks(req: Request, res: Response, next: NextFunction) {
+  try {
+    let { searchQuery } = req.params;
+    if (Array.isArray(searchQuery)) searchQuery = searchQuery[0];
+    const books = await searchBooksByQuery(searchQuery);
+    return res.json(books);
+  } catch (err) {
+    next(err);
+  }
+}
 
 // Gets a single book by its UUID.
 export async function getBookId(req: Request, res: Response, next: NextFunction) {
