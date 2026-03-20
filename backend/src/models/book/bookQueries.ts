@@ -1,6 +1,16 @@
 import { query } from "../../config/db.js";
 import type { Book } from "./book.js";
 
+export type CreateBookInput = {
+  isbn: string;
+  title: string;
+  author: string;
+  audience: string;
+  genre?: string | null;
+  description?: string | null;
+  publicationYear?: number | null;
+};
+
 // Matches the raw book row shape coming back from PostgreSQL.
 type BookRow = {
   book_id: string;
@@ -56,5 +66,25 @@ export async function getBookByIsbn(isbn: number): Promise<Book | null> {
   );
 
   if (res.rows.length === 0) return null;
+  return mapBookRow(res.rows[0]);
+}
+
+// Creates a new book and returns the inserted row.
+export async function createBook(input: CreateBookInput): Promise<Book> {
+  const res = await query<BookRow>(
+    `INSERT INTO books (isbn, title, author, audience, genre, description, publication_year)
+     VALUES ($1, $2, $3, $4, $5, $6, $7)
+     RETURNING ${BOOK_COLUMNS}`,
+    [
+      input.isbn,
+      input.title,
+      input.author,
+      input.audience,
+      input.genre ?? null,
+      input.description ?? null,
+      input.publicationYear ?? null,
+    ]
+  );
+
   return mapBookRow(res.rows[0]);
 }

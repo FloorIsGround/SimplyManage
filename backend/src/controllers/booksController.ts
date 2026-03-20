@@ -1,6 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
-import { getBookById, getBookByIsbn } from "../models/book/bookQueries.js";
+import { getBookById, getBookByIsbn, createBook } from "../models/book/bookQueries.js";
 import { createHttpError, requireUuid, requirePositiveInt } from "./controllerHelpers.js";
+import type { CreateBookInput } from "../models/book/bookQueries.js";
 
 // Gets a single book by its UUID.
 export async function getBookId(req: Request, res: Response, next: NextFunction) {
@@ -14,6 +15,36 @@ export async function getBookId(req: Request, res: Response, next: NextFunction)
 
     return res.json(book);
   } catch (err) {
+    next(err);
+  }
+}
+
+// Creates a new book.
+export async function postBook(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { title, author, isbn, audience, genre, description, publicationYear } = req.body;
+
+    if (!title || typeof title !== "string") throw createHttpError(400, "title is required.");
+    if (!author || typeof author !== "string") throw createHttpError(400, "author is required.");
+    if (!isbn || typeof isbn !== "string") throw createHttpError(400, "isbn is required.");
+    if (!audience || typeof audience !== "string") throw createHttpError(400, "audience is required.");
+
+    const input: CreateBookInput = {
+      title: title.trim(),
+      author: author.trim(),
+      isbn: isbn.trim(),
+      audience: audience.trim(),
+      genre: genre != null ? String(genre) : null,
+      description: description != null ? String(description) : null,
+      publicationYear: publicationYear != null ? Number(publicationYear) : null,
+    };
+
+    const book = await createBook(input);
+    return res.status(201).json(book);
+  } catch (err: any) {
+    if (err?.code === "23505") {
+      return next(createHttpError(409, "A book with that ISBN already exists."));
+    }
     next(err);
   }
 }
