@@ -1,7 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
-import { getBookById, getBookByIsbn, createBook } from "../models/book/bookQueries.js";
+import { getBookById, getBookByIsbn, createBook, updateBook } from "../models/book/bookQueries.js";
 import { createHttpError, requireUuid, requirePositiveInt } from "./controllerHelpers.js";
-import type { CreateBookInput } from "../models/book/bookQueries.js";
+import type { CreateBookInput, UpdateBookInput } from "../models/book/bookQueries.js";
 
 // Gets a single book by its UUID.
 export async function getBookId(req: Request, res: Response, next: NextFunction) {
@@ -41,6 +41,40 @@ export async function postBook(req: Request, res: Response, next: NextFunction) 
 
     const book = await createBook(input);
     return res.status(201).json(book);
+  } catch (err: any) {
+    if (err?.code === "23505") {
+      return next(createHttpError(409, "A book with that ISBN already exists."));
+    }
+    next(err);
+  }
+}
+
+// Updates a book by its UUID.
+export async function patchBook(req: Request, res: Response, next: NextFunction) {
+  try {
+    const bookId = requireUuid(req.params.bookId, "bookId");
+    const { isbn, title, author, audience, genre, description, publicationYear } = req.body;
+
+    if ([isbn, title, author, audience, genre, description, publicationYear].every(v => v === undefined)) {
+      throw createHttpError(400, "At least one field must be provided.");
+    }
+
+    const input: UpdateBookInput = {};
+    if (isbn !== undefined) input.isbn = String(isbn).trim();
+    if (title !== undefined) input.title = String(title).trim();
+    if (author !== undefined) input.author = String(author).trim();
+    if (audience !== undefined) input.audience = String(audience).trim();
+    if (genre !== undefined) input.genre = genre === null ? null : String(genre);
+    if (description !== undefined) input.description = description === null ? null : String(description);
+    if (publicationYear !== undefined) input.publicationYear = publicationYear === null ? null : Number(publicationYear);
+
+    const book = await updateBook(bookId, input);
+
+    if (!book) {
+      throw createHttpError(404, "Book not found.");
+    }
+
+    return res.json(book);
   } catch (err: any) {
     if (err?.code === "23505") {
       return next(createHttpError(409, "A book with that ISBN already exists."));

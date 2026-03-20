@@ -1,6 +1,16 @@
 import { query } from "../../config/db.js";
 import type { Book } from "./book.js";
 
+export type UpdateBookInput = {
+  isbn?: string;
+  title?: string;
+  author?: string;
+  audience?: string;
+  genre?: string | null;
+  description?: string | null;
+  publicationYear?: number | null;
+};
+
 export type CreateBookInput = {
   isbn: string;
   title: string;
@@ -86,5 +96,32 @@ export async function createBook(input: CreateBookInput): Promise<Book> {
     ]
   );
 
+  return mapBookRow(res.rows[0]);
+}
+
+// Updates the book fields that were provided and returns the updated book.
+export async function updateBook(bookId: string, input: UpdateBookInput): Promise<Book | null> {
+  const fields: string[] = [];
+  const values: unknown[] = [];
+  let paramIndex = 1;
+
+  if (input.isbn !== undefined) { fields.push(`isbn = $${paramIndex++}`); values.push(input.isbn); }
+  if (input.title !== undefined) { fields.push(`title = $${paramIndex++}`); values.push(input.title); }
+  if (input.author !== undefined) { fields.push(`author = $${paramIndex++}`); values.push(input.author); }
+  if (input.audience !== undefined) { fields.push(`audience = $${paramIndex++}`); values.push(input.audience); }
+  if (input.genre !== undefined) { fields.push(`genre = $${paramIndex++}`); values.push(input.genre); }
+  if (input.description !== undefined) { fields.push(`description = $${paramIndex++}`); values.push(input.description); }
+  if (input.publicationYear !== undefined) { fields.push(`publication_year = $${paramIndex++}`); values.push(input.publicationYear); }
+
+  if (fields.length === 0) return null;
+
+  values.push(bookId);
+
+  const res = await query<BookRow>(
+    `UPDATE books SET ${fields.join(", ")} WHERE book_id = $${paramIndex} RETURNING ${BOOK_COLUMNS}`,
+    values
+  );
+
+  if (res.rows.length === 0) return null;
   return mapBookRow(res.rows[0]);
 }
