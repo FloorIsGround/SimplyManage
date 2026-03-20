@@ -1,15 +1,16 @@
 //import { pool } from "../config/db.js";
 import { Router, type Request, type Response } from "express";
 import {
-  createUser,
   getFaqs,
   getHoursLocations,
   getEvents,
   getUserByEmail,
 } from "../config/db.js";
+import { createStaffUser } from "../models/user/userQueries.js";
 import reviewsRouter from "./reviews.js";
 import booksRouter from "./books.js";
 import copiesRouter from "./copies.js";
+import usersRouter from "./users.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
@@ -26,7 +27,7 @@ router.post("/signup", async (req: Request, res: Response) => {
     if (!email || !password || !firstName || !lastName) {
       return res.status(400).json({ error: "All fields are required." });
     }
-    const user = await createUser({ email, password, firstName, lastName });
+    const user = await createStaffUser({ email, password, firstName, lastName });
     res.status(201).json({ user });
   } catch (err: any) {
     // Handle duplicate email error
@@ -58,6 +59,9 @@ router.use("/reviews", reviewsRouter);
 
 // Copies routes
 router.use("/copies", copiesRouter);
+
+// Users routes
+router.use("/users", usersRouter);
 
 // Login route
 router.post("/users/login", async (req: Request, res: Response) => {

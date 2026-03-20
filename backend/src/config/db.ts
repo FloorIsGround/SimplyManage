@@ -19,19 +19,6 @@ export async function getEvents(): Promise<Event[]> {
     endTime: event.endTime
   }));
 }
-import bcrypt from "bcryptjs";
-
-// Create user for signup
-export async function createUser({ email, password, firstName, lastName }: { email: string; password: string; firstName: string; lastName: string }): Promise<any> {
-  const hashedPassword = await bcrypt.hash(password, 10);
-  const res = await pool.query(
-    `INSERT INTO users (email, password_hash, first_name, last_name, role, status, created_at)
-    VALUES ($1, $2, $3, $4, 'PATRON', 'ACTIVE', NOW()) RETURNING user_id, email, first_name, last_name, role, status`,
-    [email, hashedPassword, firstName, lastName]
-  );
-  return res.rows[0];
-}
-
 // Get user by email for login
 export async function getUserByEmail(email: string): Promise<any | null> {
   const res = await pool.query(
