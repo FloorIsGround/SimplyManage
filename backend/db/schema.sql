@@ -158,6 +158,11 @@ CREATE TABLE IF NOT EXISTS public.copies (
     CONSTRAINT copies_condition_status_check CHECK ((condition_status = ANY (ARRAY['AVAILABLE'::text, 'LOST'::text, 'DAMAGED'::text, 'MAINTENANCE'::text])))
 );
 
+-- Currently in the database already:
+-- CREATE SEQUENCE copy_barcode_seq;
+-- ALTER TABLE copies ALTER COLUMN barcode SET DEFAULT 'BC' || LPAD(nextval('copy_barcode_seq')::text, 8, '0');
+
+
 
 --
 -- Name: fees; Type: TABLE; Schema: public; Owner: -
