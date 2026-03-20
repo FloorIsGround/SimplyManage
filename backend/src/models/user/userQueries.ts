@@ -107,6 +107,29 @@ export async function updateUserStatus(userId: string, status: UserStatus): Prom
   return mapUserRow(res.rows[0]);
 }
 
+// Checks a plain-text password against the stored hash for a user. Returns false if the user doesn't exist.
+export async function verifyUserPassword(userId: string, password: string): Promise<boolean> {
+  const res = await query<{ password_hash: string }>(
+    `SELECT password_hash FROM users WHERE user_id = $1`,
+    [userId]
+  );
+
+  if (res.rows.length === 0) return false;
+  return bcrypt.compare(password, res.rows[0].password_hash);
+}
+
+// Updates the password_hash for a user and returns true if a row was updated.
+export async function updateUserPassword(userId: string, password: string): Promise<boolean> {
+  const passwordHash = await bcrypt.hash(password, 10);
+
+  const res = await query<{ user_id: string }>(
+    `UPDATE users SET password_hash = $1 WHERE user_id = $2 RETURNING user_id`,
+    [passwordHash, userId]
+  );
+
+  return res.rows.length > 0;
+}
+
 // Deletes a user by UUID and returns true if a row was removed.
 export async function deleteUser(userId: string): Promise<boolean> {
   const res = await query<{ user_id: string }>(

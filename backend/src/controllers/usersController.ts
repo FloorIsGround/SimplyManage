@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
-import { createStaffUser, updateUser, updateUserStatus } from "../models/user/userQueries.js";
+import { createStaffUser, updateUser, updateUserStatus, updateUserPassword, verifyUserPassword, deleteUser } from "../models/user/userQueries.js";
 import { createHttpError, requireUuid } from "./controllerHelpers.js";
 import { USER_ROLES, USER_STATUSES } from "../models/user/user.js";
 import type { CreateUserInput, UpdateUserInput } from "../models/user/userQueries.js";
@@ -60,6 +60,69 @@ export async function patchUser(req: Request, res: Response, next: NextFunction)
   } catch (err: any) {
     if (err?.code === "23505") {
       return next(createHttpError(409, "A user with that email already exists."));
+    }
+    next(err);
+  }
+}
+
+// Verifies a plain-text password against the stored hash for a user.
+export async function postVerifyPassword(req: Request, res: Response, next: NextFunction) {
+  try {
+    const userId = requireUuid(req.params.userId, "userId");
+    const { password } = req.body;
+
+    if (!password || typeof password !== "string") {
+      throw createHttpError(400, "password is required.");
+    }
+
+    const valid = await verifyUserPassword(userId, password);
+
+    if (!valid) {
+      throw createHttpError(401, "Password is incorrect.");
+    }
+
+    return res.json({ valid: true });
+  } catch (err) {
+    next(err);
+  }
+}
+
+// Updates a user's password by their UUID.
+export async function patchUserPassword(req: Request, res: Response, next: NextFunction) {
+  try {
+    const userId = requireUuid(req.params.userId, "userId");
+    const { password } = req.body;
+
+    if (!password || typeof password !== "string") {
+      throw createHttpError(400, "password is required.");
+    }
+
+    const updated = await updateUserPassword(userId, password);
+
+    if (!updated) {
+      throw createHttpError(404, "User not found.");
+    }
+
+    return res.json({ message: "Password updated successfully." });
+  } catch (err) {
+    next(err);
+  }
+}
+
+// Deletes a user by their UUID.
+export async function removeUser(req: Request, res: Response, next: NextFunction) {
+  try {
+    const userId = requireUuid(req.params.userId, "userId");
+    const deleted = await deleteUser(userId);
+
+    if (!deleted) {
+      throw createHttpError(404, "User not found.");
+    }
+
+    return res.json({ message: "User deleted successfully." });
+  } catch (err: any) {
+    if (err?.code === "23503") {
+      return next(createHttpError(409, "Cannot delete user with active loans or holds."));
     }
     next(err);
   }
