@@ -47,6 +47,8 @@ export async function getBookById(bookId: string): Promise<Book | null> {
 }
 
 // Gets a single book by its ISBN.
+// Takes isbn as a number
+// The db returns isbn as a string
 export async function getBookByIsbn(isbn: number): Promise<Book | null> {
   const res = await query<BookRow>(
     `SELECT ${BOOK_COLUMNS} FROM books WHERE isbn = $1`,
