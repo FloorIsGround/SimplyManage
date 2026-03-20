@@ -1,7 +1,7 @@
-export const USER_ROLES = ['PATRON', 'STAFF', 'ADMIN'] as const;
+export const USER_ROLES = ['PATRON', 'LIBRARIAN', 'ADMIN'] as const;
 export type UserRole = typeof USER_ROLES[number];
 
-export const USER_STATUSES = ['ACTIVE', 'INACTIVE', 'SUSPENDED'] as const;
+export const USER_STATUSES = ['ACTIVE', 'SUSPENDED'] as const;
 export type UserStatus = typeof USER_STATUSES[number];
 
 export interface User {
