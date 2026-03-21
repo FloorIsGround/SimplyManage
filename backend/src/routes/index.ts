@@ -7,8 +7,8 @@ import {
   getHoursLocations,
   getEvents,
   getUserByEmail,
-  createReview
 } from "../config/db.js";
+import reviewsRouter from "./reviews.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
@@ -113,14 +113,6 @@ router.post("/books/:bookId/reviews", async (req: Request, res: Response) => {
       return res.status(401).json({ error: "Invalid token." });
     }
 
-    const review = await createReview({
-      bookId: bookIdParam,
-      userId: decoded.userId,
-      rating,
-      comment,
-    });
-
-    res.status(201).json(review);
   } catch (err: any) {
     res.status(500).json({ error: err.message || "Failed to create review." });
   }
@@ -138,9 +130,58 @@ router.get("/hourslocations", async (_req: Request, res: Response) => {
   res.json({ libraries });
 });
 
-// --- ROOT ---
-router.get("/", (_req: Request, res: Response) => {
-  res.json({ ok: true, message: "SimplyManage API" });
+// Reviews routes
+router.use("/reviews", reviewsRouter);
+
+// Login route
+router.post("/users/login", async (req: Request, res: Response) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({
+        error: {
+          code: "MISSING_FIELDS",
+          message: "Email and password are required.",
+        },
+      });
+    }
+
+    const user = await getUserByEmail(email);
+    if (!user) {
+      return res.status(401).json({
+        error: {
+          code: "INVALID_CREDENTIALS",
+          message: "Email or password is incorrect.",
+        },
+      });
+    }
+
+    const passwordMatch = await bcrypt.compare(password, user.password_hash);
+    if (!passwordMatch) {
+      return res.status(401).json({
+        error: {
+          code: "INVALID_CREDENTIALS",
+          message: "Email or password is incorrect.",
+        },
+      });
+    }
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { userId: user.user_id, email: user.email, role: user.role },
+      process.env.JWT_SECRET || "changeme",
+      { expiresIn: "1d" }
+    );
+
+    return res.json({ token });
+  } catch (err: any) {
+    res.status(500).json({
+      error: {
+        code: "LOGIN_ERROR",
+        message: err.message || "Login failed.",
+      },
+    });
+  }
 });
 
 export default router;
