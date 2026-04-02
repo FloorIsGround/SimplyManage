@@ -193,6 +193,7 @@ CREATE TABLE IF NOT EXISTS public.holds (
     placed_at timestamp with time zone NOT NULL,
     status text NOT NULL,
     ready_expires_at timestamp with time zone,
+    queue_position integer NOT NULL,
     CONSTRAINT holds_status_check CHECK ((status = ANY (ARRAY['ACTIVE'::text, 'READY'::text, 'FULFILLED'::text, 'CANCELLED'::text])))
 );
 
