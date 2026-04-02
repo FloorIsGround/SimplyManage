@@ -36,6 +36,17 @@ function mapCopyRow(row: CopyRow): Copy {
 
 const COPY_COLUMNS = `copy_id, book_id, barcode, condition_status, location, created_at`;
 
+// Gets a single copy by its UUID.
+export async function getCopyById(copyId: string): Promise<Copy | null> {
+  const res = await query<CopyRow>(
+    `SELECT ${COPY_COLUMNS} FROM copies WHERE copy_id = $1`,
+    [copyId]
+  );
+
+  if (res.rows.length === 0) return null;
+  return mapCopyRow(res.rows[0]);
+}
+
 // Gets all copies for a given book.
 export async function getCopiesByBookId(bookId: string): Promise<Copy[]> {
   const res = await query<CopyRow>(

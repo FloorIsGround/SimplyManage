@@ -11,6 +11,7 @@ import booksRouter from "./books.js";
 import copiesRouter from "./copies.js";
 import usersRouter from "./users.js";
 import holdsRouter from "./holds.js";
+import loansRouter from "./loans.js";
 
 const router = Router();
 
@@ -63,6 +64,9 @@ router.use("/users", usersRouter);
 
 // Holds routes
 router.use("/holds", holdsRouter);
+
+// Loans routes
+router.use("/loans", loansRouter);
 
 
 export default router;

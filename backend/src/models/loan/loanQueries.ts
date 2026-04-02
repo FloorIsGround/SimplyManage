@@ -31,6 +31,21 @@ function mapLoanRow(row: LoanRow): Loan {
     };
 }
 
+// Returns the active (not yet returned) loan for a copy, or null if the copy is not checked out.
+export async function getActiveLoanByCopyId(copyId: string): Promise<Loan | null> {
+    const res = await query<LoanRow>(
+        `SELECT ${LOAN_COLUMNS}
+         FROM loans
+         WHERE copy_id = $1
+           AND returned_at IS NULL
+         LIMIT 1`,
+        [copyId]
+    );
+
+    if (res.rows.length === 0) return null;
+    return mapLoanRow(res.rows[0]);
+}
+
 // Creates a new loan for a user checking out a copy.
 export async function createLoan(input: CreateLoanInput): Promise<Loan> {
     const res = await query<LoanRow>(
