@@ -4,9 +4,9 @@ import { getCopyLoans, getLoan, getUserLoans, patchLoanRenew, patchLoanReturn, p
 const router = Router();
 
 router.post("/", postLoan);
-router.get("/:loanId", getLoan);
 router.get("/user/:userId", getUserLoans);
 router.get("/copy/:copyId", getCopyLoans);
+router.get("/:loanId", getLoan);
 router.patch("/:loanId/return", patchLoanReturn);
 router.patch("/:loanId/renew", patchLoanRenew);
 
