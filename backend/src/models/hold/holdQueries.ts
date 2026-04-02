@@ -147,6 +147,23 @@ export async function updateHoldStatus(
     return mapHoldRow(res.rows[0]);
 }
 
+// Returns the next ACTIVE hold in queue for a book by lowest queue_position.
+// Used during loan return to determine if a hold should be transitioned to READY.
+export async function getNextHoldInQueue(bookId: string): Promise<Hold | null> {
+    const res = await query<HoldRow>(
+        `SELECT ${HOLD_COLUMNS}
+         FROM holds
+         WHERE book_id = $1
+           AND status = 'ACTIVE'
+         ORDER BY queue_position ASC
+         LIMIT 1`,
+        [bookId]
+    );
+
+    if (res.rows.length === 0) return null;
+    return mapHoldRow(res.rows[0]);
+}
+
 // Reassigns queue_position 1..N for the given holds in the order provided.
 // Only updates holds that are ACTIVE or READY for the given book.
 export async function reorderQueue(
