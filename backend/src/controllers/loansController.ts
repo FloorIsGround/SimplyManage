@@ -1,6 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
 import { createHttpError, requireUuid } from "./controllerHelpers.js";
-import { createLoan, getActiveLoanByCopyId, getLoanById, getLoansByCopyId, getLoansByUserId, returnLoan } from "../models/loan/loanQueries.js";
+import { createLoan, getActiveLoanByCopyId, getLoanById, getLoansByCopyId, getLoansByUserId, renewLoan, returnLoan } from "../models/loan/loanQueries.js";
 import { getCopyById } from "../models/copy/copyQueries.js";
 import { getUserById } from "../models/user/userQueries.js";
 import { getNextHoldInQueue, updateHoldStatus } from "../models/hold/holdQueries.js";
@@ -65,7 +65,7 @@ export async function patchLoanReturn(req: Request, res: Response, next: NextFun
             throw createHttpError(500, "Failed to process return.");
         }
 
-        // TODO: Fee generation — if loan.returnedAt > loan.dueAt, assess an OVERDUE fee.
+        // TODO: Fee generation: if loan.returnedAt > loan.dueAt, assess an OVERDUE fee.
 
         const copy = await getCopyById(loan.copyId);
         if (copy) {
@@ -110,6 +110,35 @@ export async function getUserLoans(req: Request, res: Response, next: NextFuncti
         const loans = await getLoansByUserId(userId);
 
         return res.json(loans);
+    } catch (err) {
+        next(err);
+    }
+}
+
+// Extends the due date of an active loan and increments renewal_count.
+export async function patchLoanRenew(req: Request, res: Response, next: NextFunction) {
+    try {
+        const loanId = requireUuid(req.params.loanId, "loanId");
+        const { dueAt } = req.body;
+
+        if (!dueAt || typeof dueAt !== "string" || isNaN(Date.parse(dueAt))) {
+            throw createHttpError(400, "dueAt must be a valid ISO date string.");
+        }
+
+        const existing = await getLoanById(loanId);
+        if (!existing) {
+            throw createHttpError(404, "Loan not found.");
+        }
+        if (existing.returnedAt !== null) {
+            throw createHttpError(409, "Cannot renew a loan that has already been returned.");
+        }
+
+        const loan = await renewLoan(loanId, dueAt);
+        if (!loan) {
+            throw createHttpError(500, "Failed to process renewal.");
+        }
+
+        return res.json(loan);
     } catch (err) {
         next(err);
     }
