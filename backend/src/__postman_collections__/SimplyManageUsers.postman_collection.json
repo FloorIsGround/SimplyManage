@@ -35,6 +35,32 @@
       "response": []
     },
     {
+      "name": "Get User First & Last Name",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{link}}/api/users/:userId",
+          "host": [
+            "{{link}}"
+          ],
+          "path": [
+            "api",
+            "users",
+            ":userId"
+          ],
+          "variable": [
+            {
+              "key": "userId",
+              "value": "92956e74-1d30-44ed-87fc-053764256ec9",
+              "description": "UUID"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
       "name": "Create User (Always Patron)",
       "request": {
         "method": "POST",
@@ -204,7 +230,7 @@
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n  \"status\": \"SUSPENDED\" // \"ACTIVE\", \"SUSPENDED\"\r\n}",
+          "raw": "{\r\n  \"status\": \"ACTIVE\" // \"ACTIVE\", \"SUSPENDED\"\r\n}",
           "options": {
             "raw": {
               "language": "json"

@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
-import { getUserByEmail, createStaffUser, updateUser, updateUserStatus, updateUserPassword, verifyUserPassword, deleteUser } from "../models/user/userQueries.js";
+import { getUserByEmail, getUserById, createStaffUser, updateUser, updateUserStatus, updateUserPassword, verifyUserPassword, deleteUser } from "../models/user/userQueries.js";
 import { createHttpError, requireUuid } from "./controllerHelpers.js";
 import { USER_ROLES, USER_STATUSES } from "../models/user/user.js";
 import type { CreateUserInput, UpdateUserInput } from "../models/user/userQueries.js";
@@ -178,6 +178,22 @@ export async function patchUserStatus(req: Request, res: Response, next: NextFun
     }
 
     return res.json(user);
+  } catch (err) {
+    next(err);
+  }
+}
+
+// Returns the first and last name for a given user.
+export async function getUser(req: Request, res: Response, next: NextFunction) {
+  try {
+    const userId = requireUuid(req.params.userId, "userId");
+
+    const user = await getUserById(userId);
+    if (!user) {
+      throw createHttpError(404, "User not found.");
+    }
+
+    return res.json({ firstName: user.firstName, lastName: user.lastName });
   } catch (err) {
     next(err);
   }
