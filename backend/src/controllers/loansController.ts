@@ -1,6 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
 import { createHttpError, requireUuid } from "./controllerHelpers.js";
-import { createLoan, getActiveLoanByCopyId } from "../models/loan/loanQueries.js";
+import { createLoan, getActiveLoanByCopyId, getLoanById, getLoansByCopyId, getLoansByUserId } from "../models/loan/loanQueries.js";
 import { getCopyById } from "../models/copy/copyQueries.js";
 import { getUserById } from "../models/user/userQueries.js";
 
@@ -40,6 +40,48 @@ export async function postLoan(req: Request, res: Response, next: NextFunction) 
         const loan = await createLoan({ userId, copyId, dueAt });
 
         return res.status(201).json(loan);
+    } catch (err) {
+        next(err);
+    }
+}
+
+// Returns a single loan by its ID.
+export async function getLoan(req: Request, res: Response, next: NextFunction) {
+    try {
+        const loanId = requireUuid(req.params.loanId, "loanId");
+
+        const loan = await getLoanById(loanId);
+        if (!loan) {
+            throw createHttpError(404, "Loan not found.");
+        }
+
+        return res.json(loan);
+    } catch (err) {
+        next(err);
+    }
+}
+
+// Returns all loans for a user, most recent first.
+export async function getUserLoans(req: Request, res: Response, next: NextFunction) {
+    try {
+        const userId = requireUuid(req.params.userId, "userId");
+
+        const loans = await getLoansByUserId(userId);
+
+        return res.json(loans);
+    } catch (err) {
+        next(err);
+    }
+}
+
+// Returns the loan history for a specific copy, most recent first.
+export async function getCopyLoans(req: Request, res: Response, next: NextFunction) {
+    try {
+        const copyId = requireUuid(req.params.copyId, "copyId");
+
+        const loans = await getLoansByCopyId(copyId);
+
+        return res.json(loans);
     } catch (err) {
         next(err);
     }
