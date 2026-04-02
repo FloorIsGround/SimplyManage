@@ -1,8 +1,9 @@
 import type { NextFunction, Request, Response } from "express";
 import { createHttpError, requireUuid } from "./controllerHelpers.js";
-import { createLoan, getActiveLoanByCopyId, getLoanById, getLoansByCopyId, getLoansByUserId } from "../models/loan/loanQueries.js";
+import { createLoan, getActiveLoanByCopyId, getLoanById, getLoansByCopyId, getLoansByUserId, returnLoan } from "../models/loan/loanQueries.js";
 import { getCopyById } from "../models/copy/copyQueries.js";
 import { getUserById } from "../models/user/userQueries.js";
+import { getNextHoldInQueue, updateHoldStatus } from "../models/hold/holdQueries.js";
 
 // Checks out a copy to a user, creating a new loan record.
 // Validates that the user is ACTIVE and the copy is AVAILABLE with no existing active loan.
@@ -40,6 +41,46 @@ export async function postLoan(req: Request, res: Response, next: NextFunction) 
         const loan = await createLoan({ userId, copyId, dueAt });
 
         return res.status(201).json(loan);
+    } catch (err) {
+        next(err);
+    }
+}
+
+// Marks a loan as returned, transitions the next hold in queue to READY if one exists,
+// and includes a placeholder for fee generation on overdue returns.
+export async function patchLoanReturn(req: Request, res: Response, next: NextFunction) {
+    try {
+        const loanId = requireUuid(req.params.loanId, "loanId");
+
+        const existing = await getLoanById(loanId);
+        if (!existing) {
+            throw createHttpError(404, "Loan not found.");
+        }
+        if (existing.returnedAt !== null) {
+            throw createHttpError(409, "Loan has already been returned.");
+        }
+
+        const loan = await returnLoan(loanId);
+        if (!loan) {
+            throw createHttpError(500, "Failed to process return.");
+        }
+
+        // TODO: Fee generation — if loan.returnedAt > loan.dueAt, assess an OVERDUE fee.
+
+        const copy = await getCopyById(loan.copyId);
+        if (copy) {
+            const nextHold = await getNextHoldInQueue(copy.bookId);
+            if (nextHold) {
+                const readyExpiresAt = new Date();
+                readyExpiresAt.setDate(readyExpiresAt.getDate() + 7);
+                await updateHoldStatus(nextHold.id, {
+                    status: "READY",
+                    readyExpiresAt: readyExpiresAt.toISOString(),
+                });
+            }
+        }
+
+        return res.json(loan);
     } catch (err) {
         next(err);
     }
