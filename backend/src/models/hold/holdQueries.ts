@@ -155,12 +155,9 @@ export async function reorderQueue(
 ): Promise<Hold[]> {
     const res = await query<HoldRow>(
         `UPDATE holds
-         SET queue_position = ord.position
-         FROM (
-             SELECT UNNEST($1::uuid[]) AS hold_id,
-                    GENERATE_SERIES(1, array_length($1::uuid[], 1)) AS position
-         ) AS ord
-         WHERE holds.hold_id = ord.hold_id
+         SET queue_position = ord.position::integer
+         FROM UNNEST($1::uuid[]) WITH ORDINALITY AS ord(ord_hold_id, position)
+         WHERE holds.hold_id = ord.ord_hold_id
            AND holds.book_id = $2
            AND holds.status IN ('ACTIVE', 'READY')
          RETURNING ${HOLD_COLUMNS}`,
