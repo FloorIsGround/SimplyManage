@@ -61,6 +61,26 @@ export async function getHoldsByBookId(bookId: string): Promise<Hold[]> {
     return res.rows.map(mapHoldRow);
 }
 
+// Returns an existing ACTIVE or READY hold for a user on a specific book, or
+// null if the user is not currently in the queue for that book.
+export async function getUserActiveHoldForBook(
+    userId: string,
+    bookId: string
+): Promise<Hold | null> {
+    const res = await query<HoldRow>(
+        `SELECT ${HOLD_COLUMNS}
+         FROM holds
+         WHERE user_id = $1
+           AND book_id = $2
+           AND status IN ('ACTIVE', 'READY')
+         LIMIT 1`,
+        [userId, bookId]
+    );
+
+    if (res.rows.length === 0) return null;
+    return mapHoldRow(res.rows[0]);
+}
+
 // Returns all holds for a user across all books.
 export async function getHoldsByUserId(userId: string): Promise<Hold[]> {
     const res = await query<HoldRow>(

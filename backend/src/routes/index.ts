@@ -10,6 +10,7 @@ import reviewsRouter from "./reviews.js";
 import booksRouter from "./books.js";
 import copiesRouter from "./copies.js";
 import usersRouter from "./users.js";
+import holdsRouter from "./holds.js";
 
 const router = Router();
 
@@ -59,6 +60,9 @@ router.use("/copies", copiesRouter);
 
 // Users routes
 router.use("/users", usersRouter);
+
+// Holds routes
+router.use("/holds", holdsRouter);
 
 
 export default router;
