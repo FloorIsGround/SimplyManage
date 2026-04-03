@@ -1,0 +1,158 @@
+import type { NextFunction, Request, Response } from "express";
+import { createHttpError, requireUuid } from "./controllerHelpers.js";
+import { createLoan, getActiveLoanByCopyId, getLoanById, getLoansByCopyId, getLoansByUserId, renewLoan, returnLoan } from "../models/loan/loanQueries.js";
+import { getCopyById } from "../models/copy/copyQueries.js";
+import { getUserById } from "../models/user/userQueries.js";
+import { getNextHoldInQueue, updateHoldStatus } from "../models/hold/holdQueries.js";
+
+// Checks out a copy to a user, creating a new loan record.
+// Validates that the user is ACTIVE and the copy is AVAILABLE with no existing active loan.
+export async function postLoan(req: Request, res: Response, next: NextFunction) {
+    try {
+        const userId = requireUuid(req.body.userId, "userId");
+        const copyId = requireUuid(req.body.copyId, "copyId");
+        const { dueAt } = req.body;
+
+        if (!dueAt || typeof dueAt !== "string" || isNaN(Date.parse(dueAt))) {
+            throw createHttpError(400, "dueAt must be a valid ISO date string.");
+        }
+
+        const user = await getUserById(userId);
+        if (!user) {
+            throw createHttpError(404, "User not found.");
+        }
+        if (user.status !== "ACTIVE") {
+            throw createHttpError(403, "User account is suspended and cannot check out items.");
+        }
+
+        const copy = await getCopyById(copyId);
+        if (!copy) {
+            throw createHttpError(404, "Copy not found.");
+        }
+        if (copy.conditionStatus !== "AVAILABLE") {
+            throw createHttpError(409, `Copy is not available for checkout (status: ${copy.conditionStatus}).`);
+        }
+
+        const activeLoan = await getActiveLoanByCopyId(copyId);
+        if (activeLoan) {
+            throw createHttpError(409, "Copy is already checked out.");
+        }
+
+        const loan = await createLoan({ userId, copyId, dueAt });
+
+        return res.status(201).json(loan);
+    } catch (err) {
+        next(err);
+    }
+}
+
+// Marks a loan as returned, transitions the next hold in queue to READY if one exists,
+// and includes a placeholder for fee generation on overdue returns.
+export async function patchLoanReturn(req: Request, res: Response, next: NextFunction) {
+    try {
+        const loanId = requireUuid(req.params.loanId, "loanId");
+
+        const existing = await getLoanById(loanId);
+        if (!existing) {
+            throw createHttpError(404, "Loan not found.");
+        }
+        if (existing.returnedAt !== null) {
+            throw createHttpError(409, "Loan has already been returned.");
+        }
+
+        const loan = await returnLoan(loanId);
+        if (!loan) {
+            throw createHttpError(500, "Failed to process return.");
+        }
+
+        // TODO: Fee generation: if loan.returnedAt > loan.dueAt, assess an OVERDUE fee.
+
+        const copy = await getCopyById(loan.copyId);
+        if (copy) {
+            const nextHold = await getNextHoldInQueue(copy.bookId);
+            if (nextHold) {
+                const readyExpiresAt = new Date();
+                readyExpiresAt.setDate(readyExpiresAt.getDate() + 7);
+                await updateHoldStatus(nextHold.id, {
+                    status: "READY",
+                    readyExpiresAt: readyExpiresAt.toISOString(),
+                });
+            }
+        }
+
+        return res.json(loan);
+    } catch (err) {
+        next(err);
+    }
+}
+
+// Returns a single loan by its ID.
+export async function getLoan(req: Request, res: Response, next: NextFunction) {
+    try {
+        const loanId = requireUuid(req.params.loanId, "loanId");
+
+        const loan = await getLoanById(loanId);
+        if (!loan) {
+            throw createHttpError(404, "Loan not found.");
+        }
+
+        return res.json(loan);
+    } catch (err) {
+        next(err);
+    }
+}
+
+// Returns all loans for a user, most recent first.
+export async function getUserLoans(req: Request, res: Response, next: NextFunction) {
+    try {
+        const userId = requireUuid(req.params.userId, "userId");
+
+        const loans = await getLoansByUserId(userId);
+
+        return res.json(loans);
+    } catch (err) {
+        next(err);
+    }
+}
+
+// Extends the due date of an active loan and increments renewal_count.
+export async function patchLoanRenew(req: Request, res: Response, next: NextFunction) {
+    try {
+        const loanId = requireUuid(req.params.loanId, "loanId");
+        const { dueAt } = req.body;
+
+        if (!dueAt || typeof dueAt !== "string" || isNaN(Date.parse(dueAt))) {
+            throw createHttpError(400, "dueAt must be a valid ISO date string.");
+        }
+
+        const existing = await getLoanById(loanId);
+        if (!existing) {
+            throw createHttpError(404, "Loan not found.");
+        }
+        if (existing.returnedAt !== null) {
+            throw createHttpError(409, "Cannot renew a loan that has already been returned.");
+        }
+
+        const loan = await renewLoan(loanId, dueAt);
+        if (!loan) {
+            throw createHttpError(500, "Failed to process renewal.");
+        }
+
+        return res.json(loan);
+    } catch (err) {
+        next(err);
+    }
+}
+
+// Returns the loan history for a specific copy, most recent first.
+export async function getCopyLoans(req: Request, res: Response, next: NextFunction) {
+    try {
+        const copyId = requireUuid(req.params.copyId, "copyId");
+
+        const loans = await getLoansByCopyId(copyId);
+
+        return res.json(loans);
+    } catch (err) {
+        next(err);
+    }
+}

@@ -1,0 +1,281 @@
+{
+  "info": {
+    "_postman_id": "b75e486d-5ac3-459e-acc5-125bfe152e7a",
+    "name": "SimplyManageHolds",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "50529965",
+    "_collection_link": "https://go.postman.co/collection/50529965-b75e486d-5ac3-459e-acc5-125bfe152e7a?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Create Hold",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"userId\": \"ad3a3fbb-8732-4bc9-8e28-901febd8b539\", //UUID\r\n  \"bookId\": \"1b1e13e2-04e7-4edf-8c25-4ea0dc19b70e\" //UUID\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{link}}/api/holds",
+          "host": [
+            "{{link}}"
+          ],
+          "path": [
+            "api",
+            "holds"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Hold Queue for Book",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{link}}/api/holds/book/:bookId",
+          "host": [
+            "{{link}}"
+          ],
+          "path": [
+            "api",
+            "holds",
+            "book",
+            ":bookId"
+          ],
+          "variable": [
+            {
+              "key": "bookId",
+              "value": "1b1e13e2-04e7-4edf-8c25-4ea0dc19b70e"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Hold Queue Position for book for user",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"userId\": \"92956e74-1d30-44ed-87fc-053764256ec9\", //UUID\r\n  \"bookId\": \"1b1e13e2-04e7-4edf-8c25-4ea0dc19b70e\" //UUID\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{link}}/api/holds/book/:bookId/position/:userId",
+          "host": [
+            "{{link}}"
+          ],
+          "path": [
+            "api",
+            "holds",
+            "book",
+            ":bookId",
+            "position",
+            ":userId"
+          ],
+          "variable": [
+            {
+              "key": "bookId",
+              "value": "1b1e13e2-04e7-4edf-8c25-4ea0dc19b70e"
+            },
+            {
+              "key": "userId",
+              "value": "ad3a3fbb-8732-4bc9-8e28-901febd8b539"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get All User Holds",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"userId\": \"92956e74-1d30-44ed-87fc-053764256ec9\", //UUID\r\n  \"bookId\": \"1b1e13e2-04e7-4edf-8c25-4ea0dc19b70e\" //UUID\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{link}}/api/holds/user/:userId",
+          "host": [
+            "{{link}}"
+          ],
+          "path": [
+            "api",
+            "holds",
+            "user",
+            ":userId"
+          ],
+          "variable": [
+            {
+              "key": "userId",
+              "value": "ad3a3fbb-8732-4bc9-8e28-901febd8b539"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Reorder Holds",
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"holdIds\": [ // ordered list of intended queue positions\r\n    \"8676a1d1-5933-498d-b986-e3b59736c3a1\",\r\n    \"cd838fdb-1690-42f0-ab8f-de9509534a71\"\r\n    \r\n  ]\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{link}}/api/holds/book/:bookId/reorder",
+          "host": [
+            "{{link}}"
+          ],
+          "path": [
+            "api",
+            "holds",
+            "book",
+            ":bookId",
+            "reorder"
+          ],
+          "variable": [
+            {
+              "key": "bookId",
+              "value": "1b1e13e2-04e7-4edf-8c25-4ea0dc19b70e"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Patch Hold Status",
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"status\": \"ACTIVE\" // one of [\"ACTIVE\", \"READY\", \"FULFILLED\", \"CANCELLED\"]\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{link}}/api/holds/:holdId/status",
+          "host": [
+            "{{link}}"
+          ],
+          "path": [
+            "api",
+            "holds",
+            ":holdId",
+            "status"
+          ],
+          "variable": [
+            {
+              "key": "holdId",
+              "value": "cd838fdb-1690-42f0-ab8f-de9509534a71"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Patch Hold Status Copy",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"status\": \"ACTIVE\" // one of [\"ACTIVE\", \"READY\", \"FULFILLED\", \"CANCELLED\"]\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{link}}/api/holds/:holdId",
+          "host": [
+            "{{link}}"
+          ],
+          "path": [
+            "api",
+            "holds",
+            ":holdId"
+          ],
+          "variable": [
+            {
+              "key": "holdId",
+              "value": "cd838fdb-1690-42f0-ab8f-de9509534a71"
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "link",
+      "value": ""
+    }
+  ]
+}
