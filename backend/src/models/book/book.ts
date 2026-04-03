@@ -11,5 +11,5 @@ export interface Book {
   createdAt: string;
   averageRating: number;
   audience: string;
-  reviews: Review[];
+  reviews?: Review[];
 }

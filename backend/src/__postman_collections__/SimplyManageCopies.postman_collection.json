@@ -1,0 +1,156 @@
+{
+  "info": {
+    "_postman_id": "dbf0e414-e212-419d-82db-f5838349d32d",
+    "name": "SimplyManageCopies",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "50529965",
+    "_collection_link": "https://go.postman.co/collection/50529965-dbf0e414-e212-419d-82db-f5838349d32d?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Create Copies",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"bookId\": \"ea2a62c6-cb28-4db8-bcf1-a5239d06d08c\",\r\n  \"quantity\": 3,\r\n  \"conditionStatus\": \"AVAILABLE\" //, \"AVAILABLE\" | \"LOST\" | \"DAMAGED\" | \"MAINTENANCE\"\r\n//\"location\": \"\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{link}}/api/copies",
+          "host": [
+            "{{link}}"
+          ],
+          "path": [
+            "api",
+            "copies"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Update Copy Status by Barcode",
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"conditionStatus\": \"AVAILABLE\" //, \"AVAILABLE\" | \"LOST\" | \"DAMAGED\" | \"MAINTENANCE\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{link}}/api/copies/barcode/:barcode/status",
+          "host": [
+            "{{link}}"
+          ],
+          "path": [
+            "api",
+            "copies",
+            "barcode",
+            ":barcode",
+            "status"
+          ],
+          "variable": [
+            {
+              "key": "barcode",
+              "value": "BC00000001"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Copies List by Book UUID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{link}}/api/copies/book/:bookId",
+          "host": [
+            "{{link}}"
+          ],
+          "path": [
+            "api",
+            "copies",
+            "book",
+            ":bookId"
+          ],
+          "variable": [
+            {
+              "key": "bookId",
+              "value": "ea2a62c6-cb28-4db8-bcf1-a5239d06d08c"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Copy by Barcode",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{link}}/api/copies/barcode/:barcode",
+          "host": [
+            "{{link}}"
+          ],
+          "path": [
+            "api",
+            "copies",
+            "barcode",
+            ":barcode"
+          ],
+          "variable": [
+            {
+              "key": "barcode",
+              "value": "BC00000001"
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "link",
+      "value": ""
+    }
+  ]
+}

@@ -1,0 +1,251 @@
+{
+  "info": {
+    "_postman_id": "549464e8-5529-4bcd-9526-c4fc667bca44",
+    "name": "SimplyManageLoans",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "50529965",
+    "_collection_link": "https://go.postman.co/collection/50529965-549464e8-5529-4bcd-9526-c4fc667bca44?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Checkout a copy to a user",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"userId\": \"92956e74-1d30-44ed-87fc-053764256ec9\",\r\n  \"copyId\": \"4e398acc-ebf6-4bb3-8d24-92e2bb14e2e7\",\r\n  \"dueAt\": \"2026-04-30T04:51:21+00:00\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{link}}/api/loans",
+          "host": [
+            "{{link}}"
+          ],
+          "path": [
+            "api",
+            "loans"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Loan by Loan Id",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{link}}/api/loans/:loanId",
+          "host": [
+            "{{link}}"
+          ],
+          "path": [
+            "api",
+            "loans",
+            ":loanId"
+          ],
+          "variable": [
+            {
+              "key": "loanId",
+              "value": "a31553cc-95f0-4573-b6e2-28a996604b7f"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Loan by User Id",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{link}}/api/loans/user/:userId",
+          "host": [
+            "{{link}}"
+          ],
+          "path": [
+            "api",
+            "loans",
+            "user",
+            ":userId"
+          ],
+          "variable": [
+            {
+              "key": "userId",
+              "value": "92956e74-1d30-44ed-87fc-053764256ec9"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Loan by Copy Id",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{link}}/api/loans/copy/:copyId",
+          "host": [
+            "{{link}}"
+          ],
+          "path": [
+            "api",
+            "loans",
+            "copy",
+            ":copyId"
+          ],
+          "variable": [
+            {
+              "key": "copyId",
+              "value": "4e398acc-ebf6-4bb3-8d24-92e2bb14e2e7"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Return a loaned book by loan Id",
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{link}}/api/loans/:loanId/return",
+          "host": [
+            "{{link}}"
+          ],
+          "path": [
+            "api",
+            "loans",
+            ":loanId",
+            "return"
+          ],
+          "variable": [
+            {
+              "key": "loanId",
+              "value": "a31553cc-95f0-4573-b6e2-28a996604b7f"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Renew a loaned book by loan Id",
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"dueAt\": \"2026-04-30T04:51:21+00:00\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{link}}/api/loans/:loanId/renew",
+          "host": [
+            "{{link}}"
+          ],
+          "path": [
+            "api",
+            "loans",
+            ":loanId",
+            "renew"
+          ],
+          "variable": [
+            {
+              "key": "loanId",
+              "value": "6dc699b7-f8b3-4b0c-b0cb-58388d0eb7cd"
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "link",
+      "value": ""
+    }
+  ]
+}

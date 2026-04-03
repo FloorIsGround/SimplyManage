@@ -1,0 +1,319 @@
+{
+  "info": {
+    "_postman_id": "20be66ed-7b35-4009-9190-c54ca6f72392",
+    "name": "SimplyManageUsers",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "50529965",
+    "_collection_link": "https://go.postman.co/collection/50529965-20be66ed-7b35-4009-9190-c54ca6f72392?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Create User",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"email\": \"iamstaff@library.co.test\",\r\n  \"password\": \"test1\",\r\n  \"firstName\": \"iam\",\r\n  \"lastName\": \"staff\",\r\n  \"role\": \"LIBRARIAN\" // \"PATRON\" | \"LIBRARIAN\" | \"ADMIN\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{link}}/api/users",
+          "host": [
+            "{{link}}"
+          ],
+          "path": [
+            "api",
+            "users"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get User First & Last Name",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{link}}/api/users/:userId",
+          "host": [
+            "{{link}}"
+          ],
+          "path": [
+            "api",
+            "users",
+            ":userId"
+          ],
+          "variable": [
+            {
+              "key": "userId",
+              "value": "92956e74-1d30-44ed-87fc-053764256ec9",
+              "description": "UUID"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create User (Always Patron)",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"email\": \"lb@library.test\",\r\n  \"password\": \"test\",\r\n  \"firstName\": \"Larry\",\r\n  \"lastName\": \"Bob\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{link}}/api/signup",
+          "host": [
+            "{{link}}"
+          ],
+          "path": [
+            "api",
+            "signup"
+          ]
+        },
+        "description": "Always creates a Patron user"
+      },
+      "response": []
+    },
+    {
+      "name": "User Login",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"email\": \"pog@newemail.com\",\r\n    \"password\": \"peak\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{link}}/api/users/login",
+          "host": [
+            "{{link}}"
+          ],
+          "path": [
+            "api",
+            "users",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Verify Password",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"password\": \"notpeak\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{link}}/api/users/:userId/verify-password",
+          "host": [
+            "{{link}}"
+          ],
+          "path": [
+            "api",
+            "users",
+            ":userId",
+            "verify-password"
+          ],
+          "variable": [
+            {
+              "key": "userId",
+              "value": "92956e74-1d30-44ed-87fc-053764256ec9",
+              "description": "UUID"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Update User Password",
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"password\": \"peak\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{link}}/api/users/:userId/password",
+          "host": [
+            "{{link}}"
+          ],
+          "path": [
+            "api",
+            "users",
+            ":userId",
+            "password"
+          ],
+          "variable": [
+            {
+              "key": "userId",
+              "value": "92956e74-1d30-44ed-87fc-053764256ec9",
+              "description": "UUID"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Update User Information",
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"email\": \"pog@newemail.com\",\r\n  \"firstName\": \"Jace\",\r\n  \"lastName\": \"IsTired\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{link}}/api/users/:userId",
+          "host": [
+            "{{link}}"
+          ],
+          "path": [
+            "api",
+            "users",
+            ":userId"
+          ],
+          "variable": [
+            {
+              "key": "userId",
+              "value": "92956e74-1d30-44ed-87fc-053764256ec9",
+              "description": "UUID"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Update User Status",
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"status\": \"ACTIVE\" // \"ACTIVE\", \"SUSPENDED\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{link}}/api/users/:userId/status",
+          "host": [
+            "{{link}}"
+          ],
+          "path": [
+            "api",
+            "users",
+            ":userId",
+            "status"
+          ],
+          "variable": [
+            {
+              "key": "userId",
+              "value": "92956e74-1d30-44ed-87fc-053764256ec9",
+              "description": "UUID"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delete User",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{link}}/api/users/:userId",
+          "host": [
+            "{{link}}"
+          ],
+          "path": [
+            "api",
+            "users",
+            ":userId"
+          ],
+          "variable": [
+            {
+              "key": "userId",
+              "value": "c8b41e32-5292-4702-962c-f2cdce5fae9e",
+              "description": "UUID"
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "link",
+      "value": ""
+    }
+  ]
+}
