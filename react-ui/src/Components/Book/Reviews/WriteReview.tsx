@@ -4,6 +4,12 @@ import { useState } from "react";
 import { Box, Button, Rating, TextField, Typography } from "@mui/material";
 import axiosServices from "../../../utils/axios-api";
 import type { Review } from "../../../Models/Book/Book";
+import { jwtDecode } from "jwt-decode";
+
+interface TokenPayload {
+    userId: string;
+}
+
 
 interface Props {
     bookId: string;                     // ID of the book being reviewed
@@ -64,12 +70,17 @@ export default function WriteReview({ bookId, onReviewAdded }: Props) {
                 return;
             }
 
+            const decoded = jwtDecode<TokenPayload>(token);
+            const userId = decoded.userId;
+
+
             // Submit the review to the backend
             const res = await axiosServices.post(
                 `/reviews`,
-                { bookId, rating, comment: text },
+                { userId, bookId, rating, comment: text },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
+
 
             /*
               The backend does not return first/last name for the reviewer.
@@ -103,7 +114,7 @@ export default function WriteReview({ bookId, onReviewAdded }: Props) {
             {/* Star rating input */}
             <Rating
                 value={rating}
-                precision={0.5}
+                precision={1}
                 size="large"
                 onChange={(_, v) => setRating(v)}
             />
