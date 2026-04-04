@@ -22,12 +22,13 @@ function BookDetails({ modalOpen, onModalClose, selectedBook }: BookDetailsProps
   const theme = useTheme();
 
   const [activeTab, setActiveTab] = useState<ActiveTabEnum>(ActiveTabEnum.details);
+  
   const [reviewText, setReviewText] = useState('');
   const [reviewRating, setReviewRating] = useState<number | null>(null);
   const [reviewError, setReviewError] = useState<string | null>(null);
   const [reviewLoading, setReviewLoading] = useState(false);
-
   const [reviewsWithNames, setReviewsWithNames] = useState<Review[]>([]);
+
   const userCache = useRef<Map<string, { firstName: string; lastName: string }>>(new Map());
 
   const handleModalClose = () => {
@@ -83,37 +84,47 @@ function BookDetails({ modalOpen, onModalClose, selectedBook }: BookDetailsProps
   };
 
   // Updated function and changed name to "fetchReviews." 04/04/2026.
-  useEffect(() => {
-    async function fetchReviews() {
+  // Updated .map to use new back-end returns.
+  useEffect(() => 
+    {
+    async function fetchReviews() 
+    {
       if (!selectedBook) return;
 
       const res = await axiosServices.get(`/reviews/book/${selectedBook.id}`);
-      const reviews = res.data;
+      const reviews: Review[] = res.data;
 
       // Enrich with names
-      const updatedReviews = await Promise.all(
-        reviews.map(async (review) => {
-          if (userCache.current.has(review.userId)) {
-            return { ...review, ...userCache.current.get(review.userId)! };
-          }
+      const updatedReviews = await Promise.all
+      (
+        reviews.map(async (review: Review) => 
+          {
+            if (userCache.current.has(review.userId)) 
+              {
+                return { ...review, ...userCache.current.get(review.userId)! };
+              }
 
-          try {
-            const userRes = await axiosServices.get(`/users/${review.userId}`);
-            const { firstName, lastName } = userRes.data;
-            userCache.current.set(review.userId, { firstName, lastName });
-            return { ...review, firstName, lastName };
-          } catch {
-            return review;
-          }
-        })
+            try 
+              {
+                const res = await axiosServices.get(`/users/${review.userId}`);
+                const { firstName, lastName } = res.data as { firstName: string; lastName: string };
+                userCache.current.set(review.userId, { firstName, lastName });
+                return { ...review, firstName, lastName };
+              } 
+            
+            catch 
+              {
+                return review;
+              }
+
+          })
       );
-
 
       setReviewsWithNames(updatedReviews);
     }
 
     fetchReviews();
-  }, [selectedBook]);
+    }, [selectedBook]);
 
 
   return (
