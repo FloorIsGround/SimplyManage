@@ -82,33 +82,39 @@ function BookDetails({ modalOpen, onModalClose, selectedBook }: BookDetailsProps
     }
   };
 
-  // Enrich reviews with user first/last names
+  // Updated function and changed name to "fetchReviews." 04/04/2026.
   useEffect(() => {
-    async function enrichReviews() {
+    async function fetchReviews() {
       if (!selectedBook) return;
 
+      const res = await axiosServices.get(`/reviews/book/${selectedBook.id}`);
+      const reviews = res.data;
+
+      // Enrich with names
       const updatedReviews = await Promise.all(
-        selectedBook.reviews.map(async (review) => {
+        reviews.map(async (review) => {
           if (userCache.current.has(review.userId)) {
             return { ...review, ...userCache.current.get(review.userId)! };
           }
 
           try {
-            const res = await axiosServices.get(`/users/${review.userId}`);
-            const { firstName, lastName } = res.data as { firstName: string; lastName: string };
+            const userRes = await axiosServices.get(`/users/${review.userId}`);
+            const { firstName, lastName } = userRes.data;
             userCache.current.set(review.userId, { firstName, lastName });
             return { ...review, firstName, lastName };
           } catch {
-            return review; // fallback if fetch fails
+            return review;
           }
         })
       );
 
+
       setReviewsWithNames(updatedReviews);
     }
 
-    enrichReviews();
+    fetchReviews();
   }, [selectedBook]);
+
 
   return (
     <Dialog
