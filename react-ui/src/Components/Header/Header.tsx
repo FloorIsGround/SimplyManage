@@ -10,6 +10,10 @@ import CatalogSearchBar from "./CatalogSearchBar";
 import type { Book } from "../../Models/Book/Book";
 
 function Header() {
+  // Temporary variables to fix logged in issue.
+  const token = localStorage.getItem("token");
+  const isLoggedIn = !!token;
+
   const theme = useTheme();
   const navigate = useNavigate();
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -42,9 +46,30 @@ function Header() {
             <Button variant="text" size="large" endIcon={<ExpandMoreIcon />} onClick={ (e) => { setHelpAnchorEl(e.currentTarget) }}>
               Help
             </Button>
-            <Button variant="contained" size="large" onClick={ (e) => { setLoginAnchorEl(e.currentTarget) } } sx={{ lineHeight: 'normal' }}>
-              Log In
-            </Button>
+            {isLoggedIn ? (
+              <Button
+                variant="contained"
+                size="large"
+                color="secondary"
+                onClick={() => {
+                  localStorage.removeItem("token");
+                  window.location.reload();
+                }}
+                sx={{ lineHeight: 'normal' }}
+              >
+                Log Out
+              </Button>
+            ) : (
+              <Button
+                variant="contained"
+                size="large"
+                onClick={(e) => { setLoginAnchorEl(e.currentTarget) }}
+                sx={{ lineHeight: 'normal' }}
+              >
+                Log In
+              </Button>
+            )}
+
           </Box>
           {/* Help Popover */}
           <Popover

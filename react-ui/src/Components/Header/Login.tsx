@@ -27,14 +27,16 @@ function Login({ open, anchorEl, onClose, apiEndpoint = "/users/login", redirect
   const handleLogin = async () => {
     setLoginLoading(true);
     setLoginError(null);
-    try {
-      const response = await import("../../utils/axios-api").then(({ default: axios }) =>
-        axios.post(apiEndpoint, { email: loginEmail, password: loginPassword })
-      );
 
-      if (response.data?.token) {
-        localStorage.setItem("token", response.data.token);
-      }
+    try {
+      const { default: axios } = await import("../../utils/axios-api");
+
+      const res = await axios.post(apiEndpoint, {
+        email: loginEmail,
+        password: loginPassword
+      });
+
+      localStorage.setItem("token", res.data.token);
 
       setLoginEmail("");
       setLoginPassword("");
@@ -43,7 +45,11 @@ function Login({ open, anchorEl, onClose, apiEndpoint = "/users/login", redirect
         navigate(redirectPath);
       }
     } catch (err: any) {
-      setLoginError(err?.response?.data?.message || "Login failed. Please check your credentials.");
+      setLoginError(
+        err?.response?.data?.error ||
+        err?.response?.data?.message ||
+        "Login failed. Please check your credentials."
+      );
     } finally {
       setLoginLoading(false);
     }
