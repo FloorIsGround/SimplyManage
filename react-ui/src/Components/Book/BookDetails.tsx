@@ -99,7 +99,7 @@ function BookDetails({ modalOpen, onModalClose, selectedBook }: BookDetailsProps
               >
                 Average Rating
               </Typography>
-              <Rating value={averageRating} readOnly />
+              <Rating value={averageRating} precision={0.1} readOnly />
             </Box>
 
             {/* Sidebar tab buttons */}
