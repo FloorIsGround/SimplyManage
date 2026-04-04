@@ -8,9 +8,18 @@ export interface LoginProps {
   onClose: () => void;
   apiEndpoint?: string;
   redirectPath?: string;
+  onLoginSuccess?: () => void;   // ← ADD THIS
 }
 
-function Login({ open, anchorEl, onClose, apiEndpoint = "/users/login", redirectPath }: LoginProps) {
+function Login({
+  open,
+  anchorEl,
+  onClose,
+  apiEndpoint = "/users/login",
+  redirectPath,
+  onLoginSuccess   // ← ADD THIS
+}: LoginProps) {
+
   const navigate = useNavigate();
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
@@ -37,7 +46,7 @@ function Login({ open, anchorEl, onClose, apiEndpoint = "/users/login", redirect
       });
 
       localStorage.setItem("token", res.data.token);
-
+      onLoginSuccess?.();
       setLoginEmail("");
       setLoginPassword("");
       handleClose();
