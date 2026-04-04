@@ -27,18 +27,39 @@ function Login({ open, anchorEl, onClose, apiEndpoint = "/users/login", redirect
   const handleLogin = async () => {
     setLoginLoading(true);
     setLoginError(null);
+
     try {
-      await import("../../utils/axios-api").then(({default: axios}) => axios.post(apiEndpoint, { email: loginEmail, password: loginPassword }));
+      const { default: axios } = await import("../../utils/axios-api");
+
+      const res = await axios.post(apiEndpoint, {
+        email: loginEmail,
+        password: loginPassword
+      });
+
+      // ✔ Store the token returned by backend
+      localStorage.setItem("token", res.data.token);
+
+      // ✔ Reset fields
       setLoginEmail("");
       setLoginPassword("");
+
+      // ✔ Close login popover
       handleClose();
+
+      // ✔ Redirect if needed
       if (redirectPath) {
         navigate(redirectPath);
       }
-      // Optionally, store token or user info
-      // localStorage.setItem("token", res.data.token);
+
+      // ✔ Tell the header that login succeeded (if you added onLoginSuccess)
+      // onLoginSuccess?.();
+
     } catch (err: any) {
-      setLoginError(err?.response?.data?.message || "Login failed. Please check your credentials.");
+      setLoginError(
+        err?.response?.data?.error ||
+        err?.response?.data?.message ||
+        "Login failed. Please check your credentials."
+      );
     } finally {
       setLoginLoading(false);
     }
