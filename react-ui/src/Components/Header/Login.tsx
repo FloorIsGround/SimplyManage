@@ -8,9 +8,18 @@ export interface LoginProps {
   onClose: () => void;
   apiEndpoint?: string;
   redirectPath?: string;
+  onLoginSuccess?: () => void;   // ← ADD THIS
 }
 
-function Login({ open, anchorEl, onClose, apiEndpoint = "/users/login", redirectPath }: LoginProps) {
+function Login({
+  open,
+  anchorEl,
+  onClose,
+  apiEndpoint = "/users/login",
+  redirectPath,
+  onLoginSuccess   // ← ADD THIS
+}: LoginProps) {
+
   const navigate = useNavigate();
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
@@ -39,6 +48,9 @@ function Login({ open, anchorEl, onClose, apiEndpoint = "/users/login", redirect
       // ✔ Store the token returned by backend
       localStorage.setItem("token", res.data.token);
 
+      // ✔ Notify Header that login succeeded
+      onLoginSuccess?.();
+
       // ✔ Reset fields
       setLoginEmail("");
       setLoginPassword("");
@@ -50,9 +62,6 @@ function Login({ open, anchorEl, onClose, apiEndpoint = "/users/login", redirect
       if (redirectPath) {
         navigate(redirectPath);
       }
-
-      // ✔ Tell the header that login succeeded (if you added onLoginSuccess)
-      // onLoginSuccess?.();
 
     } catch (err: any) {
       setLoginError(
