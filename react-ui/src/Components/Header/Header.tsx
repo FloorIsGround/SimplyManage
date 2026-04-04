@@ -46,18 +46,29 @@ function Header() {
               Help
             </Button>
             {isLoggedIn ? (
-              <Button
-                variant="contained"
-                size="large"
-                color="secondary"
-                onClick={() => {
-                  localStorage.removeItem("token");
-                  window.location.reload();
-                }}
-                sx={{ lineHeight: 'normal' }}
-              >
-                Log Out
-              </Button>
+              <>
+                <Button
+                  variant="outlined"
+                  size="large"
+                  onClick={() => navigate("/patron-dashboard")}
+                  sx={{ lineHeight: 'normal' }}
+                >
+                  User Dashboard
+                </Button>
+
+                <Button
+                  variant="contained"
+                  size="large"
+                  color="secondary"
+                  onClick={() => {
+                    localStorage.removeItem("token");
+                    window.location.reload();
+                  }}
+                  sx={{ lineHeight: 'normal' }}
+                >
+                  Log Out
+                </Button>
+              </>
             ) : (
               <Button
                 variant="contained"
