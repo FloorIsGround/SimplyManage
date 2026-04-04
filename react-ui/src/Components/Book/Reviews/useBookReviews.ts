@@ -1,5 +1,4 @@
 // react-ui/src/Components/Book/Reviews/useBookReviews.ts
-
 import { useEffect, useRef, useState } from "react";
 import axiosServices from "../../../utils/axios-api";
 import type { Review } from "../../../Models/Book/Book";
@@ -21,6 +20,9 @@ export function useBookReviews(bookId: string | null) {
 
     // Holds the final enriched list of reviews
     const [reviews, setReviews] = useState<Review[]>([]);
+
+    // Holds the computed average rating for the book
+    const [averageRating, setAverageRating] = useState<number>(0);
 
     /*
       Cache for user lookups:
@@ -75,6 +77,17 @@ export function useBookReviews(bookId: string | null) {
 
             // Update state with enriched reviews
             setReviews(enriched);
+
+            // Compute average rating on the front-end
+            if (enriched.length > 0) {
+                const avg =
+                    enriched.reduce((sum, r) => sum + r.rating, 0) / enriched.length;
+                setAverageRating(avg);
+            } else {
+                setAverageRating(0);
+            }
+
+
         }
 
         // Trigger the fetch when bookId changes
@@ -88,5 +101,5 @@ export function useBookReviews(bookId: string | null) {
         • setReviews: allows parent components to add new reviews
           (e.g., after submitting a new one)
     */
-    return { reviews, setReviews };
+      return { reviews, setReviews, averageRating };
 }

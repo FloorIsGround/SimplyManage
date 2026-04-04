@@ -41,7 +41,7 @@ function BookDetails({ modalOpen, onModalClose, selectedBook }: BookDetailsProps
   const [activeTab, setActiveTab] = useState<ActiveTabEnum>(ActiveTabEnum.details);
 
   // Load reviews using the custom hook. Automatically fetches and enriches with user names.
-  const { reviews, setReviews } = useBookReviews(selectedBook?.id ?? null);
+  const { reviews, setReviews, averageRating } = useBookReviews(selectedBook?.id ?? null);
 
   // Callback for WriteReview component
   // Adds the new review to the top of the list.
@@ -99,7 +99,7 @@ function BookDetails({ modalOpen, onModalClose, selectedBook }: BookDetailsProps
               >
                 Average Rating
               </Typography>
-              <Rating value={selectedBook.averageRating} readOnly />
+              <Rating value={averageRating} readOnly />
             </Box>
 
             {/* Sidebar tab buttons */}
