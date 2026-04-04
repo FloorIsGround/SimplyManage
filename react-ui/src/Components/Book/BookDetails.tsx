@@ -13,12 +13,14 @@ import WriteReview from "./Reviews/WriteReview";
 
 import type { Book, Review } from "../../Models/Book/Book";
 
+
 export interface BookDetailsProps {
-  modalOpen: boolean;
-  selectedBook: Book | null;
-  onModalClose(): void;
+  modalOpen: boolean; // Controls modal visibility
+  selectedBook: Book | null; // Currently selected book
+  onModalClose(): void; // Callback to close the modal.
 }
 
+// Taps for the left sidebar navigation in book details.
 enum ActiveTabEnum {
   details = "Details",
   copiesAvailable = "Copies Available",
@@ -26,20 +28,28 @@ enum ActiveTabEnum {
   writeAReview = "Write a Review"
 }
 
-// Completely removed all reviews functions and migrated them to their own models.
+/*
+BookDetails Component:
+Displays book details, copies available, and reviews functionality.
+All review logic has been extracted into separate files for readability. 
+*/
+// Completely removed all reviews functions and migrated them to their own models. 04/04/2026
 function BookDetails({ modalOpen, onModalClose, selectedBook }: BookDetailsProps) {
   const theme = useTheme();
 
+  // Control which tab is active.
   const [activeTab, setActiveTab] = useState<ActiveTabEnum>(ActiveTabEnum.details);
 
-  // Load reviews using the custom hook
+  // Load reviews using the custom hook. Automatically fetches and enriches with user names.
   const { reviews, setReviews } = useBookReviews(selectedBook?.id ?? null);
 
   // Callback for WriteReview component
+  // Adds the new review to the top of the list.
   function handleReviewAdded(newReview: Review) {
     setReviews((prev) => [newReview, ...prev]);
   }
 
+  // Resest the UI state when modal closes.
   const handleModalClose = () => {
     setActiveTab(ActiveTabEnum.details);
     onModalClose();
@@ -64,6 +74,7 @@ function BookDetails({ modalOpen, onModalClose, selectedBook }: BookDetailsProps
         }
       }}
     >
+      {/* Only render content if a book is selected */}
       {selectedBook && (
         <>
           {/* Sidebar */}
@@ -77,8 +88,10 @@ function BookDetails({ modalOpen, onModalClose, selectedBook }: BookDetailsProps
               gap: 2
             }}
           >
+            {/* Book cover image */}
             <BookCover isbn={selectedBook.isbn} alt={selectedBook.title + " Book Cover"} />
-
+            
+            {/* Average rating display */}
             <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 0.25 }}>
               <Typography
                 variant="subtitle2"
@@ -89,6 +102,7 @@ function BookDetails({ modalOpen, onModalClose, selectedBook }: BookDetailsProps
               <Rating value={selectedBook.averageRating} readOnly />
             </Box>
 
+            {/* Sidebar tab buttons */}
             <Box
               sx={{
                 display: "flex",
@@ -113,10 +127,13 @@ function BookDetails({ modalOpen, onModalClose, selectedBook }: BookDetailsProps
 
           {/* Main content */}
           <Box sx={{ flex: 1, p: 3, position: "relative", height: "100%" }}>
+
+            {/* Close button */}
             <IconButton sx={{ position: "absolute", top: 8, right: 8 }} onClick={handleModalClose}>
               <CloseIcon />
             </IconButton>
 
+            {/* Book title + author */}
             <Box>
               <Typography variant="h4">{selectedBook.title}</Typography>
               <Typography variant="h6" color="text.secondary">
