@@ -113,9 +113,9 @@ const BookList: React.FC<BookListProps> = ({
           </IconButton>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', width: '100%' }}>
             <CatalogSearchBar
-              onSearchFailure={(err) => {setResultsError(err)}}
-              onSearchLoading={(isLoading) => {setResultsLoading(isLoading)}}
-              onSearchSuccess={(results: Book[]) => {setSearchResults(results)}}
+              onSearchFailure={(err) => { setResultsError(err) }}
+              onSearchLoading={(isLoading) => { setResultsLoading(isLoading) }}
+              onSearchSuccess={(results: Book[]) => { setSearchResults(results) }}
             />
           </Box>
           <Box
@@ -134,7 +134,7 @@ const BookList: React.FC<BookListProps> = ({
           </Box>
         </Box>
       </Drawer>
-      <BookDetails 
+      <BookDetails
         modalOpen={modalOpen}
         selectedBook={selectedBook}
         onModalClose={() => {
