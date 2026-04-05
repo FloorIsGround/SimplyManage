@@ -28,8 +28,7 @@ export function useBookReviews(bookId: string | null) {
       Cache for user lookups:
       - Key: userId
       - Value: { firstName, lastName }
-      This prevents unnecessary API calls when multiple reviews
-      belong to the same user.
+      This prevents unnecessary API calls when multiple reviews belong to the same user.
     */
     const userCache = useRef<Map<string, { firstName: string; lastName: string }>>(new Map());
 
@@ -86,8 +85,6 @@ export function useBookReviews(bookId: string | null) {
             } else {
                 setAverageRating(0);
             }
-
-
         }
 
         // Trigger the fetch when bookId changes
@@ -101,5 +98,5 @@ export function useBookReviews(bookId: string | null) {
         • setReviews: allows parent components to add new reviews
           (e.g., after submitting a new one)
     */
-      return { reviews, setReviews, averageRating };
+    return { reviews, setReviews, averageRating };
 }

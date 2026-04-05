@@ -26,7 +26,7 @@ export default function ReviewList({ reviews }: { reviews: Review[] }) {
 
                     {/* Star rating for the review */}
                     <Rating value={review.rating} readOnly size="small" />
-                    
+
                     {/* Review text/comment */}
                     <Typography variant="body2">{review.comment}</Typography>
 
@@ -34,7 +34,7 @@ export default function ReviewList({ reviews }: { reviews: Review[] }) {
                     <Typography variant="caption" color="text.secondary">
                         {review.firstName && review.lastName
                             ? `${review.firstName} ${review.lastName}`
-                            : `User ${review.userId}`}
+                            : "Anonymous User"}
                     </Typography>
                 </Box>
             ))}
