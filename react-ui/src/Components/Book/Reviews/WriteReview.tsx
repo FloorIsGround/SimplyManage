@@ -89,7 +89,7 @@ export default function WriteReview({ bookId, onReviewAdded }: Props) {
             const newReview: Review = {
                 ...res.data,
                 firstName: "You",
-                lastName: ""
+                lastName: " "
             };
 
             // Notify parent component so it can update the review list
