@@ -100,7 +100,7 @@ function Header() {
             anchorEl={loginAnchorEl}
             onClose={() => setLoginAnchorEl(null)}
             redirectPath="/patron-dashboard"
-            onLoginSuccess={() => setIsLoggedIn(true)}   // ← ADD THIS
+            onLoginSuccess={() => setIsLoggedIn(true)}
           />
 
         </Toolbar>

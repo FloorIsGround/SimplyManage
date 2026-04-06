@@ -8,7 +8,7 @@ export interface LoginProps {
   onClose: () => void;
   apiEndpoint?: string;
   redirectPath?: string;
-  onLoginSuccess?: () => void;   // ← ADD THIS
+  onLoginSuccess?: () => void;
 }
 
 function Login({
@@ -17,7 +17,7 @@ function Login({
   onClose,
   apiEndpoint = "/users/login",
   redirectPath,
-  onLoginSuccess   // ← ADD THIS
+  onLoginSuccess
 }: LoginProps) {
 
   const navigate = useNavigate();
