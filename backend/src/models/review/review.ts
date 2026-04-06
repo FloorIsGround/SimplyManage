@@ -5,6 +5,8 @@ export interface Review {
     rating: number;
     comment: string | null;
     createdAt: string;
+    firstName?: string;
+    lastName?: string;
 }
 
 export interface CreateReviewInput {

@@ -458,6 +458,38 @@ VALUES
 
 
 --
+-- Trigger: keep books.average_rating in sync with reviews
+--
+
+CREATE OR REPLACE FUNCTION public.sync_book_average_rating()
+RETURNS TRIGGER AS $$
+DECLARE
+  affected_book_id uuid;
+BEGIN
+  affected_book_id := COALESCE(NEW.book_id, OLD.book_id);
+
+  UPDATE public.books
+  SET average_rating = (
+    SELECT ROUND(AVG(rating), 2) FROM public.reviews WHERE book_id = affected_book_id
+  )
+  WHERE book_id = affected_book_id;
+
+  RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER trg_sync_book_average_rating
+AFTER INSERT OR UPDATE OR DELETE ON public.reviews
+FOR EACH ROW
+EXECUTE FUNCTION public.sync_book_average_rating();
+
+-- Backfill average_rating for any books that already have reviews
+UPDATE public.books b
+SET average_rating = (
+  SELECT ROUND(AVG(rating), 2) FROM public.reviews WHERE book_id = b.book_id
+);
+
+--
 -- PostgreSQL database dump complete
 --
 

@@ -23,7 +23,7 @@ const EventList: React.FC = () => {
 useEffect(() => {
   axiosServices.get("/events")
     .then(res => {
-      console.log(res.data); // Add this line
+      console.log(res.data);
       setEvents(res.data);
       setLoading(false);
     })

@@ -10,10 +10,13 @@ import CatalogSearchBar from "./CatalogSearchBar";
 import type { Book } from "../../Models/Book/Book";
 
 function Header() {
+  // Temporary variables to fix logged in issue.
+  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
+
   const theme = useTheme();
   const navigate = useNavigate();
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [loginAnchorEl, setLoginAnchorEl] = useState<null | HTMLElement>(null); 
+  const [loginAnchorEl, setLoginAnchorEl] = useState<null | HTMLElement>(null);
   const [helpAnchorEl, setHelpAnchorEl] = useState<null | HTMLElement>(null);
   const [searchResults, setSearchResults] = useState<Book[]>([]);
   const [searchLoading, setSearchLoading] = useState(false);
@@ -26,31 +29,52 @@ function Header() {
     setDrawerOpen(false);
   };
 
-  return(
+  return (
     <>
       {/* Primary Header Bar */}
       <AppBar position='static' elevation={0} sx={{ backgroundColor: 'white', borderBottom: `2px solid ${theme.palette.primary.main}`, height: 65 }}>
         <Toolbar>
-          <LocalLibraryIcon sx={{ fontSize: 50, color: theme.palette.primary.main }}/>
+          <LocalLibraryIcon sx={{ fontSize: 50, color: theme.palette.primary.main }} />
           <Typography sx={{ ml: 2, color: theme.palette.primary.main, fontSize: 17, cursor: "pointer" }} onClick={() => { navigate("/") }} component="span">
             SimplyManage Public Library
           </Typography>
           <Box sx={{ ml: 'auto', display: 'flex', gap: 2, alignItems: 'center' }}>
-            <Button variant="text" size="large" startIcon={<LocationOnIcon />} onClick={ () => { navigate("/hours-locations") }}>
+            <Button variant="text" size="large" startIcon={<LocationOnIcon />} onClick={() => { navigate("/hours-locations") }}>
               Hours & Locations
             </Button>
-            <Button variant="text" size="large" endIcon={<ExpandMoreIcon />} onClick={ (e) => { setHelpAnchorEl(e.currentTarget) }}>
+            <Button variant="text" size="large" endIcon={<ExpandMoreIcon />} onClick={(e) => { setHelpAnchorEl(e.currentTarget) }}>
               Help
             </Button>
-            <Button variant="contained" size="large" onClick={ (e) => { setLoginAnchorEl(e.currentTarget) } } sx={{ lineHeight: 'normal' }}>
-              Log In
-            </Button>
+            {isLoggedIn ? (
+              <Button
+                variant="contained"
+                size="large"
+                color="secondary"
+                onClick={() => {
+                  localStorage.removeItem("token");
+                  window.location.reload();
+                }}
+                sx={{ lineHeight: 'normal' }}
+              >
+                Log Out
+              </Button>
+            ) : (
+              <Button
+                variant="contained"
+                size="large"
+                onClick={(e) => { setLoginAnchorEl(e.currentTarget) }}
+                sx={{ lineHeight: 'normal' }}
+              >
+                Log In
+              </Button>
+            )}
+
           </Box>
           {/* Help Popover */}
           <Popover
-            open={ helpOpen }
-            anchorEl={ helpAnchorEl }
-            onClose={ () => { setHelpAnchorEl(null) }} 
+            open={helpOpen}
+            anchorEl={helpAnchorEl}
+            onClose={() => { setHelpAnchorEl(null) }}
             anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
             transformOrigin={{ vertical: 'top', horizontal: 'right' }}
           >
@@ -64,26 +88,33 @@ function Header() {
                 </Typography>
               </CardContent>
               <CardActions>
-                <Button size="small" onClick={ () => { setHelpAnchorEl(null); navigate("/faqs") }}>
+                <Button size="small" onClick={() => { setHelpAnchorEl(null); navigate("/faqs") }}>
                   Learn More
                 </Button>
               </CardActions>
             </Card>
           </Popover>
           {/* Login component */}
-          <Login open={loginOpen} anchorEl={loginAnchorEl} onClose={() => setLoginAnchorEl(null)} redirectPath="/patron-dashboard" />
+          <Login
+            open={loginOpen}
+            anchorEl={loginAnchorEl}
+            onClose={() => setLoginAnchorEl(null)}
+            redirectPath="/patron-dashboard"
+            onLoginSuccess={() => setIsLoggedIn(true)}
+          />
+
         </Toolbar>
       </AppBar>
       {/* Secondary Header Bar */}
-      <AppBar position="static" elevation={ 0 } sx={{ backgroundColor: 'white', height: 35 }}>
+      <AppBar position="static" elevation={0} sx={{ backgroundColor: 'white', height: 35 }}>
         <Toolbar sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <CatalogSearchBar 
-            onSearchSuccess={(results: Book[]) => { setSearchResults(results)}}
+          <CatalogSearchBar
+            onSearchSuccess={(results: Book[]) => { setSearchResults(results) }}
             onSearchLoading={(loading: boolean) => {
               setSearchLoading(loading);
               setDrawerOpen(true);
             }}
-            onSearchFailure={(error: string) => {setSearchFailure(error)}}
+            onSearchFailure={(error: string) => { setSearchFailure(error) }}
           />
         </Toolbar>
       </AppBar>

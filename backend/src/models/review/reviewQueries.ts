@@ -9,6 +9,8 @@ type ReviewRow = {
   rating: number;
   comment: string | null;
   created_at: string | Date;
+  first_name?: string;
+  last_name?: string;
 };
 
 // Converts a database row into the frontend/backend review model shape.
@@ -22,16 +24,20 @@ function mapReviewRow(row: ReviewRow): Review {
     createdAt: row.created_at instanceof Date
       ? row.created_at.toISOString()
       : row.created_at,
+    firstName: row.first_name,
+    lastName: row.last_name,
   };
 }
 
 // Gets all reviews for one specific book.
 export async function getReviewsByBookId(bookId: string): Promise<Review[]> {
   const res = await query<ReviewRow>(
-    `SELECT id, user_id, book_id, rating, comment, created_at
-     FROM reviews
-     WHERE book_id = $1
-     ORDER BY created_at DESC`,
+    `SELECT r.id, r.user_id, r.book_id, r.rating, r.comment, r.created_at,
+            u.first_name, u.last_name
+     FROM reviews r
+     JOIN users u ON u.user_id = r.user_id
+     WHERE r.book_id = $1
+     ORDER BY r.created_at DESC`,
     [bookId]
   );
 

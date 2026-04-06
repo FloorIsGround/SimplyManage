@@ -1,5 +1,5 @@
 export interface Book {
-  id: string;
+  id: string;           // book_id in DB
   isbn: number;
   title: string;
   author: string;
@@ -19,4 +19,6 @@ export interface Review {
   rating: number;
   comment: string;
   createdAt: string;
+  firstName?: string;
+  lastName?: string;
 }
