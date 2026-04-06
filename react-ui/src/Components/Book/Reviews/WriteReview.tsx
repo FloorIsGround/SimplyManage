@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { Box, Button, Rating, TextField, Typography } from "@mui/material";
 import axiosServices from "../../../utils/axios-api";
-import type { Review } from "../../../Models/Book/Book";
 import { jwtDecode } from "jwt-decode";
 
 interface TokenPayload {
@@ -13,7 +12,7 @@ interface TokenPayload {
 
 interface Props {
     bookId: string;                     // ID of the book being reviewed
-    onReviewAdded(review: Review): void; // Callback to notify parent when a new review is submitted
+    onReviewAdded(): Promise<void>;     // Refresh reviews after a successful submission
 }
 
 /*
@@ -25,7 +24,7 @@ interface Props {
     • Collect rating + review text from the user
     • Validate input before submitting
     • Send POST request to backend
-    • Return the newly created review to the parent component
+    • Refresh the review list after a successful submission
     • Display loading + error states
 
   This component does NOT fetch existing reviews — that is handled
@@ -48,8 +47,8 @@ export default function WriteReview({ bookId, onReviewAdded }: Props) {
     /*
       submit()
       --------
-      Validates input, sends the POST request, and returns the new review
-      to the parent component via onReviewAdded().
+      Validates input, sends the POST request, and refreshes the review list
+      in the parent component via onReviewAdded().
     */
     async function submit() {
         // Basic validation
@@ -75,25 +74,14 @@ export default function WriteReview({ bookId, onReviewAdded }: Props) {
 
 
             // Submit the review to the backend
-            const res = await axiosServices.post(
+            await axiosServices.post(
                 `/reviews`,
                 { userId, bookId, rating, comment: text },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 
-
-            /*
-              The backend does not return first/last name for the reviewer.
-              Since this user just submitted the review, we label it as "You".
-            */
-            const newReview: Review = {
-                ...res.data,
-                firstName: "You",
-                lastName: " "
-            };
-
-            // Notify parent component so it can update the review list
-            onReviewAdded(newReview);
+            // Refresh reviews so the UI uses backend-enriched reviewer data.
+            await onReviewAdded();
 
             // Reset form fields
             setRating(null);

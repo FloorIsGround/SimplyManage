@@ -6,6 +6,12 @@ import type { Review } from "../../../Models/Book/Book";
 export function useBookReviews(bookId: string | null) {
     const [reviews, setReviews] = useState<Review[]>([]);
 
+    async function refreshReviews() {
+        if (!bookId) return;
+        const res = await axiosServices.get(`/reviews/book/${bookId}`);
+        setReviews(res.data);
+    }
+
     useEffect(() => {
         if (!bookId) return;
 
@@ -17,5 +23,5 @@ export function useBookReviews(bookId: string | null) {
         fetchReviews();
     }, [bookId]);
 
-    return { reviews, setReviews };
+    return { reviews, refreshReviews };
 }

@@ -5,7 +5,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import BookCover from "./BookCover";
 import ReviewList from "./Reviews/ReviewList";
 import WriteReview from "./Reviews/WriteReview";
-import type { Book, Review } from "../../Models/Book/Book";
+import type { Book } from "../../Models/Book/Book";
 
 
 export interface BookDetailsProps {
@@ -25,13 +25,7 @@ enum ActiveTabEnum {
 function BookDetails({ modalOpen, onModalClose, selectedBook }: BookDetailsProps) {
   const theme = useTheme();
   const [activeTab, setActiveTab] = useState<ActiveTabEnum>(ActiveTabEnum.details);
-  const { reviews, setReviews } = useBookReviews(selectedBook?.id ?? null);
-
-  // Callback for WriteReview component
-  // Adds the new review to the top of the list.
-  function handleReviewAdded(newReview: Review) {
-    setReviews((prev) => [newReview, ...prev]);
-  }
+  const { reviews, refreshReviews } = useBookReviews(selectedBook?.id ?? null);
 
   const handleModalClose = () => {
     setActiveTab(ActiveTabEnum.details);
@@ -145,7 +139,7 @@ function BookDetails({ modalOpen, onModalClose, selectedBook }: BookDetailsProps
             )}
             {/* WRITE REVIEW TAB */}
             {activeTab === ActiveTabEnum.writeAReview && selectedBook && (
-              <WriteReview bookId={selectedBook.id} onReviewAdded={handleReviewAdded} />
+              <WriteReview bookId={selectedBook.id} onReviewAdded={refreshReviews} />
             )}
           </Box>
         </>
