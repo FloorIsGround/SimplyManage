@@ -28,15 +28,20 @@ function Login({ open, anchorEl, onClose, apiEndpoint = "/users/login", redirect
     setLoginLoading(true);
     setLoginError(null);
     try {
-      await import("../../utils/axios-api").then(({default: axios}) => axios.post(apiEndpoint, { email: loginEmail, password: loginPassword }));
+      const response = await import("../../utils/axios-api").then(({ default: axios }) =>
+        axios.post(apiEndpoint, { email: loginEmail, password: loginPassword })
+      );
+
+      if (response.data?.token) {
+        localStorage.setItem("token", response.data.token);
+      }
+
       setLoginEmail("");
       setLoginPassword("");
       handleClose();
       if (redirectPath) {
         navigate(redirectPath);
       }
-      // Optionally, store token or user info
-      // localStorage.setItem("token", res.data.token);
     } catch (err: any) {
       setLoginError(err?.response?.data?.message || "Login failed. Please check your credentials.");
     } finally {
