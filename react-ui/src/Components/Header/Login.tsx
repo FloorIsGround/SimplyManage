@@ -73,53 +73,61 @@ function Login({
       transformOrigin={{ vertical: 'top', horizontal: 'right' }}
     >
       <Card sx={{ minWidth: 275 }}>
-        <CardContent>
-          <Typography gutterBottom sx={{ color: 'text.secondary', fontSize: 14 }}>
-            Log In to Your Account
-          </Typography>
-          <TextField
-            id="email"
-            label="Email"
-            variant="outlined"
-            fullWidth
-            size="small"
-            sx={{ mt: 1, mb: 0.5 }}
-            value={loginEmail}
-            onChange={e => setLoginEmail(e.target.value)}
-            autoComplete="username"
-          />
-          <TextField
-            id="password"
-            label="Password"
-            type="password"
-            variant="outlined"
-            fullWidth
-            size="small"
-            sx={{ mb: 0 }}
-            value={loginPassword}
-            onChange={e => setLoginPassword(e.target.value)}
-            autoComplete="current-password"
-          />
-          {loginError && (
-            <Typography color="error" variant="body2" sx={{ mt: 1 }}>
-              {loginError}
+        <form
+          onSubmit={e => {
+            e.preventDefault();
+            handleLogin();
+          }}
+        >
+          <CardContent>
+            <Typography gutterBottom sx={{ color: 'text.secondary', fontSize: 14 }}>
+              Log In to Your Account
             </Typography>
-          )}
-        </CardContent>
-        <CardActions sx={{ flexDirection: 'column', gap: 0.5, pt: 0 }}>
-          <Button
-            size="medium"
-            variant="contained"
-            fullWidth
-            onClick={handleLogin}
-            disabled={loginLoading || !loginEmail || !loginPassword}
-          >
-            {loginLoading ? "Logging In..." : "Log In"}
-          </Button>
-          <Button size="medium" variant="text" fullWidth onClick={() => { handleClose(); navigate("/sign-up") }}>
-            Sign Up
-          </Button>
-        </CardActions>
+            <TextField
+              id="email"
+              label="Email"
+              variant="outlined"
+              fullWidth
+              size="small"
+              sx={{ mt: 1, mb: 0.5 }}
+              value={loginEmail}
+              onChange={e => setLoginEmail(e.target.value)}
+              autoComplete="username"
+            />
+            <TextField
+              id="password"
+              label="Password"
+              type="password"
+              variant="outlined"
+              fullWidth
+              size="small"
+              sx={{ mb: 0 }}
+              value={loginPassword}
+              onChange={e => setLoginPassword(e.target.value)}
+              autoComplete="current-password"
+            />
+            {loginError && (
+              <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+                {loginError}
+              </Typography>
+            )}
+          </CardContent>
+          <CardActions sx={{ flexDirection: 'column', gap: 0.5, pt: 0 }}>
+            <Button
+              size="medium"
+              variant="contained"
+              fullWidth
+              type="submit"
+              onClick={handleLogin}
+              disabled={loginLoading || !loginEmail || !loginPassword}
+            >
+              {loginLoading ? "Logging In..." : "Log In"}
+            </Button>
+            <Button size="medium" variant="text" fullWidth onClick={() => { handleClose(); navigate("/sign-up") }}>
+              Sign Up
+            </Button>
+          </CardActions>
+        </form>
       </Card>
     </Popover>
   );

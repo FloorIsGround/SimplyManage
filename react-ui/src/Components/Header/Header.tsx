@@ -2,7 +2,7 @@ import { AppBar, Box, Button, Card, CardActions, CardContent, Popover, Toolbar, 
 import LocalLibraryIcon from "@mui/icons-material/LocalLibrary";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Login from "./Login";
 import { useNavigate } from "react-router-dom";
 import BookList from "../Book/BookList";
@@ -10,8 +10,16 @@ import CatalogSearchBar from "./CatalogSearchBar";
 import type { Book } from "../../Models/Book/Book";
 
 function Header() {
+  const logOutButtonRef = useRef<HTMLButtonElement | null>(null);
   // Temporary variables to fix logged in issue.
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
+
+  // Blur Log Out button after login
+  useEffect(() => {
+    if (isLoggedIn && logOutButtonRef.current) {
+      logOutButtonRef.current.blur();
+    }
+  }, [isLoggedIn]);
 
   const theme = useTheme();
   const navigate = useNavigate();
@@ -50,6 +58,7 @@ function Header() {
                 variant="contained"
                 size="large"
                 color="secondary"
+                ref={logOutButtonRef}
                 onClick={() => {
                   localStorage.removeItem("token");
                   window.location.reload();
@@ -68,7 +77,6 @@ function Header() {
                 Log In
               </Button>
             )}
-
           </Box>
           {/* Help Popover */}
           <Popover
@@ -100,9 +108,10 @@ function Header() {
             anchorEl={loginAnchorEl}
             onClose={() => setLoginAnchorEl(null)}
             redirectPath="/patron-dashboard"
-            onLoginSuccess={() => setIsLoggedIn(true)}
+            onLoginSuccess={() => {
+              setIsLoggedIn(true);
+            }}
           />
-
         </Toolbar>
       </AppBar>
       {/* Secondary Header Bar */}
