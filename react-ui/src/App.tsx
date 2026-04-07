@@ -12,6 +12,10 @@ const theme = createTheme({
     primary: {
       main: '#4E780C',
     },
+    secondary: {
+      main: '#355507', 
+      contrastText: '#fff',
+    },
   },
   components: {
     // Global button styling — removes automatic uppercase text
