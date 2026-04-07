@@ -158,6 +158,11 @@ CREATE TABLE IF NOT EXISTS public.copies (
     CONSTRAINT copies_condition_status_check CHECK ((condition_status = ANY (ARRAY['AVAILABLE'::text, 'LOST'::text, 'DAMAGED'::text, 'MAINTENANCE'::text])))
 );
 
+-- Currently in the database already:
+-- CREATE SEQUENCE copy_barcode_seq;
+-- ALTER TABLE copies ALTER COLUMN barcode SET DEFAULT 'BC' || LPAD(nextval('copy_barcode_seq')::text, 8, '0');
+
+
 
 --
 -- Name: fees; Type: TABLE; Schema: public; Owner: -
@@ -188,6 +193,7 @@ CREATE TABLE IF NOT EXISTS public.holds (
     placed_at timestamp with time zone NOT NULL,
     status text NOT NULL,
     ready_expires_at timestamp with time zone,
+    queue_position integer NOT NULL,
     CONSTRAINT holds_status_check CHECK ((status = ANY (ARRAY['ACTIVE'::text, 'READY'::text, 'FULFILLED'::text, 'CANCELLED'::text])))
 );
 
@@ -450,6 +456,38 @@ VALUES
 -- ALTER TABLE ONLY public.loans
 --     ADD CONSTRAINT loans_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(user_id) ON DELETE RESTRICT;
 
+
+--
+-- Trigger: keep books.average_rating in sync with reviews
+--
+
+CREATE OR REPLACE FUNCTION public.sync_book_average_rating()
+RETURNS TRIGGER AS $$
+DECLARE
+  affected_book_id uuid;
+BEGIN
+  affected_book_id := COALESCE(NEW.book_id, OLD.book_id);
+
+  UPDATE public.books
+  SET average_rating = (
+    SELECT ROUND(AVG(rating), 2) FROM public.reviews WHERE book_id = affected_book_id
+  )
+  WHERE book_id = affected_book_id;
+
+  RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER trg_sync_book_average_rating
+AFTER INSERT OR UPDATE OR DELETE ON public.reviews
+FOR EACH ROW
+EXECUTE FUNCTION public.sync_book_average_rating();
+
+-- Backfill average_rating for any books that already have reviews
+UPDATE public.books b
+SET average_rating = (
+  SELECT ROUND(AVG(rating), 2) FROM public.reviews WHERE book_id = b.book_id
+);
 
 --
 -- PostgreSQL database dump complete

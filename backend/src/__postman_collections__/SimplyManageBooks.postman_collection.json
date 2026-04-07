@@ -1,0 +1,227 @@
+{
+  "info": {
+    "_postman_id": "6203b90c-f7cf-458a-b2a4-4126887c96da",
+    "name": "SimplyManageBooks",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "50529965",
+    "_collection_link": "https://go.postman.co/collection/50529965-6203b90c-f7cf-458a-b2a4-4126887c96da?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Create Book",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"isbn\": \"9780547928227\",\r\n  \"title\": \"The Hobbit\",\r\n  \"author\": \"J.R.R. Tolkien\",\r\n  \"audience\": \"Young Adult\",\r\n  \"genre\": \"Fantasy\",\r\n  \"description\": \"A fantasy novel about Bilbo Baggins, a hobbit who is drawn into an adventure with a group of dwarves to reclaim treasure guarded by a dragon.\",\r\n  \"publicationYear\": 1937\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{link}}/api/books",
+          "host": [
+            "{{link}}"
+          ],
+          "path": [
+            "api",
+            "books"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Update Book",
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"isbn\": \"9780547928227\",\r\n  \"title\": \"The Hobbit\",\r\n  \"author\": \"J.R.R. Tolkien\",\r\n  \"audience\": \"Young Adult\",\r\n  \"genre\": \"Fantasy\",\r\n  \"description\": \"A fantasy novel about Bilbo Baggins, a hobbit who is drawn into an adventure with a group of dwarves to reclaim treasure guarded by a dragon.\",\r\n  \"publicationYear\": 1937\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{link}}/api/books/:bookId",
+          "host": [
+            "{{link}}"
+          ],
+          "path": [
+            "api",
+            "books",
+            ":bookId"
+          ],
+          "variable": [
+            {
+              "key": "bookId",
+              "value": "dd30696f-f704-4a39-854c-0fc63de9276d",
+              "description": "UUID"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delete Book",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{link}}/api/books/:bookId",
+          "host": [
+            "{{link}}"
+          ],
+          "path": [
+            "api",
+            "books",
+            ":bookId"
+          ],
+          "variable": [
+            {
+              "key": "bookId",
+              "value": "dd30696f-f704-4a39-854c-0fc63de9276d",
+              "description": "UUID"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Books List",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{link}}/api/books/",
+          "host": [
+            "{{link}}"
+          ],
+          "path": [
+            "api",
+            "books",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Books By ISBN",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{link}}/api/books/isbn/:isbn",
+          "host": [
+            "{{link}}"
+          ],
+          "path": [
+            "api",
+            "books",
+            "isbn",
+            ":isbn"
+          ],
+          "variable": [
+            {
+              "key": "isbn",
+              "value": "9780547928227"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Books By UUID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{link}}/api/books/:bookId",
+          "host": [
+            "{{link}}"
+          ],
+          "path": [
+            "api",
+            "books",
+            ":bookId"
+          ],
+          "variable": [
+            {
+              "key": "bookId",
+              "value": "283eeac4-0462-4533-8dbd-0d3afb41ba94",
+              "description": "UUID"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Search Books",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{link}}/api/books/search/:searchQuery",
+          "host": [
+            "{{link}}"
+          ],
+          "path": [
+            "api",
+            "books",
+            "search",
+            ":searchQuery"
+          ],
+          "variable": [
+            {
+              "key": "searchQuery",
+              "value": "Fantasy",
+              "description": "Searches by Author, Title, or Genre"
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "link",
+      "value": ""
+    }
+  ]
+}

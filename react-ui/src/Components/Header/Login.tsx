@@ -8,9 +8,18 @@ export interface LoginProps {
   onClose: () => void;
   apiEndpoint?: string;
   redirectPath?: string;
+  onLoginSuccess?: () => void;
 }
 
-function Login({ open, anchorEl, onClose, apiEndpoint = "/users/login", redirectPath }: LoginProps) {
+function Login({
+  open,
+  anchorEl,
+  onClose,
+  apiEndpoint = "/users/login",
+  redirectPath,
+  onLoginSuccess
+}: LoginProps) {
+
   const navigate = useNavigate();
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
@@ -27,18 +36,29 @@ function Login({ open, anchorEl, onClose, apiEndpoint = "/users/login", redirect
   const handleLogin = async () => {
     setLoginLoading(true);
     setLoginError(null);
+
     try {
-      await import("../../utils/axios-api").then(({default: axios}) => axios.post(apiEndpoint, { email: loginEmail, password: loginPassword }));
+      const { default: axios } = await import("../../utils/axios-api");
+
+      const res = await axios.post(apiEndpoint, {
+        email: loginEmail,
+        password: loginPassword
+      });
+
+      localStorage.setItem("token", res.data.token);
+      onLoginSuccess?.();
       setLoginEmail("");
       setLoginPassword("");
       handleClose();
       if (redirectPath) {
         navigate(redirectPath);
       }
-      // Optionally, store token or user info
-      // localStorage.setItem("token", res.data.token);
     } catch (err: any) {
-      setLoginError(err?.response?.data?.message || "Login failed. Please check your credentials.");
+      setLoginError(
+        err?.response?.data?.error ||
+        err?.response?.data?.message ||
+        "Login failed. Please check your credentials."
+      );
     } finally {
       setLoginLoading(false);
     }
