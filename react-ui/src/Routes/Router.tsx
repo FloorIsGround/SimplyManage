@@ -5,15 +5,15 @@ import SignUp from "../Components/SignUp/SignUp";
 import Faqs from "../Components/Faqs";
 import Homepage from "../Components/Homepage/Homepage";
 import PatronDashboard from "../Components/Dashboard/PatronDashboard";
+import StaffDashboard from "../Components/Dashboard/StaffDashboard";
 
-// Main application router configuration.
-//  This defines all navigable paths in the app and which component should render for each. 
+// Main router
 export const Router = createBrowserRouter([
     {
-        // Root layout — App acts as the parent wrapper for all nested routes
+        // Root layout. App acts as the parent wrapper for all nested routes
         path: "/",
         element: <App />,
-        
+
         // Child routes render inside <Outlet /> within App
         children: [
             {
@@ -37,5 +37,9 @@ export const Router = createBrowserRouter([
                 element: <PatronDashboard />
             }
         ]
+    },
+    {
+        path: "/staff-dashboard",
+        element: <StaffDashboard />
     }
 ])

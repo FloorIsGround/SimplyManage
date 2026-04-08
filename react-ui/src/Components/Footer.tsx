@@ -1,6 +1,9 @@
 import { Box, Typography } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 function Footer() {
+  const navigate = useNavigate();
+
   return (
     <Box component="footer" sx={{
       width: '100%',
@@ -15,7 +18,13 @@ function Footer() {
           <Typography component="a" href="#contact" sx={{ color: 'white', textDecoration: 'underline', cursor: 'pointer' }}>Contact Us</Typography>
           <Typography component="a" href="#faq" sx={{ color: 'white', textDecoration: 'underline', cursor: 'pointer' }}>Help/FAQ</Typography>
           <Typography component="a" href="#hours" sx={{ color: 'white', textDecoration: 'underline', cursor: 'pointer' }}>Hours & Location</Typography>
-          <Typography component="a" href="#admin" sx={{ color: 'white', textDecoration: 'underline', cursor: 'pointer' }}>Staff/Admin Login</Typography>
+          <Typography
+            component="span"
+            sx={{ color: 'white', textDecoration: 'underline', cursor: 'pointer' }}
+            onClick={() => navigate('/staff-dashboard')}
+          >
+            Staff/Admin Login
+          </Typography>
         </Box>
         <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, fontSize: 12 }}>
           <Typography component="span">&copy; {new Date().getFullYear()} SimplyManage Public Library</Typography>
