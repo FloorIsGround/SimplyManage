@@ -23,7 +23,7 @@ function Footer() {
             sx={{ color: 'white', textDecoration: 'underline', cursor: 'pointer' }}
             onClick={() => navigate('/staff-dashboard')}
           >
-            Staff/Admin Login
+            Staff/Admin Dashboard
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, fontSize: 12 }}>
