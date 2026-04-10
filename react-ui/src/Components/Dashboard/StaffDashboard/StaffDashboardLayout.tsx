@@ -1,9 +1,10 @@
 import React from 'react';
-import type { User } from '../../Models/User/User';
+import type { User } from '../../../Models/User/User';
 import { Box, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography, IconButton, Avatar, Divider, Menu, MenuItem } from '@mui/material';
 import { Dashboard, MenuBook, LocationOn, People, Settings, Logout } from '@mui/icons-material';
 import { styled, useTheme } from '@mui/material/styles';
 import LocalLibraryIcon from '@mui/icons-material/LocalLibrary';
+import { useNavigate } from 'react-router-dom';
 
 const drawerWidth = 145;
 
@@ -28,10 +29,10 @@ const Main = styled('main')(({ theme }) => ({
 }));
 
 const navItems = [
-  { label: 'Dashboard', icon: <Dashboard /> },
-  { label: 'Books', icon: <MenuBook /> },
-  { label: 'Libraries', icon: <LocationOn /> },
-  { label: 'Users', icon: <People /> }
+  { label: 'Dashboard', icon: <Dashboard />, path: '/staff-dashboard' },
+  { label: 'Books', icon: <MenuBook />, path: '/staff-dashboard/books' },
+  { label: 'Libraries', icon: <LocationOn />, path: '/staff-dashboard/libraries' },
+  { label: 'Users', icon: <People />, path: '/staff-dashboard/users' }
 ];
 
 interface StaffDashboardLayoutProps {
@@ -44,6 +45,7 @@ const StaffDashboardLayout: React.FC<StaffDashboardLayoutProps> = ({ children, p
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+  const navigate = useNavigate();
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -70,8 +72,10 @@ const StaffDashboardLayout: React.FC<StaffDashboardLayoutProps> = ({ children, p
         <List sx={{ width: '100%' }}>
           {navItems.map((item) => (
             <ListItem key={item.label} disablePadding>
-              <ListItemButton sx={{ justifyContent: 'flex-start', py: 2 }}>
-                <ListItemIcon sx={{ color: theme.palette.primary.contrastText || '#fff', minWidth: 40, justifyContent: 'flex-start' }}>{item.icon}</ListItemIcon>
+              <ListItemButton sx={{ justifyContent: 'flex-start', py: 2 }} onClick={() => navigate(item.path)}>
+                <ListItemIcon sx={{ color: theme.palette.primary.contrastText || '#fff', minWidth: 40, justifyContent: 'flex-start' }}>
+                  {item.icon}
+                </ListItemIcon>
                 <ListItemText
                   primary={item.label}
                   slotProps={{
@@ -89,7 +93,7 @@ const StaffDashboardLayout: React.FC<StaffDashboardLayoutProps> = ({ children, p
         <Divider sx={{ background: 'rgba(255,255,255,0.2)', width: '80%', mx: 'auto', my: 2 }} />
         <List sx={{ width: '100%' }}>
           <ListItem disablePadding>
-            <ListItemButton sx={{ justifyContent: 'center', py: 2 }}>
+            <ListItemButton sx={{ justifyContent: 'center', py: 2 }} onClick={() => navigate('/staff-dashboard/settings')}>
               <ListItemIcon sx={{ color: theme.palette.primary.contrastText || '#fff', minWidth: 0 }}>
                 <Settings />
               </ListItemIcon>
@@ -115,7 +119,9 @@ const StaffDashboardLayout: React.FC<StaffDashboardLayoutProps> = ({ children, p
               {pageTitle}
             </Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Typography sx={{ fontWeight: 600, fontFamily: theme.typography.fontFamily }}>{user.firstName} {user.lastName}</Typography>
+              <Typography sx={{ fontWeight: 600, fontFamily: theme.typography.fontFamily }}>
+                {user.firstName} {user.lastName}
+              </Typography>
               <Typography variant="caption" sx={{ color: theme.palette.primary.main, fontWeight: 700, fontFamily: theme.typography.fontFamily }}>
                 {typeof user.role === 'string' ? user.role : (typeof user.role === 'number' ? Object.keys(user.role)[user.role] : user.role)}
               </Typography>
@@ -124,13 +130,16 @@ const StaffDashboardLayout: React.FC<StaffDashboardLayoutProps> = ({ children, p
               </IconButton>
               <Menu anchorEl={anchorEl} open={open} onClose={() => setAnchorEl(null)}>
                 <MenuItem>
-                  <Logout fontSize="small" sx={{ mr: 1 }} /> Logout
+                  <Logout fontSize="small" sx={{ mr: 1 }} >
+                    Logout
+                  </Logout>
                 </MenuItem>
               </Menu>
             </Box>
           </Box>
-          <Box sx={{ width: '100%', height: 2, background: theme.palette.primary.main, borderRadius: 1, mb: 3 }} />
-          {children}
+          <Box sx={{ width: '100%', height: 2, background: theme.palette.primary.main, borderRadius: 1, mb: 3 }} >
+            {children}
+          </Box>
         </Main>
       </Box>
     </Box>
