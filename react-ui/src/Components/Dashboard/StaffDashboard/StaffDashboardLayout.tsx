@@ -68,7 +68,7 @@ const StaffDashboardLayout: React.FC<StaffDashboardLayoutProps> = ({ children, p
             <LocalLibraryIcon sx={{ color: theme.palette.primary.main, fontSize: 40 }} />
           </Box>
         </Box>
-        { /* Navigation */ }
+        {/* Navigation */}
         <List sx={{ width: '100%' }}>
           {navItems.map((item) => (
             <ListItem key={item.label} disablePadding>
@@ -137,9 +137,9 @@ const StaffDashboardLayout: React.FC<StaffDashboardLayoutProps> = ({ children, p
               </Menu>
             </Box>
           </Box>
-          <Box sx={{ width: '100%', height: 2, background: theme.palette.primary.main, borderRadius: 1, mb: 3 }} >
-            {children}
-          </Box>
+          <Box sx={{ width: '100%', height: 2, background: theme.palette.primary.main, borderRadius: 1, mb: 0 }} />
+          {/* Main Content */}
+          {children}
         </Main>
       </Box>
     </Box>

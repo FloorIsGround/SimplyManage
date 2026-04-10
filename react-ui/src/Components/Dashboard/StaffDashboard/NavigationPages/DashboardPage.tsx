@@ -21,7 +21,7 @@ const mockUser: User = {
 const DashboardPage: React.FC = () => (
   <ThemeProvider theme={theme}>
     <StaffDashboardLayout user={mockUser} pageTitle="SimplyManage">
-      <Box sx={{ background: '#fff', borderRadius: 2, p: 4, boxShadow: 1 }}>
+      <Box sx={{ background: '#fff', borderRadius: 2, p: 4, boxShadow: 1, mt: 4 }}>
         <Typography variant="h4" sx={{ fontWeight: 700, mb: 2 }}>
           Staff Dashboard
         </Typography>
