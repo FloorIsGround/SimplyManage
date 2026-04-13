@@ -64,7 +64,7 @@ function BookDetails({ modalOpen, onModalClose, selectedBook }: BookDetailsProps
             }}
           >
             {/* Book Cover */}
-            <BookCover isbn={selectedBook.isbn} alt={selectedBook.title + " Book Cover"} />
+            <BookCover isbn={String(selectedBook.isbn)} alt={selectedBook.title + " Book Cover"} />
             {/* Rating */}
             <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 0.25 }}>
               <Typography variant="subtitle2" sx={{ color: theme.palette.primary.main, textAlign: "center", mb: 0 }}>

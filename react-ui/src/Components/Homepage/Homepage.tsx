@@ -107,7 +107,7 @@ function Homepage() {
                             }}
                           >
                             <Box sx={{ width: 120, height: 180, display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 1, borderRadius: 1, overflow: 'hidden', boxShadow: 2 }}>
-                              <BookCover isbn={book.isbn} alt={book.title} />
+                              <BookCover isbn={String(book.isbn)} alt={book.title} />
                             </Box>
                             <Typography align="center" sx={{ fontSize: 15, fontWeight: 600, maxWidth: 120, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: 'primary.main', mb: 0.5 }}>
                               {book.title}
