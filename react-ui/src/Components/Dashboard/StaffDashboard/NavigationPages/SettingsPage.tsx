@@ -1,5 +1,5 @@
 import React from 'react';
-import StaffDashboardLayout from './../StaffDashboardLayout';
+import StaffDashboardLayout from '../StaffDashboardLayout';
 import type { User } from '../../../../Models/User/User';
 import { Role, UserStatus } from '../../../../Models/User/User';
 import theme from '../../../../utils/theme';

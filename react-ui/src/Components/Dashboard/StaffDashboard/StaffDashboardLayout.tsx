@@ -124,6 +124,8 @@ const StaffDashboardLayout: React.FC<StaffDashboardLayoutProps> = ({ children, p
               </Typography>
               <Typography variant="caption" sx={{ color: theme.palette.primary.main, fontWeight: 700, fontFamily: theme.typography.fontFamily }}>
                 {typeof user.role === 'string' ? user.role : (typeof user.role === 'number' ? Object.keys(user.role)[user.role] : user.role)}
+                {/* Update after Role is changed to enum in the backend */}
+                {/* {Role[user.role]} */} 
               </Typography>
               <IconButton onClick={(e) => setAnchorEl(e.currentTarget)}>
                 <Avatar sx={{ width: 32, height: 32, bgcolor: theme.palette.primary.main, fontFamily: theme.typography.fontFamily }} />
@@ -131,7 +133,6 @@ const StaffDashboardLayout: React.FC<StaffDashboardLayoutProps> = ({ children, p
               <Menu anchorEl={anchorEl} open={open} onClose={() => setAnchorEl(null)}>
                 <MenuItem>
                   <Logout fontSize="small" sx={{ mr: 1 }} >
-                    Logout
                   </Logout>
                 </MenuItem>
               </Menu>

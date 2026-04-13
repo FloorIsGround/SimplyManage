@@ -22,7 +22,7 @@ export interface BookListProps {
   error?: string | undefined;
   open: boolean;
   onClose: () => void;
-  showNoResultsImmediately?: boolean;
+  showNoResults?: boolean;
 }
 
 const BookList: React.FC<BookListProps> = ({
@@ -31,7 +31,7 @@ const BookList: React.FC<BookListProps> = ({
   error,
   open,
   onClose,
-  showNoResultsImmediately = false
+  showNoResults = false
 }) => {
   const theme = useTheme();
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
@@ -80,7 +80,7 @@ const BookList: React.FC<BookListProps> = ({
     }
 
     if (searchResults.length === 0) {
-      if (showNoResultsImmediately || hasSearched) {
+      if (showNoResults || hasSearched) {
         return <Typography variant="body2" sx={{ textAlign: 'center' }}>No results found.</Typography>;
       } else {
         return null;

@@ -4,7 +4,7 @@ import HoursLocations from "../Components/Header/HoursLocations";
 import SignUp from "../Components/SignUp/SignUp";
 import Faqs from "../Components/Faqs";
 import Homepage from "../Components/Homepage/Homepage";
-import PatronDashboard from ".././Components/Dashboard/PatronDashboard/PatronDashboard";
+import PatronDashboard from "../Components/Dashboard/PatronDashboard/PatronDashboard";
 import LibrariesPage from "../Components/Dashboard/StaffDashboard/NavigationPages/LibrariesPage";
 import UsersPage from "../Components/Dashboard/StaffDashboard/NavigationPages/UsersPage";
 import DashboardPage from "../Components/Dashboard/StaffDashboard/NavigationPages/DashboardPage";

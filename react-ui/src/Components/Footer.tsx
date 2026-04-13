@@ -1,8 +1,7 @@
 import { Box, Typography } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+ import { Link as RouterLink } from "react-router-dom";
 
 function Footer() {
-  const navigate = useNavigate();
 
   return (
     <Box component="footer" sx={{
@@ -25,9 +24,9 @@ function Footer() {
             Hours & Location
           </Typography>
           <Typography
-            component="span"
+            component={RouterLink}
+            to="/staff-dashboard"
             sx={{ color: 'white', textDecoration: 'underline', cursor: 'pointer' }}
-            onClick={() => navigate('/staff-dashboard')}
           >
             Staff/Admin Dashboard
           </Typography>

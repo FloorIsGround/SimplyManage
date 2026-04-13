@@ -133,7 +133,7 @@ function Header() {
         results={searchResults} 
         open={drawerOpen} 
         onClose={handleDrawerClose} 
-        showNoResultsImmediately={true} />
+        showNoResults={true} />
     </>
   )
 }

@@ -9,7 +9,7 @@ interface AddBookFormProps {
 }
 
 const AddBookForm: React.FC<AddBookFormProps> = ({ open, onClose, onSuccess }) => {
-  const [form, setForm] = useState({
+  const initialFormState = React.useMemo(() => ({
     title: '',
     author: '',
     isbn: '',
@@ -17,11 +17,34 @@ const AddBookForm: React.FC<AddBookFormProps> = ({ open, onClose, onSuccess }) =
     description: '',
     publicationYear: '',
     audience: '',
-  });
+  }), []);
+  const [form, setForm] = useState(initialFormState);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [validationError, setValidationError] = useState('');
   const [success, setSuccess] = useState('');
+  const timeoutRef = React.useRef<number | null>(null);
+
+  // Reset form and messages when dialog opens or closes
+  React.useEffect(() => {
+    if (!open) {
+      setForm(initialFormState);
+      setSuccess('');
+      setError('');
+      setValidationError('');
+    }
+    if (open) {
+      setSuccess('');
+      setError('');
+      setValidationError('');
+    }
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+    };
+  }, [open, initialFormState]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -51,26 +74,56 @@ const AddBookForm: React.FC<AddBookFormProps> = ({ open, onClose, onSuccess }) =
       setLoading(false);
       setSuccess('Book added successfully!');
       if (onSuccess) onSuccess();
-      setTimeout(onClose, 1200);
+      timeoutRef.current = setTimeout(onClose, 1200);
     } catch (err: any) {
       setLoading(false);
       setError(err?.response?.data?.message || 'Failed to add book');
     }
   };
 
+  // Helper for required field validation props
+  const getFieldValidation = (field: keyof typeof form, label: string) => ({
+    required: true,
+    error: !!validationError && !form[field].trim(),
+    helperText: !!validationError && !form[field].trim() ? `${label} is required.` : ''
+  });
+
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>Add New Book</DialogTitle>
       <DialogContent sx={{ minHeight: 400 }}>
         <Box display="flex" flexDirection="column" gap={2} mt={1}>
-          <TextField label="Title" name="title" value={form.title} onChange={handleChange} required />
-          <TextField label="Author" name="author" value={form.author} onChange={handleChange} required />
-          <TextField label="ISBN" name="isbn" value={form.isbn} onChange={handleChange} required />
+          <TextField
+            label="Title"
+            name="title"
+            value={form.title}
+            onChange={handleChange}
+            {...getFieldValidation('title', 'Title')}
+          />
+          <TextField
+            label="Author"
+            name="author"
+            value={form.author}
+            onChange={handleChange}
+            {...getFieldValidation('author', 'Author')}
+          />
+          <TextField
+            label="ISBN"
+            name="isbn"
+            value={form.isbn}
+            onChange={handleChange}
+            {...getFieldValidation('isbn', 'ISBN')}
+          />
           <TextField label="Genre" name="genre" value={form.genre} onChange={handleChange} />
           <TextField label="Description" name="description" value={form.description} onChange={handleChange} multiline rows={2} />
           <TextField label="Publication Year" name="publicationYear" value={form.publicationYear} onChange={handleChange} type="number" />
-          <TextField label="Audience" name="audience" value={form.audience} onChange={handleChange} />
-          {validationError && <Alert severity="error">{validationError}</Alert>}
+          <TextField
+            label="Audience"
+            name="audience"
+            value={form.audience}
+            onChange={handleChange}
+            {...getFieldValidation('audience', 'Audience')}
+          />
           {error && <Alert severity="error">{error}</Alert>}
           {success && <Alert severity="success">{success}</Alert>}
         </Box>
