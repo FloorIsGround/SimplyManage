@@ -3,18 +3,35 @@ import LocalLibraryIcon from "@mui/icons-material/LocalLibrary";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import { useState, useRef, useEffect } from "react";
+import Avatar from "@mui/material/Avatar";
 import Login from "./Login";
 import { useNavigate } from "react-router-dom";
+import { getUserRole } from "../../utils/auth";
 import BookList from "../Book/BookList";
 import CatalogSearchBar from "./CatalogSearchBar";
 import type { Book } from "../../Models/Book/Book";
 
 function Header() {
   const logOutButtonRef = useRef<HTMLButtonElement | null>(null);
-  // Temporary variables to fix logged in issue.
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
+  const [avatarMenuAnchor, setAvatarMenuAnchor] = useState<null | HTMLElement>(null);
 
-  // Blur Log Out button after login
+  // Get user info from token
+  let userLetter = "U";
+  let userEmail = "";
+  if (isLoggedIn) {
+    try {
+      const token = localStorage.getItem("token");
+      if (token) {
+        const decoded: any = JSON.parse(atob(token.split(".")[1]));
+        userEmail = decoded.email || "";
+        userLetter = (decoded.firstName?.[0] || decoded.email?.[0] || "U").toUpperCase();
+      }
+    } catch {
+      // catch
+    }
+  }
+
   useEffect(() => {
     if (isLoggedIn && logOutButtonRef.current) {
       logOutButtonRef.current.blur();
@@ -54,19 +71,69 @@ function Header() {
               Help
             </Button>
             {isLoggedIn ? (
-              <Button
-                variant="contained"
-                size="large"
-                color="secondary"
-                ref={logOutButtonRef}
-                onClick={() => {
-                  localStorage.removeItem("token");
-                  window.location.reload();
-                }}
-                sx={{ lineHeight: 'normal' }}
-              >
-                Log Out
-              </Button>
+              <>
+                <Avatar
+                  sx={{ bgcolor: theme.palette.primary.main, cursor: 'pointer' }}
+                  onClick={e => setAvatarMenuAnchor(e.currentTarget)}
+                  aria-label="user-avatar"
+                >
+                  {userLetter}
+                </Avatar>
+                <Popover
+                  open={Boolean(avatarMenuAnchor)}
+                  anchorEl={avatarMenuAnchor}
+                  onClose={() => setAvatarMenuAnchor(null)}
+                  anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                  transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                  slotProps={{ paper: { sx: { borderRadius: 2, minWidth: 240, boxShadow: 3 } } }}
+                >
+                  <Card sx={{ minWidth: 240 }}>
+                    <CardContent sx={{ pb: 1 }}>
+                      <Typography sx={{ fontWeight: 600, fontSize: 15, color: 'text.primary', textAlign: 'center', mb: 1 }}>
+                        {userEmail}
+                      </Typography>
+                    </CardContent>
+                    <CardActions sx={{ flexDirection: 'column', gap: 0.5, pt: 0 }}>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        fullWidth
+                        size="medium"
+                        onClick={() => {
+                          setAvatarMenuAnchor(null);
+                          const role = getUserRole();
+                          if (!role) {
+                            window.alert("You must be logged in to access your dashboard.");
+                            return;
+                          }
+                          if (role === "admin" || role === "librarian") {
+                            navigate("/staff-dashboard");
+                          } else if (role === "patron") {
+                            navigate("/patron-dashboard");
+                          } else {
+                            window.alert("Unknown user role. Please contact support.");
+                          }
+                        }}
+                      >
+                        Dashboard
+                      </Button>
+                      <Button
+                        variant="text"
+                        color="primary"
+                        fullWidth
+                        size="medium"
+                        onClick={() => {
+                          localStorage.removeItem("token");
+                          window.location.reload();
+                        }}
+                        sx={{ color: 'error.main', fontWeight: 600 }}
+                      >
+                        Log Out
+                      </Button>
+                    </CardActions>
+                  </Card>
+                </Popover>
+              </>
             ) : (
               <Button
                 variant="contained"

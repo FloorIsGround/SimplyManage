@@ -8,7 +8,6 @@ import PatronDashboard from "../Components/Dashboard/PatronDashboard/PatronDashb
 import LibrariesPage from "../Components/Dashboard/StaffDashboard/NavigationPages/LibrariesPage";
 import UsersPage from "../Components/Dashboard/StaffDashboard/NavigationPages/UsersPage";
 import DashboardPage from "../Components/Dashboard/StaffDashboard/NavigationPages/DashboardPage";
-import SettingsPage from "../Components/Dashboard/StaffDashboard/NavigationPages/SettingsPage";
 import BooksPage from "../Components/Dashboard/StaffDashboard/NavigationPages/BooksPage";
 
 // Main router
@@ -58,8 +57,4 @@ export const Router = createBrowserRouter([
         path: "/staff-dashboard/users",
         element: <UsersPage />
     },
-    {
-        path: "/staff-dashboard/settings",
-        element: <SettingsPage />
-    }
 ])

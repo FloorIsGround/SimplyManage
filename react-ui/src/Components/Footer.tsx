@@ -1,7 +1,9 @@
 import { Box, Typography } from "@mui/material";
- import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink } from "react-router-dom";
+import { hasStaffAccess } from "../utils/auth";
 
 function Footer() {
+  const canAccessStaff = hasStaffAccess();
 
   return (
     <Box component="footer" sx={{
@@ -23,13 +25,15 @@ function Footer() {
           <Typography component="a" href="#hours" sx={{ color: 'white', textDecoration: 'underline', cursor: 'pointer' }}>
             Hours & Location
           </Typography>
-          <Typography
-            component={RouterLink}
-            to="/staff-dashboard"
-            sx={{ color: 'white', textDecoration: 'underline', cursor: 'pointer' }}
-          >
-            Staff/Admin Dashboard
-          </Typography>
+          {canAccessStaff && (
+            <Typography
+              component={RouterLink}
+              to="/staff-dashboard"
+              sx={{ color: 'white', textDecoration: 'underline', cursor: 'pointer' }}
+            >
+              Staff/Admin Dashboard
+            </Typography>
+          )}
         </Box>
         <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, fontSize: 12 }}>
           <Typography component="span">&copy; {new Date().getFullYear()} 
