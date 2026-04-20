@@ -70,7 +70,7 @@ function SignUp() {
           <Box sx={{ mb: 2 }}>
             <LocalizationProvider dateAdapter={AdapterDateFns}>
               <DatePicker
-                label="DD/MM/YYYY"
+                label="MM/DD/YYYY"
                 value={dateValue}
                 onChange={handleDateChange}
                 maxDate={new Date('2100-12-31')}
