@@ -11,6 +11,7 @@ export interface User {
   status: UserStatus;
   createdAt: Date;
   borrowedBooks: Book[];          // Array of books currently checked out
+  libraryCardNumber: string;      // Library card number assigned to the user
 }
 
 // Possible system roles a user can have within the application

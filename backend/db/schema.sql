@@ -223,6 +223,7 @@ CREATE TABLE IF NOT EXISTS public.users (
     password_hash text NOT NULL,
     first_name text NOT NULL,
     last_name text NOT NULL,
+    library_card_number char(8) UNIQUE NOT NULL,
     role text NOT NULL,
     status text NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,

@@ -9,6 +9,7 @@ export interface User {
   email: string;
   firstName: string;
   lastName: string;
+  libraryCardNumber: string;
   role: UserRole;
   status: UserStatus;
   createdAt: string;

@@ -1,12 +1,14 @@
 import { IconButton, useTheme, Box, Button, Dialog, Divider, Rating, Typography } from "@mui/material";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useBookReviews } from "./Reviews/useBookReviews";
 import CloseIcon from '@mui/icons-material/Close';
 import BookCover from "./BookCover";
 import ReviewList from "./Reviews/ReviewList";
 import WriteReview from "./Reviews/WriteReview";
 import type { Book } from "../../Models/Book/Book";
-
+import type { Copy } from "../../Models/Book/Copy";
+import { ConditionStatus } from "../../Models/Book/Copy";
+import axios from "../../utils/axios-api";
 
 export interface BookDetailsProps {
   modalOpen: boolean; 
@@ -26,6 +28,21 @@ function BookDetails({ modalOpen, onModalClose, selectedBook }: BookDetailsProps
   const theme = useTheme();
   const [activeTab, setActiveTab] = useState<ActiveTabEnum>(ActiveTabEnum.details);
   const { reviews, refreshReviews } = useBookReviews(selectedBook?.id ?? null);
+  const [copies, setCopies] = useState<Copy[]>([]);
+  const [loadingCopies, setLoadingCopies] = useState(false);
+
+  useEffect(() => {
+    if (selectedBook) {
+      if (!loadingCopies) setLoadingCopies(true);
+      axios.get(`/books/${selectedBook.id}/copies`)
+        .then(res => setCopies(res.data))
+        .catch(() => setCopies([]))
+        .finally(() => setLoadingCopies(false));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedBook]);
+
+  const isAvailable = copies.some(copy => copy.conditionStatus === ConditionStatus.available);
 
   const handleModalClose = () => {
     setActiveTab(ActiveTabEnum.details);
@@ -99,10 +116,20 @@ function BookDetails({ modalOpen, onModalClose, selectedBook }: BookDetailsProps
               <Typography variant="h6" color="text.secondary">
                 {selectedBook.author}
               </Typography>
-              {/* Hold button */}
-              <Button variant="contained" color="primary" sx={{ mt: 2 }}>
-                Place Hold
-              </Button>
+              {/* Checkout or Hold button based on availability */}
+              {loadingCopies ? (
+                <Button variant="contained" color="primary" sx={{ mt: 2 }} disabled>
+                  Loading...
+                </Button>
+              ) : isAvailable ? (
+                <Button variant="contained" color="primary" sx={{ mt: 2 }}>
+                  Check Out
+                </Button>
+              ) : (
+                <Button variant="contained" color="primary" sx={{ mt: 2 }}>
+                  Place Hold
+                </Button>
+              )}
             </Box>
             <Divider sx={{ my: 2 }} />
             {/* Details */}
@@ -124,8 +151,8 @@ function BookDetails({ modalOpen, onModalClose, selectedBook }: BookDetailsProps
                 <Typography variant="body1" sx={{ mb: 2 }}>
                   Copies Available
                 </Typography>
-                <Typography variant="body2">Main Branch — 3 available</Typography>
-                <Typography variant="body2">East Branch — 1 available</Typography>
+                <Typography variant="body2">Main Branch — {isAvailable ? "3 available" : "No copies available"}</Typography>
+                <Typography variant="body2">East Branch — {isAvailable ? "1 available" : "No copies available"}</Typography>
               </Box>
             )}
             {/* Reviews */}

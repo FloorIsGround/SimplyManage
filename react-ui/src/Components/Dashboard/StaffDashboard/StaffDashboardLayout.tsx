@@ -1,6 +1,6 @@
 import React from 'react';
 import type { User } from '../../../Models/User/User';
-import { Box, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography, IconButton, Avatar, Divider, Popover, Card, CardContent, CardActions, Button } from '@mui/material';
+import { Box, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography, IconButton, Avatar, Divider, Popover, Card, Button } from '@mui/material';
 import SettingsPopup from './NavigationPages/SettingsPopup';
 import { Dashboard, MenuBook, LocationOn, People, Settings } from '@mui/icons-material';
 import { styled, useTheme } from '@mui/material/styles';
@@ -132,11 +132,6 @@ const StaffDashboardLayout: React.FC<StaffDashboardLayoutProps> = ({ children, p
               <Typography sx={{ fontWeight: 600, fontFamily: theme.typography.fontFamily }}>
                 {user.firstName} {user.lastName}
               </Typography>
-              <Typography variant="caption" sx={{ color: theme.palette.primary.main, fontWeight: 700, fontFamily: theme.typography.fontFamily }}>
-                {typeof user.role === 'string' ? user.role : (typeof user.role === 'number' ? Object.keys(user.role)[user.role] : user.role)}
-                {/* Update after Role is changed to enum in the backend */}
-                {/* {Role[user.role]} */} 
-              </Typography>
               <IconButton onClick={(e) => setAnchorEl(e.currentTarget)}>
                 <Avatar sx={{ width: 32, height: 32, bgcolor: theme.palette.primary.main, fontFamily: theme.typography.fontFamily }} />
               </IconButton>
@@ -149,12 +144,13 @@ const StaffDashboardLayout: React.FC<StaffDashboardLayoutProps> = ({ children, p
                 slotProps={{ paper: { sx: { borderRadius: 2, minWidth: 240, boxShadow: 3 } } }}
               >
                 <Card sx={{ minWidth: 240 }}>
-                  <CardContent sx={{ pb: 1 }}>
-                    <Typography sx={{ fontWeight: 600, fontSize: 15, color: 'text.primary', textAlign: 'center', mb: 1 }}>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', minHeight: 120, height: '100%' }}>
+                    <Typography variant="caption" sx={{ color: theme.palette.primary.main, fontWeight: 700, fontFamily: theme.typography.fontFamily, textAlign: 'center', display: 'block', mt: 2 }}>
+                      {typeof user.role === 'string' ? user.role : (typeof user.role === 'number' ? Object.keys(user.role)[user.role] : user.role)}
+                    </Typography>
+                    <Typography sx={{ fontWeight: 600, fontSize: 15, color: 'text.primary', textAlign: 'center', my: 1 }}>
                       {user.email}
                     </Typography>
-                  </CardContent>
-                  <CardActions sx={{ flexDirection: 'column', gap: 0.5, pt: 0 }}>
                     <Button
                       variant="text"
                       color="primary"
@@ -162,13 +158,13 @@ const StaffDashboardLayout: React.FC<StaffDashboardLayoutProps> = ({ children, p
                       size="medium"
                       onClick={() => {
                         localStorage.removeItem('token');
-                        window.location.reload();
+                        navigate('/');
                       }}
-                      sx={{ color: 'error.main', fontWeight: 600 }}
+                      sx={{ color: 'error.main', fontWeight: 600, mb: 2 }}
                     >
                       Log Out
                     </Button>
-                  </CardActions>
+                  </Box>
                 </Card>
               </Popover>
             </Box>
