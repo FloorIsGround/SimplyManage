@@ -4,16 +4,20 @@ import HoursLocations from "../Components/Header/HoursLocations";
 import SignUp from "../Components/SignUp/SignUp";
 import Faqs from "../Components/Faqs";
 import Homepage from "../Components/Homepage/Homepage";
-import PatronDashboard from "../Components/Dashboard/PatronDashboard";
+import PatronDashboard from "../Components/Dashboard/PatronDashboard/PatronDashboard";
+import LibrariesPage from "../Components/Dashboard/StaffDashboard/NavigationPages/LibrariesPage";
+import UsersPage from "../Components/Dashboard/StaffDashboard/NavigationPages/UsersPage";
+import DashboardPage from "../Components/Dashboard/StaffDashboard/NavigationPages/DashboardPage";
+import SettingsPage from "../Components/Dashboard/StaffDashboard/NavigationPages/SettingsPage";
+import BooksPage from "../Components/Dashboard/StaffDashboard/NavigationPages/BooksPage";
 
-// Main application router configuration.
-//  This defines all navigable paths in the app and which component should render for each. 
+// Main router
 export const Router = createBrowserRouter([
     {
-        // Root layout — App acts as the parent wrapper for all nested routes
+        // Root layout. App acts as the parent wrapper for all nested routes
         path: "/",
         element: <App />,
-        
+
         // Child routes render inside <Outlet /> within App
         children: [
             {
@@ -37,5 +41,25 @@ export const Router = createBrowserRouter([
                 element: <PatronDashboard />
             }
         ]
+    },
+    {
+        path: "/staff-dashboard",
+        element: <DashboardPage />
+    },
+    {
+        path: "/staff-dashboard/books",
+        element: <BooksPage />
+    },
+    {
+        path: "/staff-dashboard/libraries",
+        element: <LibrariesPage />
+    },
+    {
+        path: "/staff-dashboard/users",
+        element: <UsersPage />
+    },
+    {
+        path: "/staff-dashboard/settings",
+        element: <SettingsPage />
     }
 ])

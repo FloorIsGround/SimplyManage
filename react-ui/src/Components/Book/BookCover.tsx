@@ -1,7 +1,7 @@
 import React from 'react';
 
 interface BookCoverProps {
-  isbn: number;
+  isbn: string;
   alt?: string;
 }
 

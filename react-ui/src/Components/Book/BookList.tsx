@@ -22,6 +22,7 @@ export interface BookListProps {
   error?: string | undefined;
   open: boolean;
   onClose: () => void;
+  showNoResults?: boolean;
 }
 
 const BookList: React.FC<BookListProps> = ({
@@ -29,7 +30,8 @@ const BookList: React.FC<BookListProps> = ({
   loading,
   error,
   open,
-  onClose
+  onClose,
+  showNoResults = false
 }) => {
   const theme = useTheme();
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
@@ -37,6 +39,7 @@ const BookList: React.FC<BookListProps> = ({
   const [resultsLoading, setResultsLoading] = useState(loading);
   const [resultsError, setResultsError] = useState(error);
   const [searchResults, setSearchResults] = useState(results);
+  const [hasSearched, setHasSearched] = useState(false);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -77,7 +80,11 @@ const BookList: React.FC<BookListProps> = ({
     }
 
     if (searchResults.length === 0) {
-      return <Typography variant="body2" sx={{ textAlign: 'center' }}>No results found.</Typography>;
+      if (showNoResults || hasSearched) {
+        return <Typography variant="body2" sx={{ textAlign: 'center' }}>No results found.</Typography>;
+      } else {
+        return null;
+      }
     }
 
     return (
@@ -85,7 +92,7 @@ const BookList: React.FC<BookListProps> = ({
         {searchResults.map((book) => (
           <ListItemButton key={book.id} onClick={() => handleBookClick(book)} sx={{ display: 'flex', alignItems: 'center' }}>
             <Box sx={{ width: 48, height: 72, mr: 2, flexShrink: 0 }}>
-              <BookCover isbn={book.isbn} alt={book.title} />
+              <BookCover isbn={String(book.isbn)} alt={book.title} />
             </Box>
             <ListItemText primary={book.title} secondary={book.author} />
           </ListItemButton>
@@ -113,9 +120,9 @@ const BookList: React.FC<BookListProps> = ({
           </IconButton>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', width: '100%' }}>
             <CatalogSearchBar
-              onSearchFailure={(err) => { setResultsError(err) }}
-              onSearchLoading={(isLoading) => { setResultsLoading(isLoading) }}
-              onSearchSuccess={(results: Book[]) => { setSearchResults(results) }}
+              onSearchFailure={(err) => { setResultsError(err); setHasSearched(true); }}
+              onSearchLoading={(isLoading) => { setResultsLoading(isLoading); }}
+              onSearchSuccess={(results: Book[]) => { setSearchResults(results); setHasSearched(true); }}
             />
           </Box>
           <Box

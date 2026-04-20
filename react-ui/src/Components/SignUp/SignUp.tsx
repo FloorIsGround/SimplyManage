@@ -53,7 +53,6 @@ function SignUp() {
         sx={{
           maxWidth: 400,
           mx: "auto",
-          mt: 6,
           p: 3,
           boxShadow: 2,
           borderRadius: 3,

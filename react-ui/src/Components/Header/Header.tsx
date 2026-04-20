@@ -127,7 +127,13 @@ function Header() {
           />
         </Toolbar>
       </AppBar>
-      <BookList loading={searchLoading} error={searchFailure} results={searchResults} open={drawerOpen} onClose={handleDrawerClose} />
+      <BookList 
+        loading={searchLoading} 
+        error={searchFailure} 
+        results={searchResults} 
+        open={drawerOpen} 
+        onClose={handleDrawerClose} 
+        showNoResults={true} />
     </>
   )
 }
