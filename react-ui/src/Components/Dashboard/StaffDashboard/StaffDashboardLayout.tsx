@@ -1,7 +1,8 @@
 import React from 'react';
 import type { User } from '../../../Models/User/User';
-import { Box, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography, IconButton, Avatar, Divider, Menu, MenuItem } from '@mui/material';
-import { Dashboard, MenuBook, LocationOn, People, Settings, Logout } from '@mui/icons-material';
+import { Box, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography, IconButton, Avatar, Divider, Popover, Card, CardContent, CardActions, Button } from '@mui/material';
+import SettingsPopup from './NavigationPages/SettingsPopup';
+import { Dashboard, MenuBook, LocationOn, People, Settings } from '@mui/icons-material';
 import { styled, useTheme } from '@mui/material/styles';
 import LocalLibraryIcon from '@mui/icons-material/LocalLibrary';
 import { useNavigate } from 'react-router-dom';
@@ -43,7 +44,8 @@ interface StaffDashboardLayoutProps {
 
 const StaffDashboardLayout: React.FC<StaffDashboardLayoutProps> = ({ children, pageTitle = 'SimplyManage', user }) => {
   const theme = useTheme();
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [settingsAnchorEl, setSettingsAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null); // For avatar menu
   const open = Boolean(anchorEl);
   const navigate = useNavigate();
 
@@ -93,7 +95,10 @@ const StaffDashboardLayout: React.FC<StaffDashboardLayoutProps> = ({ children, p
         <Divider sx={{ background: 'rgba(255,255,255,0.2)', width: '80%', mx: 'auto', my: 2 }} />
         <List sx={{ width: '100%' }}>
           <ListItem disablePadding>
-            <ListItemButton sx={{ justifyContent: 'center', py: 2 }} onClick={() => navigate('/staff-dashboard/settings')}>
+            <ListItemButton
+              sx={{ justifyContent: 'center', py: 2 }}
+              onClick={e => setSettingsAnchorEl(e.currentTarget)}
+            >
               <ListItemIcon sx={{ color: theme.palette.primary.contrastText || '#fff', minWidth: 0 }}>
                 <Settings />
               </ListItemIcon>
@@ -109,6 +114,11 @@ const StaffDashboardLayout: React.FC<StaffDashboardLayoutProps> = ({ children, p
             </ListItemButton>
           </ListItem>
         </List>
+        <SettingsPopup
+          open={Boolean(settingsAnchorEl)}
+          anchorEl={settingsAnchorEl}
+          onClose={() => setSettingsAnchorEl(null)}
+        />
       </StyledDrawer>
       {/* Main content */}
       <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', ml: `${drawerWidth}px` }}>
@@ -130,12 +140,37 @@ const StaffDashboardLayout: React.FC<StaffDashboardLayoutProps> = ({ children, p
               <IconButton onClick={(e) => setAnchorEl(e.currentTarget)}>
                 <Avatar sx={{ width: 32, height: 32, bgcolor: theme.palette.primary.main, fontFamily: theme.typography.fontFamily }} />
               </IconButton>
-              <Menu anchorEl={anchorEl} open={open} onClose={() => setAnchorEl(null)}>
-                <MenuItem>
-                  <Logout fontSize="small" sx={{ mr: 1 }} >
-                  </Logout>
-                </MenuItem>
-              </Menu>
+              <Popover
+                open={open}
+                anchorEl={anchorEl}
+                onClose={() => setAnchorEl(null)}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                slotProps={{ paper: { sx: { borderRadius: 2, minWidth: 240, boxShadow: 3 } } }}
+              >
+                <Card sx={{ minWidth: 240 }}>
+                  <CardContent sx={{ pb: 1 }}>
+                    <Typography sx={{ fontWeight: 600, fontSize: 15, color: 'text.primary', textAlign: 'center', mb: 1 }}>
+                      {user.email}
+                    </Typography>
+                  </CardContent>
+                  <CardActions sx={{ flexDirection: 'column', gap: 0.5, pt: 0 }}>
+                    <Button
+                      variant="text"
+                      color="primary"
+                      fullWidth
+                      size="medium"
+                      onClick={() => {
+                        localStorage.removeItem('token');
+                        window.location.reload();
+                      }}
+                      sx={{ color: 'error.main', fontWeight: 600 }}
+                    >
+                      Log Out
+                    </Button>
+                  </CardActions>
+                </Card>
+              </Popover>
             </Box>
           </Box>
           <Box sx={{ width: '100%', height: 2, background: theme.palette.primary.main, borderRadius: 1, mb: 0 }} />

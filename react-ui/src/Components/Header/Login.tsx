@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button, Card, CardActions, CardContent, Popover, TextField, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 
 export interface LoginProps {
   open: boolean;
@@ -46,11 +47,25 @@ function Login({
       });
 
       localStorage.setItem("token", res.data.token);
+      const token = res.data.token;
+      let role = undefined;
+      try {
+        const decoded: any = jwtDecode(token);
+        role = decoded.role?.toLowerCase?.() || decoded.role;
+      } catch (e) {
+        console.log("Failed to decode token", e);
+      }
       onLoginSuccess?.();
       setLoginEmail("");
       setLoginPassword("");
       handleClose();
-      if (redirectPath) {
+
+      // Redirect based on decoded role
+      if (role === "patron") {
+        navigate("/patron-dashboard");
+      } else if (role === "admin" || role === "librarian") {
+        navigate("/staff-dashboard");
+      } else if (redirectPath) {
         navigate(redirectPath);
       }
     } catch (err: any) {
