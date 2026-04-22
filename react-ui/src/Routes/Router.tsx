@@ -9,6 +9,7 @@ import LibrariesPage from "../Components/Dashboard/StaffDashboard/NavigationPage
 import UsersPage from "../Components/Dashboard/StaffDashboard/NavigationPages/UsersPage";
 import DashboardPage from "../Components/Dashboard/StaffDashboard/NavigationPages/DashboardPage";
 import BooksPage from "../Components/Dashboard/StaffDashboard/NavigationPages/BooksPage";
+import ContactUs from "../Components/Footer/ContactUs";
 
 // Main router
 export const Router = createBrowserRouter([
@@ -38,6 +39,10 @@ export const Router = createBrowserRouter([
             {
                 path: "/patron-dashboard",
                 element: <PatronDashboard />
+            },
+            {
+                path: "/contact",
+                element: <ContactUs />
             }
         ]
     },
