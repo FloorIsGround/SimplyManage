@@ -164,7 +164,7 @@ function BookDetails({ modalOpen, onModalClose, selectedBook }: BookDetailsProps
                   </Typography>
                 ) : (
                   branches.map(branch => {
-                    const availableCount = copies.filter(copy => copy.location === branch.name && copy.conditionStatus === "AVAILABLE").length;
+                    const availableCount = copies.filter(copy => copy.branchId === branch.id && copy.conditionStatus === "AVAILABLE").length;
                     return (
                       <Typography key={branch.id} variant="body2">
                         {branch.name} — {availableCount > 0 ? `${availableCount} available` : "No copies available"}

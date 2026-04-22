@@ -5,7 +5,7 @@ export interface Copy {
   bookId: string;
   barcode: string;
   conditionStatus: ConditionStatusString;
-  location: string;
+  branchId: number;
   createdAt: Date;
 }
 

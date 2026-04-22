@@ -27,7 +27,7 @@ const AddBookForm: React.FC<AddBookFormProps> = ({ open, onClose, onSuccess }) =
     audience: '',
     numCopies: 1,
     conditionStatus: 'AVAILABLE',
-    location: '',
+    branchId: '',
   }), []);
   const [form, setForm] = useState(initialFormState);
   const [loading, setLoading] = useState(false);
@@ -67,7 +67,7 @@ const AddBookForm: React.FC<AddBookFormProps> = ({ open, onClose, onSuccess }) =
     setError('');
     setSuccess('');
     // Validate required fields
-    if (!form.title.trim() || !form.author.trim() || !form.isbn.trim() || !form.audience.trim()) {
+    if (!form.title.trim() || !form.author.trim() || !form.isbn.trim() || !form.audience.trim() || !form.branchId) {
       setValidationError('Please fill in all required fields.');
       return;
     }
@@ -85,9 +85,9 @@ const AddBookForm: React.FC<AddBookFormProps> = ({ open, onClose, onSuccess }) =
       publicationYear: form.publicationYear.trim() ? Number(form.publicationYear) : null,
     };
     setLoading(true);
-    let bookId;
+    let bookId: string | undefined;
     try {
-      // Try to create the book
+      // Try to Create the book
       const res = await axios.post('/books', payload);
       bookId = res.data?.id || res.data?.bookId || res.data?._id;
     } catch (err: any) {
@@ -95,7 +95,18 @@ const AddBookForm: React.FC<AddBookFormProps> = ({ open, onClose, onSuccess }) =
       if (err?.response?.status === 409) {
         try {
           const existing = await axios.get(`/books?isbn=${encodeURIComponent(form.isbn.trim())}`);
-          bookId = existing.data?.id || existing.data?.bookId || existing.data?._id;
+          // If the response is an array, get the first item
+          if (Array.isArray(existing.data)) {
+            // Find the book with the exact matching ISBN
+            const isbnToFind = form.isbn.trim();
+            const found = existing.data.find((b: any) => {
+              if (b.isbn == null) return false;
+              return String(b.isbn) === isbnToFind || Number(b.isbn) === Number(isbnToFind);
+            });
+            bookId = found?.id || found?.bookId || found?._id;
+          } else {
+            bookId = existing.data?.id || existing.data?.bookId || existing.data?._id;
+          }
         } catch {
           setLoading(false);
           setError('Book exists but could not fetch its ID.');
@@ -113,13 +124,14 @@ const AddBookForm: React.FC<AddBookFormProps> = ({ open, onClose, onSuccess }) =
         return;
       }
     }
-    // Add Copies
+    // Try to Add Copies
     try {
-      const copiesPayload = Array.from({ length: Number(form.numCopies) }).map(() => ({
+      const copiesPayload = {
         bookId,
+        quantity: Number(form.numCopies),
         conditionStatus: form.conditionStatus,
-        location: form.location || null,
-      }));
+        branchId: Number(form.branchId),
+      };
       await axios.post('/copies', copiesPayload);
       setLoading(false);
       setSuccess('Book and copies added successfully!');
@@ -216,13 +228,12 @@ const AddBookForm: React.FC<AddBookFormProps> = ({ open, onClose, onSuccess }) =
           </TextField>
           <TextField
             select
-            label="Location"
-            name="location"
-            value={form.location}
+            label="Branch"
+            name="branchId"
+            value={form.branchId}
             onChange={handleChange}
             sx={{ mt: 1 }}
             disabled={branchesLoading || !!branchesError}
-            helperText={branchesError || ''}
             required
           >
             {branches.map(branch => (
