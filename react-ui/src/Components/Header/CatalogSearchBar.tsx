@@ -19,7 +19,6 @@ function CatalogSearchBar({ onSearchSuccess, onSearchLoading, onSearchFailure }:
     axios
       .get(`/books/search/${searchQuery}`)
       .then((res) => {
-        console.log("book search response:", res.data);
         onSearchSuccess(res.data);
         onSearchLoading(false);
         setSearchQuery("");

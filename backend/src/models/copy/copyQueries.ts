@@ -5,6 +5,7 @@ export type CreateCopiesInput = {
   bookId: string;
   quantity: number;
   conditionStatus: ConditionStatus;
+  branchId: number;
   location?: string | null;
 };
 
@@ -71,13 +72,35 @@ export async function getCopyByBarcode(barcode: string): Promise<Copy | null> {
 // Inserts N copies for a book and returns all inserted rows.
 export async function createCopies(input: CreateCopiesInput): Promise<Copy[]> {
   const rows: Copy[] = [];
+  const branchCode = input.branchId.toString().padStart(2, '0');
+  const year = new Date().getFullYear().toString().slice(-2);
 
   for (let i = 0; i < input.quantity; i++) {
+    // Find the current max sequence for this branch/year
+    const seqRes = await query(
+      `SELECT barcode FROM copies WHERE barcode LIKE $1 ORDER BY barcode DESC LIMIT 1`,
+      [`${branchCode}${year}%`]
+    );
+    let nextSeq = 1;
+    if (seqRes.rows.length > 0) {
+      const lastBarcode = seqRes.rows[0].barcode;
+      const lastSeq = parseInt(lastBarcode.slice(4), 10);
+      nextSeq = lastSeq + 1;
+    }
+    const seqStr = nextSeq.toString().padStart(4, '0');
+    const barcode = `${branchCode}${year}${seqStr}`;
+
+    // Ensure uniqueness (should be unique, but double-check)
+    const check = await query('SELECT 1 FROM copies WHERE barcode = $1', [barcode]);
+    if (check.rows.length > 0) {
+      throw new Error('Barcode collision detected.');
+    }
+
     const res = await query<CopyRow>(
-      `INSERT INTO copies (book_id, condition_status, location)
-       VALUES ($1, $2, $3)
+      `INSERT INTO copies (book_id, condition_status, location, barcode)
+       VALUES ($1, $2, $3, $4)
        RETURNING ${COPY_COLUMNS}`,
-      [input.bookId, input.conditionStatus, input.location ?? null]
+      [input.bookId, input.conditionStatus, input.location ?? null, barcode]
     );
     rows.push(mapCopyRow(res.rows[0]));
   }

@@ -1,26 +1,10 @@
-import { useEffect, useState } from "react";
+
+import { useBranches } from "../LibraryInfo/useBranches";
 import { Box, Typography, Paper, useTheme, CircularProgress } from "@mui/material";
-import axios from "../../utils/axios-api";
-import type { Library } from "../../Models/LibraryInfo/Library";
 
 function HoursLocations() {
   const theme = useTheme();
-  const [libraries, setLibraries] = useState<Library[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    axios.get("/hourslocations")
-      .then(res => {
-        console.log('API response:', res.data);
-        setLibraries(Array.isArray(res.data.libraries) ? res.data.libraries : []);
-        setLoading(false);
-      })
-      .catch(() => {
-        setError("Failed to load library locations.");
-        setLoading(false);
-      });
-  }, []);
+  const { branches: libraries, loading, error } = useBranches();
 
   if (loading) {
     return (

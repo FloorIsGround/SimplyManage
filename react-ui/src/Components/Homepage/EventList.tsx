@@ -23,7 +23,6 @@ const EventList: React.FC = () => {
 useEffect(() => {
   axiosServices.get("/events")
     .then(res => {
-      console.log(res.data);
       setEvents(res.data);
       setLoading(false);
     })
@@ -47,7 +46,6 @@ useEffect(() => {
   return (
     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3, justifyContent: 'center' }}>
       {events.map((event: Event, idx: number) => {
-        console.log(event);
         return (
           <Box
             key={idx}

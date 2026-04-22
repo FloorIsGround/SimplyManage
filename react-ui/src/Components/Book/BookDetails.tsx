@@ -7,7 +7,7 @@ import ReviewList from "./Reviews/ReviewList";
 import WriteReview from "./Reviews/WriteReview";
 import type { Book } from "../../Models/Book/Book";
 import type { Copy } from "../../Models/Book/Copy";
-import { ConditionStatus } from "../../Models/Book/Copy";
+import { useBranches } from "../LibraryInfo/useBranches";
 import axios from "../../utils/axios-api";
 
 export interface BookDetailsProps {
@@ -30,19 +30,22 @@ function BookDetails({ modalOpen, onModalClose, selectedBook }: BookDetailsProps
   const { reviews, refreshReviews } = useBookReviews(selectedBook?.id ?? null);
   const [copies, setCopies] = useState<Copy[]>([]);
   const [loadingCopies, setLoadingCopies] = useState(false);
+  const { branches, loading: branchesLoading } = useBranches();
 
   useEffect(() => {
     if (selectedBook) {
       if (!loadingCopies) setLoadingCopies(true);
-      axios.get(`/books/${selectedBook.id}/copies`)
-        .then(res => setCopies(res.data))
+        axios.get(`copies/book/${selectedBook.id}`)
+        .then(res => {
+          setCopies(res.data);
+        })
         .catch(() => setCopies([]))
         .finally(() => setLoadingCopies(false));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedBook]);
 
-  const isAvailable = copies.some(copy => copy.conditionStatus === ConditionStatus.available);
+  const isAvailable = copies.some(copy => copy.conditionStatus === "AVAILABLE");
 
   const handleModalClose = () => {
     setActiveTab(ActiveTabEnum.details);
@@ -151,8 +154,24 @@ function BookDetails({ modalOpen, onModalClose, selectedBook }: BookDetailsProps
                 <Typography variant="body1" sx={{ mb: 2 }}>
                   Copies Available
                 </Typography>
-                <Typography variant="body2">Main Branch — {isAvailable ? "3 available" : "No copies available"}</Typography>
-                <Typography variant="body2">East Branch — {isAvailable ? "1 available" : "No copies available"}</Typography>
+                {branchesLoading ? (
+                  <Typography variant="body2">
+                    Loading branches...
+                  </Typography>
+                ) : branches.length === 0 ? (
+                  <Typography variant="body2">
+                    No branch data available.
+                  </Typography>
+                ) : (
+                  branches.map(branch => {
+                    const availableCount = copies.filter(copy => copy.location === branch.name && copy.conditionStatus === "AVAILABLE").length;
+                    return (
+                      <Typography key={branch.id} variant="body2">
+                        {branch.name} — {availableCount > 0 ? `${availableCount} available` : "No copies available"}
+                      </Typography>
+                    );
+                  })
+                )}
               </Box>
             )}
             {/* Reviews */}
