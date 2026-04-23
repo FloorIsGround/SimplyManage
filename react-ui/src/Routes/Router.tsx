@@ -10,6 +10,7 @@ import UsersPage from "../Components/Dashboard/StaffDashboard/NavigationPages/Us
 import DashboardPage from "../Components/Dashboard/StaffDashboard/NavigationPages/DashboardPage";
 import BooksPage from "../Components/Dashboard/StaffDashboard/NavigationPages/BooksPage";
 import ContactUs from "../Components/Footer/ContactUs";
+import PrivacyPolicy from "../Components/Footer/PrivacyPolicy";
 
 // Main router
 export const Router = createBrowserRouter([
