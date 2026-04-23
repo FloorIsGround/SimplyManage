@@ -48,7 +48,7 @@ function Footer() {
           </Typography>
           <Typography
             component={RouterLink}
-            to="/privacy"
+            to="/privacy-policy"
             sx={{ color: 'white', textDecoration: 'underline', cursor: 'pointer' }}
           >
             Privacy Policy

@@ -46,7 +46,7 @@ export const Router = createBrowserRouter([
                 element: <ContactUs />
             },
             {
-                path: "/privacy",
+                path: "/privacy-policy",
                 element: <PrivacyPolicy />
             },
         ]
