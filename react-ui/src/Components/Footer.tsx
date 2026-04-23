@@ -46,7 +46,11 @@ function Footer() {
           <Typography component="a" href="#terms" sx={{ color: 'white', textDecoration: 'underline', cursor: 'pointer' }}>
             Terms of Use
           </Typography>
-          <Typography component="a" href="#privacy" sx={{ color: 'white', textDecoration: 'underline', cursor: 'pointer' }}>
+          <Typography
+            component={RouterLink}
+            to="/privacy"
+            sx={{ color: 'white', textDecoration: 'underline', cursor: 'pointer' }}
+          >
             Privacy Policy
           </Typography>
         </Box>
