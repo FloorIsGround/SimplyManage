@@ -45,7 +45,7 @@ function Footer() {
           </Typography>
           <Typography
             component={RouterLink}
-            to="/termsofuse"
+            to="/terms-of-use"
             sx={{ color: 'white', textDecoration: 'underline', cursor: 'pointer' }}
           >
             Terms of Use
