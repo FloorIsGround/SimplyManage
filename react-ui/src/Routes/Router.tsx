@@ -46,7 +46,7 @@ export const Router = createBrowserRouter([
                 element: <ContactUs />
             },
             {
-                path: "/termsofuse",
+                path: "/terms-of-use",
                 element: <TermsOfUse />
             }
         ]
