@@ -24,9 +24,7 @@ function PrivacyPolicy() {
         }}
       >
         <Typography variant="body1" paragraph>
-          Welcome to SimplyManage. By accessing or using our application, you
-          agree to be bound by these Terms of Use. If you do not agree, please do
-          not use the service.
+          This is a privacy policy test yo
         </Typography>
 
         <Typography variant="h6" gutterBottom>
