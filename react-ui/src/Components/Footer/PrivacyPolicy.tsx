@@ -11,7 +11,7 @@ function PrivacyPolicy() {
         gutterBottom
         color="primary"
       >
-        Terms of Use
+        Privacy Policy
       </Typography>
 
       <Paper
@@ -24,61 +24,70 @@ function PrivacyPolicy() {
         }}
       >
         <Typography variant="body1" paragraph>
-          This is a privacy policy test yo
+          SimplyManage respects your privacy. This Privacy Policy explains how we
+          collect, use, and protect your information when you use our application.
         </Typography>
 
         <Typography variant="h6" gutterBottom>
-          1. Use of Service
+          1. Information We Collect
         </Typography>
         <Typography variant="body2" paragraph>
-          This application is intended for managing library-related data and
-          resources. You agree to use the service only for lawful purposes and in
-          a way that does not infringe the rights of others or restrict their use
-          of the service.
+          We may collect personal information such as your name, email address,
+          and account details when you register or interact with the application.
+          We may also collect non-personal data such as usage statistics to
+          improve our services.
         </Typography>
 
         <Typography variant="h6" gutterBottom>
-          2. User Responsibilities
+          2. How We Use Your Information
         </Typography>
         <Typography variant="body2" paragraph>
-          You are responsible for maintaining the confidentiality of your account
-          and any activities that occur under it. You agree not to misuse the
-          system, attempt unauthorized access, or disrupt the application.
+          Your information is used to operate and improve the application,
+          provide support, and communicate important updates. We do not sell your
+          personal information to third parties.
         </Typography>
 
         <Typography variant="h6" gutterBottom>
-          3. Intellectual Property
+          3. Data Security
         </Typography>
         <Typography variant="body2" paragraph>
-          All content, features, and functionality of this application are owned
-          by SimplyManage and are protected by applicable laws. You may not copy,
-          modify, or distribute any part of the service without permission.
+          We take reasonable measures to protect your data from unauthorized
+          access, alteration, or disclosure. However, no method of transmission
+          over the internet is completely secure.
         </Typography>
 
         <Typography variant="h6" gutterBottom>
-          4. Limitation of Liability
+          4. Sharing of Information
         </Typography>
         <Typography variant="body2" paragraph>
-          SimplyManage is provided "as is" without warranties of any kind. We are
-          not responsible for any damages resulting from the use or inability to
-          use the service.
+          We may share information only when necessary to comply with legal
+          obligations or to protect the rights and safety of our users and
+          application.
         </Typography>
 
         <Typography variant="h6" gutterBottom>
-          5. Changes to Terms
+          5. Cookies and Tracking
         </Typography>
         <Typography variant="body2" paragraph>
-          We reserve the right to update these Terms of Use at any time. Continued
-          use of the service after changes are made constitutes acceptance of the
-          revised terms.
+          Our application may use cookies or similar technologies to enhance user
+          experience and analyze usage patterns.
         </Typography>
 
         <Typography variant="h6" gutterBottom>
-          6. Contact Information
+          6. Changes to This Policy
+        </Typography>
+        <Typography variant="body2" paragraph>
+          We may update this Privacy Policy from time to time. Continued use of
+          the application after changes are made indicates acceptance of the
+          updated policy.
+        </Typography>
+
+        <Typography variant="h6" gutterBottom>
+          7. Contact Information
         </Typography>
         <Typography variant="body2">
-          If you have any questions about these Terms, please contact us at
-          support@simplymanage.com.
+          If you have any questions about this Privacy Policy, please contact us
+          at support@simplymanage.com.
         </Typography>
       </Paper>
 
