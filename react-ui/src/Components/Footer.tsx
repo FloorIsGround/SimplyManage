@@ -43,7 +43,11 @@ function Footer() {
           <Typography component="span">&copy; {new Date().getFullYear()} 
             SimplyManage Public Library
           </Typography>
-          <Typography component="a" href="#terms" sx={{ color: 'white', textDecoration: 'underline', cursor: 'pointer' }}>
+          <Typography
+            component={RouterLink}
+            to="/terms-of-use"
+            sx={{ color: 'white', textDecoration: 'underline', cursor: 'pointer' }}
+          >
             Terms of Use
           </Typography>
           <Typography component="a" href="#privacy" sx={{ color: 'white', textDecoration: 'underline', cursor: 'pointer' }}>

@@ -10,6 +10,7 @@ import UsersPage from "../Components/Dashboard/StaffDashboard/NavigationPages/Us
 import DashboardPage from "../Components/Dashboard/StaffDashboard/NavigationPages/DashboardPage";
 import BooksPage from "../Components/Dashboard/StaffDashboard/NavigationPages/BooksPage";
 import ContactUs from "../Components/Footer/ContactUs";
+import TermsOfUse from "../Components/Footer/TermsOfUse";
 
 // Main router
 export const Router = createBrowserRouter([
@@ -43,6 +44,10 @@ export const Router = createBrowserRouter([
             {
                 path: "/contact",
                 element: <ContactUs />
+            },
+            {
+                path: "/terms-of-use",
+                element: <TermsOfUse />
             }
         ]
     },
