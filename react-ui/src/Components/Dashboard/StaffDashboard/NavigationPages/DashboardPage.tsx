@@ -1,27 +1,15 @@
 import SignUp from '../../../SignUp/SignUp';
 import AddBookForm from '../../../Book/AddBookForm';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import StaffDashboardLayout from '../StaffDashboardLayout';
 import BookList from '../../../Book/BookList';
 import type { User } from '../../../../Models/User/User';
-import { Role, UserStatus } from '../../../../Models/User/User';
-import theme from '../../../../utils/theme';
+import axios from '../../../../utils/axios-api';
+import { jwtDecode } from 'jwt-decode';
 import {
   ThemeProvider, Typography, Box, Card, CardContent, Button, Dialog, DialogTitle, DialogContent, DialogActions, Badge
 } from '@mui/material';
-
-const mockUser: User = {
-  id: '1',
-  email: 'admin@simplymanage.com',
-  firstName: 'Admin',
-  lastName: 'Chelsey',
-  dateOfBirth: '1990-01-01',
-  password: '',
-  role: Role.admin,
-  status: UserStatus.active,
-  createdAt: new Date(),
-  borrowedBooks: [],
-};
+import theme from '../../../../utils/theme';
 
 const stats = [
   { label: 'Total Books', value: 12450 },
@@ -52,6 +40,51 @@ const DashboardPage: React.FC = () => {
   const [openAddPatron, setOpenAddPatron] = useState(false);
   const [openSearchBook, setOpenSearchBook] = useState(false);
   const [openAddBook, setOpenAddBook] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setTimeout(() => {
+        setUser(null);
+        setLoading(false);
+        setError('Not logged in.');
+      }, 0);
+      return;
+    }
+    let userId = undefined;
+    try {
+      const decoded: any = jwtDecode(token);
+      userId = decoded.id || decoded.userId || decoded._id;
+    } catch {
+      setTimeout(() => {
+        setUser(null);
+        setLoading(false);
+        setError('Invalid token.');
+      }, 0);
+      return;
+    }
+    if (!userId) {
+      setTimeout(() => {
+        setUser(null);
+        setLoading(false);
+        setError('No user ID found in token.');
+      }, 0);
+      return;
+    }
+    axios.get(`/users/${userId}`)
+      .then((res: any) => {
+        setUser(res.data);
+        setError(null);
+      })
+      .catch(() => {
+        setUser(null);
+        setError('Failed to load user.');
+      })
+      .finally(() => setLoading(false));
+  }, []);
 
   const handleOpenDialog = (label: string) => {
     if (label === 'Add Patron') {
@@ -69,9 +102,28 @@ const DashboardPage: React.FC = () => {
   const handleCloseSearchBook = () => setOpenSearchBook(false);
   const handleCloseAddBook = () => setOpenAddBook(false);
 
+  if (loading) {
+    return (
+      <ThemeProvider theme={theme}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
+          <Typography variant="h6">Loading...</Typography>
+        </Box>
+      </ThemeProvider>
+    );
+  }
+  if (error || !user) {
+    return (
+      <ThemeProvider theme={theme}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
+          <Typography variant="h6" color="error">{error || 'User not found.'}</Typography>
+        </Box>
+      </ThemeProvider>
+    );
+  }
+
   return (
     <ThemeProvider theme={theme}>
-      <StaffDashboardLayout user={mockUser} pageTitle="SimplyManage">
+      <StaffDashboardLayout user={user} pageTitle="SimplyManage">
         <Box sx={{ background: '#fff', borderRadius: 2, p: 4, boxShadow: 1, mt: 4 }}>
           <Typography variant="h4" sx={{ fontWeight: 700, mb: 2 }}>
             Staff Dashboard

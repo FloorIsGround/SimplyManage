@@ -62,7 +62,7 @@ export async function postUser(req: Request, res: Response, next: NextFunction) 
     return res.status(201).json(user);
   } catch (err: any) {
     if (err?.code === "23505") {
-      return next(createHttpError(409, "A user with that email already exists."));
+      return next(createHttpError(409, "A user with that email already exists or library card number is taken."));
     }
     next(err);
   }
@@ -193,7 +193,14 @@ export async function getUser(req: Request, res: Response, next: NextFunction) {
       throw createHttpError(404, "User not found.");
     }
 
-    return res.json({ firstName: user.firstName, lastName: user.lastName });
+    return res.json({
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      libraryCardNumber: user.libraryCardNumber,
+      role: user.role,
+      status: user.status
+    });
   } catch (err) {
     next(err);
   }

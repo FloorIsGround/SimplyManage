@@ -11,6 +11,7 @@ import DashboardPage from "../Components/Dashboard/StaffDashboard/NavigationPage
 import BooksPage from "../Components/Dashboard/StaffDashboard/NavigationPages/BooksPage";
 import ContactUs from "../Components/Footer/ContactUs";
 import PrivacyPolicy from "../Components/Footer/PrivacyPolicy";
+import TermsOfUse from "../Components/Footer/TermsOfUse";
 
 // Main router
 export const Router = createBrowserRouter([
@@ -49,6 +50,9 @@ export const Router = createBrowserRouter([
                 path: "/privacy-policy",
                 element: <PrivacyPolicy />
             },
+                path: "/terms-of-use",
+                element: <TermsOfUse />
+            }
         ]
     },
     {

@@ -7,6 +7,7 @@ export type CreateUserInput = {
   password: string;
   firstName: string;
   lastName: string;
+  libraryCardNumber?: string;
   role?: UserRole;
 };
 
@@ -21,6 +22,7 @@ type UserRow = {
   email: string;
   first_name: string;
   last_name: string;
+  library_card_number: string;
   role: UserRole;
   status: UserStatus;
   created_at: string | Date;
@@ -32,6 +34,7 @@ function mapUserRow(row: UserRow): User {
     email: row.email,
     firstName: row.first_name,
     lastName: row.last_name,
+    libraryCardNumber: row.library_card_number,
     role: row.role,
     status: row.status,
     createdAt: row.created_at instanceof Date
@@ -40,7 +43,7 @@ function mapUserRow(row: UserRow): User {
   };
 }
 
-const USER_COLUMNS = `user_id, email, first_name, last_name, role, status, created_at`;
+const USER_COLUMNS = `user_id, email, first_name, last_name, library_card_number, role, status, created_at`;
 
 // Gets a single user by their UUID.
 export async function getUserById(userId: string): Promise<User | null> {
@@ -66,15 +69,22 @@ export async function getUserByEmail(email: string): Promise<any | null> {
 export async function createStaffUser(input: CreateUserInput): Promise<User> {
   const passwordHash = await bcrypt.hash(input.password, 10);
 
+  // Generate a unique library card number if not provided
+  let libraryCardNumber = input.libraryCardNumber;
+  if (!libraryCardNumber) {
+    libraryCardNumber = await generateUniqueLibraryCardNumber();
+  }
+
   const res = await query<UserRow>(
-    `INSERT INTO users (email, password_hash, first_name, last_name, role, status, created_at)
-     VALUES ($1, $2, $3, $4, $5, 'ACTIVE', NOW())
+    `INSERT INTO users (email, password_hash, first_name, last_name, library_card_number, role, status, created_at)
+     VALUES ($1, $2, $3, $4, $5, $6, 'ACTIVE', NOW())
      RETURNING ${USER_COLUMNS}`,
     [
       input.email,
       passwordHash,
       input.firstName,
       input.lastName,
+      libraryCardNumber,
       input.role ?? 'PATRON',
     ]
   );
@@ -147,4 +157,16 @@ export async function deleteUser(userId: string): Promise<boolean> {
   );
 
   return res.rows.length > 0;
+}
+
+// Generates a unique random 8-digit library card number not already used by any user.
+async function generateUniqueLibraryCardNumber(): Promise<string> {
+  let cardNumber: string;
+  let exists = true;
+  while (exists) {
+    cardNumber = Math.floor(10000000 + Math.random() * 90000000).toString();
+    const res = await query('SELECT 1 FROM users WHERE library_card_number = $1', [cardNumber]);
+    exists = res.rows.length > 0;
+  }
+  return cardNumber!;
 }
