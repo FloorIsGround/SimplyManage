@@ -38,13 +38,18 @@ export async function getCopyBarcode(req: Request, res: Response, next: NextFunc
 // Creates one or more copies for a book.
 export async function postCopies(req: Request, res: Response, next: NextFunction) {
   try {
-    const { bookId, quantity, conditionStatus, location } = req.body;
+    const { bookId, quantity, conditionStatus, branchId } = req.body;
 
     const validatedBookId = requireUuid(bookId, "bookId");
 
     const parsedQuantity = Number(quantity);
     if (!Number.isInteger(parsedQuantity) || parsedQuantity < 1) {
       throw createHttpError(400, "quantity must be a positive integer.");
+    }
+
+    const parsedBranchId = Number(branchId);
+    if (!Number.isInteger(parsedBranchId) || parsedBranchId < 1) {
+      throw createHttpError(400, "branchId must be a positive integer.");
     }
 
     if (!conditionStatus || !CONDITION_STATUSES.includes(conditionStatus)) {
@@ -55,7 +60,7 @@ export async function postCopies(req: Request, res: Response, next: NextFunction
       bookId: validatedBookId,
       quantity: parsedQuantity,
       conditionStatus,
-      location: location != null ? String(location) : null,
+      branchId: parsedBranchId,
     };
 
     const copies = await createCopies(input);
@@ -92,4 +97,4 @@ export async function patchCopyStatus(req: Request, res: Response, next: NextFun
   } catch (err) {
     next(err);
   }
-}
+  }

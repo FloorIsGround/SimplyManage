@@ -6,6 +6,6 @@ export interface Copy {
   bookId: string;
   barcode: string | null;
   conditionStatus: ConditionStatus;
-  location: string | null;
+  branchId: number;
   createdAt: string;
 }

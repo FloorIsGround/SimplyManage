@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Box, Alert } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Box, Alert, MenuItem } from '@mui/material';
+import { useBranches } from '../LibraryInfo/useBranches';
 import axios from '../../utils/axios-api';
 
 interface AddBookFormProps {
@@ -7,6 +8,13 @@ interface AddBookFormProps {
   onClose: () => void;
   onSuccess?: () => void;
 }
+
+const CONDITION_STATUSES = [
+  { value: 'AVAILABLE', label: 'Available' },
+  { value: 'LOST', label: 'Lost' },
+  { value: 'DAMAGED', label: 'Damaged' },
+  { value: 'MAINTENANCE', label: 'Maintenance' },
+];
 
 const AddBookForm: React.FC<AddBookFormProps> = ({ open, onClose, onSuccess }) => {
   const initialFormState = React.useMemo(() => ({
@@ -17,6 +25,9 @@ const AddBookForm: React.FC<AddBookFormProps> = ({ open, onClose, onSuccess }) =
     description: '',
     publicationYear: '',
     audience: '',
+    numCopies: 1,
+    conditionStatus: 'AVAILABLE',
+    branchId: '',
   }), []);
   const [form, setForm] = useState(initialFormState);
   const [loading, setLoading] = useState(false);
@@ -24,6 +35,7 @@ const AddBookForm: React.FC<AddBookFormProps> = ({ open, onClose, onSuccess }) =
   const [validationError, setValidationError] = useState('');
   const [success, setSuccess] = useState('');
   const timeoutRef = React.useRef<number | null>(null);
+  const { branches, loading: branchesLoading, error: branchesError } = useBranches();
 
   // Reset form and messages when dialog opens or closes
   React.useEffect(() => {
@@ -55,8 +67,12 @@ const AddBookForm: React.FC<AddBookFormProps> = ({ open, onClose, onSuccess }) =
     setError('');
     setSuccess('');
     // Validate required fields
-    if (!form.title.trim() || !form.author.trim() || !form.isbn.trim() || !form.audience.trim()) {
+    if (!form.title.trim() || !form.author.trim() || !form.isbn.trim() || !form.audience.trim() || !form.branchId) {
       setValidationError('Please fill in all required fields.');
+      return;
+    }
+    if (!form.numCopies || isNaN(Number(form.numCopies)) || Number(form.numCopies) < 1) {
+      setValidationError('Please enter a valid number of copies.');
       return;
     }
     const payload = {
@@ -69,24 +85,87 @@ const AddBookForm: React.FC<AddBookFormProps> = ({ open, onClose, onSuccess }) =
       publicationYear: form.publicationYear.trim() ? Number(form.publicationYear) : null,
     };
     setLoading(true);
+    let bookId: string | undefined;
     try {
-      await axios.post('/books', payload);
+      // Try to Create the book
+      const res = await axios.post('/books', payload);
+      bookId = res.data?.id || res.data?.bookId || res.data?._id;
+    } catch (err: any) {
+      // If book already exists, fetch its ID by ISBN
+      if (err?.response?.status === 409) {
+        try {
+          const existing = await axios.get(`/books?isbn=${encodeURIComponent(form.isbn.trim())}`);
+          // If the response is an array, get the first item
+          if (Array.isArray(existing.data)) {
+            // Find the book with the exact matching ISBN
+            const isbnToFind = form.isbn.trim();
+            const found = existing.data.find((b: any) => {
+              if (b.isbn == null) return false;
+              return String(b.isbn) === isbnToFind || Number(b.isbn) === Number(isbnToFind);
+            });
+            bookId = found?.id || found?.bookId || found?._id;
+          } else {
+            bookId = existing.data?.id || existing.data?.bookId || existing.data?._id;
+          }
+        } catch {
+          setLoading(false);
+          setError('Book exists but could not fetch its ID.');
+          return;
+        }
+      } else {
+        setLoading(false);
+        const errorMsg =
+          (err?.response?.data && JSON.stringify(err.response.data)) ||
+          err?.response?.data?.message ||
+          err.message ||
+          'Failed to add book or copies';
+        setError(errorMsg);
+        console.error('AddBookForm error:', err);
+        return;
+      }
+    }
+    // Try to Add Copies
+    try {
+      const copiesPayload = {
+        bookId,
+        quantity: Number(form.numCopies),
+        conditionStatus: form.conditionStatus,
+        branchId: Number(form.branchId),
+      };
+      await axios.post('/copies', copiesPayload);
       setLoading(false);
-      setSuccess('Book added successfully!');
+      setSuccess('Book and copies added successfully!');
       if (onSuccess) onSuccess();
       timeoutRef.current = setTimeout(onClose, 1200);
     } catch (err: any) {
       setLoading(false);
-      setError(err?.response?.data?.message || 'Failed to add book');
+      const errorMsg =
+        (err?.response?.data && JSON.stringify(err.response.data)) ||
+        err?.response?.data?.message ||
+        err.message ||
+        'Failed to add copies';
+      setError(errorMsg);
+      console.error('AddBookForm error:', err);
     }
   };
 
   // Helper for required field validation props
-  const getFieldValidation = (field: keyof typeof form, label: string) => ({
-    required: true,
-    error: !!validationError && !form[field].trim(),
-    helperText: !!validationError && !form[field].trim() ? `${label} is required.` : ''
-  });
+  const getFieldValidation = (field: keyof typeof form, label: string) => {
+    const value = form[field];
+    let isEmpty = false;
+    if (typeof value === 'string') {
+      isEmpty = !value.trim();
+    } else if (typeof value === 'number') {
+      isEmpty = value === undefined || value === null;
+    } else {
+      isEmpty = value === undefined || value === null;
+    }
+    return {
+      required: true,
+      error: !!validationError && isEmpty,
+      helperText: !!validationError && isEmpty ? `${label} is required.` : '',
+    };
+  };
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
@@ -124,6 +203,45 @@ const AddBookForm: React.FC<AddBookFormProps> = ({ open, onClose, onSuccess }) =
             onChange={handleChange}
             {...getFieldValidation('audience', 'Audience')}
           />
+          <TextField
+            label="Number of Copies"
+            name="numCopies"
+            type="number"
+            value={form.numCopies}
+            onChange={handleChange}
+            inputProps={{ min: 1 }}
+            sx={{ mt: 1 }}
+          />
+          <TextField
+            select
+            label="Condition Status"
+            name="conditionStatus"
+            value={form.conditionStatus}
+            onChange={handleChange}
+            sx={{ mt: 1 }}
+          >
+            {CONDITION_STATUSES.map((option) => (
+              <MenuItem key={option.value} value={option.value}>
+                {option.label}
+              </MenuItem>
+            ))}
+          </TextField>
+          <TextField
+            select
+            label="Branch"
+            name="branchId"
+            value={form.branchId}
+            onChange={handleChange}
+            sx={{ mt: 1 }}
+            disabled={branchesLoading || !!branchesError}
+            required
+          >
+            {branches.map(branch => (
+              <MenuItem key={branch.id} value={String(branch.id)}>
+                {branch.name}
+              </MenuItem>
+            ))}
+          </TextField>
           {error && <Alert severity="error">{error}</Alert>}
           {success && <Alert severity="success">{success}</Alert>}
         </Box>
