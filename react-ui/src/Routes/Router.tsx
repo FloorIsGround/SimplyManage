@@ -50,6 +50,7 @@ export const Router = createBrowserRouter([
                 path: "/privacy-policy",
                 element: <PrivacyPolicy />
             },
+            {
                 path: "/terms-of-use",
                 element: <TermsOfUse />
             }
