@@ -1,10 +1,11 @@
 import { Router } from "express";
-import { getUser, postLogin, postUser, patchUser, patchUserStatus, patchUserPassword, postVerifyPassword, removeUser } from "../controllers/usersController.js";
+import { getUser, getUsers, postLogin, postUser, patchUser, patchUserStatus, patchUserPassword, postVerifyPassword, removeUser } from "../controllers/usersController.js";
 
 const router = Router();
 
 router.post("/login", postLogin);
 router.get("/:userId", getUser);
+router.get("/", getUsers);
 router.post("/", postUser);
 router.patch("/:userId", patchUser);
 router.patch("/:userId/status", patchUserStatus);

@@ -37,6 +37,22 @@ export async function postLogin(req: Request, res: Response, next: NextFunction)
   }
 }
 
+// Returns a list of users, optionally filtered by role
+import { getUsersByFilter } from "../models/user/userQueries.js";
+
+export async function getUsers(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { role, cardNumber } = req.query;
+    const users = await getUsersByFilter({
+      role: typeof role === 'string' ? role : undefined,
+      cardNumber: typeof cardNumber === 'string' ? cardNumber : undefined,
+    });
+    return res.json(users);
+  } catch (err) {
+    next(err);
+  }
+}
+
 // Creates a new user (staff-initiated).
 export async function postUser(req: Request, res: Response, next: NextFunction) {
   try {

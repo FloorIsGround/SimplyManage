@@ -64,16 +64,48 @@ export async function getAllBooks(): Promise<Book[]> {
   return res.rows.map(mapBookRow);
 }
 
-// Searches books by title, author, or genre.
-export async function searchBooksByQuery(searchQuery: string): Promise<Book[]> {
-  const res = await query<BookRow>(
-    `SELECT ${BOOK_COLUMNS} FROM books
-     WHERE LOWER(title) LIKE LOWER($1)
-        OR LOWER(author) LIKE LOWER($1)
-        OR LOWER(genre) LIKE LOWER($1)`,
-    [`%${searchQuery}%`]
-  );
+// Searches books by title, author, genre, audience, and rating.
+export async function searchBooksByQuery({ searchQuery, genre, audience, rating, barcode }: { searchQuery?: string, genre?: string, audience?: string, rating?: number, barcode?: string }): Promise<Book[]> {
+  // If searching by barcode, join copies and filter by barcode
+  if (barcode) {
+    const res = await query<BookRow>(
+      `SELECT b.${BOOK_COLUMNS}
+       FROM books b
+       JOIN copies c ON b.book_id = c.book_id
+       WHERE c.barcode = $1
+       ORDER BY b.title`,
+      [barcode]
+    );
+    return res.rows.map(mapBookRow);
+  }
 
+  let sql = `SELECT ${BOOK_COLUMNS} FROM books WHERE 1=1`;
+  const params: any[] = [];
+  let idx = 1;
+
+  if (searchQuery) {
+    sql += ` AND (LOWER(title) LIKE LOWER($${idx}) OR LOWER(author) LIKE LOWER($${idx}) OR LOWER(genre) LIKE LOWER($${idx}))`;
+    params.push(`%${searchQuery}%`);
+    idx++;
+  }
+  if (genre) {
+    sql += ` AND LOWER(genre) = LOWER($${idx})`;
+    params.push(genre);
+    idx++;
+  }
+  if (audience) {
+    sql += ` AND LOWER(audience) = LOWER($${idx})`;
+    params.push(audience);
+    idx++;
+  }
+  if (typeof rating === 'number' && !isNaN(rating)) {
+    sql += ` AND average_rating >= $${idx}`;
+    params.push(rating);
+    idx++;
+  }
+
+  sql += ` ORDER BY title`;
+  const res = await query<BookRow>(sql, params);
   return res.rows.map(mapBookRow);
 }
 

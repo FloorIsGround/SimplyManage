@@ -1,6 +1,11 @@
 import { query } from "../../config/db.js";
 import type { CreateLoanInput, Loan } from "./loan.js";
 
+// For user loan lists, include book title
+export interface LoanWithBookTitle extends Loan {
+    bookTitle: string;
+}
+
 const LOAN_COLUMNS = "loan_id, user_id, copy_id, checkout_at, due_at, returned_at, renewal_count";
 
 type LoanRow = {
@@ -71,17 +76,28 @@ export async function getLoanById(loanId: string): Promise<Loan | null> {
     return mapLoanRow(res.rows[0]);
 }
 
-// Returns all loans for a user, most recent first.
-export async function getLoansByUserId(userId: string): Promise<Loan[]> {
-    const res = await query<LoanRow>(
-        `SELECT ${LOAN_COLUMNS}
-         FROM loans
-         WHERE user_id = $1
-         ORDER BY checkout_at DESC`,
+// Returns all loans for a user, most recent first, with book title.
+export async function getLoansByUserId(userId: string): Promise<LoanWithBookTitle[]> {
+    const res = await query(
+        `SELECT l.loan_id, l.user_id, l.copy_id, l.checkout_at, l.due_at, l.returned_at, l.renewal_count, b.title AS book_title
+         FROM loans l
+         JOIN copies c ON l.copy_id = c.copy_id
+         JOIN books b ON c.book_id = b.book_id
+         WHERE l.user_id = $1
+         ORDER BY l.checkout_at DESC`,
         [userId]
     );
-
-    return res.rows.map(mapLoanRow);
+    
+    return res.rows.map((row: any) => ({
+        id: row.loan_id,
+        userId: row.user_id,
+        copyId: row.copy_id,
+        checkoutAt: row.checkout_at instanceof Date ? row.checkout_at.toISOString() : row.checkout_at,
+        dueAt: row.due_at instanceof Date ? row.due_at.toISOString() : row.due_at,
+        returnedAt: row.returned_at instanceof Date ? row.returned_at.toISOString() : row.returned_at,
+        renewalCount: row.renewal_count,
+        bookTitle: row.book_title,
+    }));
 }
 
 // Returns all loans for a specific copy, most recent first.

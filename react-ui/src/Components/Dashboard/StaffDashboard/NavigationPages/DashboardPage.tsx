@@ -1,19 +1,84 @@
 import SignUp from '../../../SignUp/SignUp';
 import AddBookForm from '../../../Book/AddBookForm';
 import React, { useState, useEffect } from 'react';
+import Autocomplete from '@mui/material/Autocomplete';
+import TextField from '@mui/material/TextField';
 import StaffDashboardLayout from '../StaffDashboardLayout';
 import BookList from '../../../Book/BookList';
 import type { User } from '../../../../Models/User/User';
+import type { Book } from '../../../../Models/Book/Book';
+import type { Copy } from '../../../../Models/Book/Copy';
+import { useBranches } from '../../../LibraryInfo/useBranches';
+import type { Library } from '../../../../Models/LibraryInfo/Library';
 import axios from '../../../../utils/axios-api';
 import { jwtDecode } from 'jwt-decode';
 import {
-  ThemeProvider, Typography, Box, Card, CardContent, Button, Dialog, DialogTitle, DialogContent, DialogActions, Badge
+  ThemeProvider, Typography, Box, Card, CardContent, Button, Dialog, DialogTitle, DialogContent, DialogActions, Badge, CircularProgress, Snackbar, Alert
 } from '@mui/material';
 import theme from '../../../../utils/theme';
 
+{ /* CheckoutButton component */}
+interface CheckoutButtonProps {
+  selectedPatron: User | null;
+  selectedCopy: Copy | null;
+  selectedBranch: Library | null;
+  onSuccess: () => void;
+}
+
+const CheckoutButton: React.FC<CheckoutButtonProps> = ({ selectedPatron, selectedCopy, selectedBranch, onSuccess }) => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+
+  const handleCheckout = async () => {
+    if (!selectedPatron || !selectedCopy || !selectedBranch) return;
+    setLoading(true);
+    setError(null);
+    try {
+      // Calculate due date (2 weeks from checkout)
+      const dueAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString();
+      await axios.post('/loans', {
+        userId: selectedPatron.id,
+        copyId: selectedCopy.id,
+        barcode: selectedCopy.barcode,
+        branchId: selectedBranch.id,
+        dueAt,
+      });
+      setSuccess(true);
+      onSuccess();
+    } catch (err: any) {
+      setError(err?.response?.data?.error || err.message || 'Checkout failed.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <>
+      <Button
+        variant="contained"
+        color="primary"
+        disabled={loading || !selectedPatron || !selectedCopy || !selectedBranch}
+        onClick={handleCheckout}
+        startIcon={loading ? <CircularProgress size={18} /> : null}
+      >
+        Checkout
+      </Button>
+      <Snackbar open={!!error} autoHideDuration={4000} onClose={() => setError(null)}>
+        <Alert severity="error" onClose={() => setError(null)}>{error}</Alert>
+      </Snackbar>
+      <Snackbar open={success} autoHideDuration={3000} onClose={() => setSuccess(false)} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
+        <Alert severity="success" onClose={() => setSuccess(false)} sx={{ width: '100%' }}>
+          Checkout successful!
+        </Alert>
+      </Snackbar>
+    </>
+  );
+};
+
 const stats = [
-  { label: 'Total Books', value: 12450 },
-  { label: 'Total Copies', value: 30210 },
+  { label: 'Total Books', value: 3026 },
+  { label: 'Total Copies', value: 6010 },
   { label: 'Items Checked Out', value: 1875 },
   { label: 'Active Patrons', value: 920 },
 ];
@@ -28,7 +93,7 @@ const quickActions = [
 ];
 
 const circulationAlerts = [
-  { label: 'Overdue Items', count: 42 },
+  { label: 'Overdue Items', count: 2 },
   { label: 'Holds', count: 15 },
   { label: 'Lost Copies', count: 3 },
   { label: 'Damaged Copies', count: 2 },
@@ -41,6 +106,87 @@ const DashboardPage: React.FC = () => {
   const [openSearchBook, setOpenSearchBook] = useState(false);
   const [openAddBook, setOpenAddBook] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const [selectedPatron, setSelectedPatron] = useState<User | null>(null);
+  const [patronsLoading, setPatronsLoading] = useState(false);
+  const [patronsError, setPatronsError] = useState<string | null>(null);
+  const [pendingPatronCardNumber, setPendingPatronCardNumber] = useState('');
+  const { branches, loading: branchesLoading, error: branchesError } = useBranches();
+  const [selectedBranch, setSelectedBranch] = useState<Library | null>(null);
+  const [selectedBook, setSelectedBook] = useState<Book | null>(null);
+  const [selectedCopy, setSelectedCopy] = useState<Copy | null>(null);
+  const [booksLoading, setBooksLoading] = useState(false);
+  const [booksError, setBooksError] = useState<string | null>(null);
+  const [pendingBookBarcode, setPendingBookBarcode] = useState('');
+    
+  // Fetch patrons and books when checkout dialog opens
+    useEffect(() => {
+      if (openDialog === 'Checkout') {
+        setSelectedPatron(null);
+        setPatronsError(null);
+        setSelectedBook(null);
+        setSelectedCopy(null);
+        setBooksError(null);
+        setPendingPatronCardNumber('');
+        setPendingBookBarcode('');
+      }
+    }, [openDialog]);
+
+    const handlePatronSearch = async () => {
+      setPatronsLoading(true);
+      setPatronsError(null);
+      setSelectedPatron(null);
+      if (!pendingPatronCardNumber) {
+        setPatronsLoading(false);
+        return;
+      }
+      try {
+          const url = `/users?role=patron&cardNumber=${encodeURIComponent(pendingPatronCardNumber)}`;
+          const res = await axios.get(url);
+          if (res.data && res.data.length > 0) {
+            const exact = res.data.find((u: any) => u.libraryCardNumber === pendingPatronCardNumber);
+            if (exact) {
+              setSelectedPatron(exact);
+            } else {
+              setSelectedPatron(null);
+              setPatronsError('No patron found with that card number.');
+            }
+          } else {
+            setSelectedPatron(null);
+            setPatronsError('No patron found with that card number.');
+          }
+        } catch {
+          setSelectedPatron(null);
+          setPatronsError('Failed to load patron.');
+        } finally {
+          setPatronsLoading(false);
+      }
+    };
+
+    const handleBookSearch = async () => {
+      setBooksLoading(true);
+      setBooksError(null);
+      setSelectedBook(null);
+      setSelectedCopy(null);
+      if (!pendingBookBarcode) {
+        setBooksLoading(false);
+        return;
+      }
+      try {
+        const copyRes = await axios.get(`/copies/barcode/${encodeURIComponent(pendingBookBarcode)}`);
+        const copy: Copy = copyRes.data;
+        setSelectedCopy(copy);
+        const bookRes = await axios.get(`/books/${copy.bookId}`);
+        setSelectedBook(bookRes.data);
+      } catch (err: any) {
+        if (err?.response?.status === 404) {
+          setBooksError('No copy found with that barcode.');
+        } else {
+          setBooksError('Failed to load book.');
+        }
+      } finally {
+        setBooksLoading(false);
+      }
+    };
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -97,7 +243,10 @@ const DashboardPage: React.FC = () => {
       setOpenDialog(label);
     }
   };
-  const handleCloseDialog = () => setOpenDialog(null);
+  const handleCloseDialog = () => {
+    setOpenDialog(null);
+    setSelectedBranch(null);
+  };
   const handleCloseAddPatron = () => setOpenAddPatron(false);
   const handleCloseSearchBook = () => setOpenSearchBook(false);
   const handleCloseAddBook = () => setOpenAddBook(false);
@@ -200,13 +349,115 @@ const DashboardPage: React.FC = () => {
               </Badge>
             ))}
           </Box>
-          {/* Placeholder Dialog */}
+          {/* Quick Action Dialogs */}
           <Dialog open={!!openDialog} onClose={handleCloseDialog}>
             <DialogTitle>{openDialog}</DialogTitle>
             <DialogContent>
-              <Typography>
-                This is a placeholder dialog for <b>{openDialog}</b>.<br />
-              </Typography>
+              {openDialog === 'Checkout' ? (
+                <Box sx={{ minWidth: 320, py: 1, display: 'flex', flexDirection: 'column', gap: 3 }}>
+                  <div>
+                    <Typography variant="subtitle1" sx={{ mb: 1 }}>
+                      Patron Card Number
+                    </Typography>
+                    <TextField
+                      label="Library Card Number"
+                      variant="outlined"
+                      value={pendingPatronCardNumber}
+                      onChange={e => setPendingPatronCardNumber(e.target.value)}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter') {
+                          handlePatronSearch();
+                        }
+                      }}
+                      sx={{ mb: 2, width: '100%' }}
+                      error={!!patronsError}
+                      helperText={patronsError || ''}
+                      disabled={patronsLoading}
+                    />
+                    {patronsLoading && <span>Loading...</span>}
+                    {selectedPatron && (
+                      <Typography variant="body2" sx={{ mt: 1 }}>
+                        {selectedPatron.firstName} {selectedPatron.lastName} ({selectedPatron.cardNumber || selectedPatron.email})
+                      </Typography>
+                    )}
+                  </div>
+                  <div>
+                    <Typography variant="subtitle1" sx={{ mb: 1 }}>
+                      Book Barcode
+                    </Typography>
+                    <TextField
+                      label="Book Barcode"
+                      variant="outlined"
+                      value={pendingBookBarcode}
+                      onChange={e => setPendingBookBarcode(e.target.value)}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter') {
+                          handleBookSearch();
+                        }
+                      }}
+                      sx={{ mb: 2, width: '100%' }}
+                      error={!!booksError}
+                      helperText={booksError || ''}
+                      disabled={booksLoading}
+                    />
+                    {booksLoading && <span>Loading...</span>}
+                    {selectedBook && selectedCopy && (
+                      <Typography variant="body2" sx={{ mt: 1 }}>
+                        {selectedBook.title} by {selectedBook.author} (Barcode: {selectedCopy.barcode})
+                      </Typography>
+                    )}
+                  </div>
+                  <div>
+                    <Typography variant="subtitle1" sx={{ mb: 1 }}>
+                      Select Branch
+                    </Typography>
+                    <Autocomplete
+                      options={branches}
+                      getOptionLabel={(option) => option.name}
+                      loading={branchesLoading}
+                      value={selectedBranch}
+                      onChange={(_, value) => setSelectedBranch(value)}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label="Branch"
+                          variant="outlined"
+                          error={!!branchesError}
+                          helperText={branchesError || ''}
+                          InputProps={{
+                            ...params.InputProps,
+                            endAdornment: (
+                              <>
+                                {branchesLoading ? <span style={{ marginRight: 8 }}>Loading...</span> : null}
+                                {params.InputProps.endAdornment}
+                              </>
+                            ),
+                          }}
+                        />
+                      )}
+                      isOptionEqualToValue={(option, value) => option && value && option.id === value.id}
+                    />
+                  </div>
+                  <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
+                    <CheckoutButton
+                      selectedPatron={selectedPatron}
+                      selectedCopy={selectedCopy}
+                      selectedBranch={selectedBranch}
+                      onSuccess={() => {
+                        setSelectedPatron(null);
+                        setSelectedBook(null);
+                        setSelectedCopy(null);
+                        setSelectedBranch(null);
+                        handleCloseDialog();
+                      }}
+                    />
+                  </Box>
+                </Box>
+              ) : (
+                <Typography>
+                  This is a placeholder dialog for <b>{openDialog}</b>.<br />
+                </Typography>
+              )}
             </DialogContent>
             <DialogActions>
               <Button onClick={handleCloseDialog} color="primary">Close</Button>
