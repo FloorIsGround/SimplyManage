@@ -10,8 +10,7 @@ import { getNextHoldInQueue, updateHoldStatus } from "../models/hold/holdQueries
 export async function postLoan(req: Request, res: Response, next: NextFunction) {
     try {
         const userId = requireUuid(req.body.userId, "userId");
-        const copyId = requireUuid(req.body.copyId, "copyId");
-        const { dueAt } = req.body;
+        const { copyId, barcode, dueAt } = req.body;
 
         if (!dueAt || typeof dueAt !== "string" || isNaN(Date.parse(dueAt))) {
             throw createHttpError(400, "dueAt must be a valid ISO date string.");
@@ -25,20 +24,33 @@ export async function postLoan(req: Request, res: Response, next: NextFunction) 
             throw createHttpError(403, "User account is suspended and cannot check out items.");
         }
 
-        const copy = await getCopyById(copyId);
-        if (!copy) {
+        let copy;
+        let resolvedCopyId: string | undefined;
+        if (copyId) {
+            resolvedCopyId = requireUuid(copyId, "copyId");
+            copy = await getCopyById(resolvedCopyId);
+        } else if (barcode) {
+            copy = await (typeof barcode === "string" ? import("../models/copy/copyQueries.js").then(m => m.getCopyByBarcode(barcode)) : Promise.resolve(null));
+            if (copy) {
+                resolvedCopyId = copy.id;
+            }
+        } else {
+            throw createHttpError(400, "Either copyId or barcode is required.");
+        }
+
+        if (!copy || !resolvedCopyId) {
             throw createHttpError(404, "Copy not found.");
         }
         if (copy.conditionStatus !== "AVAILABLE") {
             throw createHttpError(409, `Copy is not available for checkout (status: ${copy.conditionStatus}).`);
         }
 
-        const activeLoan = await getActiveLoanByCopyId(copyId);
+        const activeLoan = await getActiveLoanByCopyId(resolvedCopyId);
         if (activeLoan) {
             throw createHttpError(409, "Copy is already checked out.");
         }
 
-        const loan = await createLoan({ userId, copyId, dueAt });
+        const loan = await createLoan({ userId, copyId: resolvedCopyId, dueAt });
 
         return res.status(201).json(loan);
     } catch (err) {

@@ -30,7 +30,7 @@ const sampleCopy: Copy = {
   bookId: "123e4567-e89b-12d3-a456-426614174000",
   barcode: "BC00000001",
   conditionStatus: "AVAILABLE",
-  location: "Shelf A1",
+  branchId: 1,
   createdAt: "2024-01-01T00:00:00.000Z",
 };
 
@@ -99,7 +99,7 @@ describe("POST /api/copies", () => {
     bookId: "123e4567-e89b-12d3-a456-426614174000",
     quantity: 2,
     conditionStatus: "AVAILABLE",
-    location: "Shelf A1",
+    branchId: 1,
   };
 
   it("creates copies and returns 201", async () => {

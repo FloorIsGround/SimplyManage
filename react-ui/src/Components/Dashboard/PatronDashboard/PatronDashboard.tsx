@@ -11,15 +11,12 @@ import {
 import { Tabs, Tab } from "@mui/material";
 import { useState, useEffect } from "react";
 import type { User } from "../../../Models/User/User";
+import type { Loan } from "../../../Models/Book/Loan";
+type LoanWithBookTitle = Loan & { bookTitle?: string };
 import axios from "../../../utils/axios-api";
 import { jwtDecode } from "jwt-decode";
 
 function PatronDashboard() {
-  // Mock data for demonstration
-  const checkedOutBooks = [
-    { title: "The Great Gatsby", dueDate: "2026-05-01", overdue: false },
-    { title: "1984", dueDate: "2026-04-15", overdue: true },
-  ];
   const holds = [
     { title: "To Kill a Mockingbird", status: "Ready for Pickup" },
     { title: "Brave New World", status: "Pending" },
@@ -35,12 +32,13 @@ function PatronDashboard() {
   const [activityTab, setActivityTab] = useState(0);
   const [user, setUser] = useState<User | null>(null);
   const [loadingUser, setLoadingUser] = useState(true);
+  const [loans, setLoans] = useState<LoanWithBookTitle[]>([]);
+  const [loadingLoans, setLoadingLoans] = useState(true);
 
   useEffect(() => {
     // Get token and decode userId
     const token = localStorage.getItem("token");
     if (!token) {
-      // Avoid direct setState in effect body: batch with microtask
       setTimeout(() => {
         setUser(null);
         setLoadingUser(false);
@@ -65,10 +63,22 @@ function PatronDashboard() {
       }, 0);
       return;
     }
+    console.log('[PatronDashboard] userId from token:', userId);
     axios.get(`/users/${userId}`)
       .then((res: any) => setUser(res.data))
       .catch(() => setUser(null))
-      .finally(() => setLoadingUser(false));
+      .finally(() => setLoadingUser(false))
+    axios.get(`/loans/user/${userId}`)
+      .then((res: any) => {
+        console.log('[PatronDashboard] /loans response:', res.data);
+        const userLoans: LoanWithBookTitle[] = res.data || [];
+        setLoans(userLoans);
+      })
+      .catch((err) => {
+        console.log('[PatronDashboard] /loans error:', err);
+        setLoans([]);
+      })
+      .finally(() => setLoadingLoans(false));
   }, []);
 
   return (
@@ -84,19 +94,32 @@ function PatronDashboard() {
         <Box sx={{ maxWidth: 500, mx: "auto" }}>
           <Card>
             <CardContent>
-              <Typography variant="h6" sx={{ mb: 2 }}>Account Summary</Typography>
+              <Typography variant="h6" sx={{ mb: 2 }}>
+                Account Summary
+              </Typography>
               {loadingUser ? (
-                <Typography>Loading...</Typography>
+                <Typography>
+                  Loading...
+                </Typography>
               ) : user ? (
                 <>
-                  <Typography>Name: {user.firstName} {user.lastName}</Typography>
-                  <Typography>Email: {user.email}</Typography>
-                  <Typography>Library Card #: {user.libraryCardNumber}</Typography>
-                  <Typography>Card Expiration: 2027-12-31</Typography>
-                  <Typography>Status: {user.status}</Typography>
+                  <Typography>
+                    Name: { user.firstName } { user.lastName }
+                  </Typography>
+                  <Typography>
+                    Email: { user.email }
+                  </Typography>
+                  <Typography>
+                    Card Expiration: 2027-12-31
+                  </Typography>
+                  <Typography>
+                    Status: { user.status }
+                  </Typography>
                 </>
               ) : (
-                <Typography color="error">Failed to load user info.</Typography>
+                <Typography color="error">
+                  Failed to load user info.
+                </Typography>
               )}
             </CardContent>
           </Card>
@@ -113,37 +136,54 @@ function PatronDashboard() {
           {activityTab === 0 && (
             <Card>
               <CardContent>
-                <Typography variant="h6" sx={{ mb: 2 }}>Loans / Loan History</Typography>
-                <List>
-                  {checkedOutBooks.map((book, idx) => (
-                    <ListItem key={idx}>
-                      <ListItemText
-                        primary={book.title}
-                        secondary={`Due: ${book.dueDate}`}
-                      />
-                      {!book.overdue && (
-                        <Button size="small" variant="outlined" sx={{ ml: 2 }}>Renew</Button>
-                      )}
-                      {book.overdue && (
-                        <Typography color="error" sx={{ ml: 2, fontWeight: 600 }}>Overdue</Typography>
-                      )}
-                    </ListItem>
-                  ))}
-                </List>
+                <Typography variant="h6" sx={{ mb: 2 }}>
+                  Loans / Loan History
+                </Typography>
+                {loadingLoans ? (
+                  <Typography>Loading...</Typography>
+                ) : loans && loans.length > 0 ? (
+                  <List>
+                    {loans.map((loan, idx) => (
+                      <ListItem key={loan.id || idx}>
+                        <ListItemText
+                          primary={loan.bookTitle || 'Book Title'}
+                          secondary={
+                            loan.returnedAt
+                              ? `Returned: ${new Date(loan.returnedAt).toLocaleDateString()}`
+                              : `Due: ${loan.dueAt ? new Date(loan.dueAt).toLocaleDateString() : 'N/A'}`
+                          }
+                        />
+                        {loan.status === 2 && (
+                          <Typography color="error" sx={{ ml: 2, fontWeight: 600 }}>
+                            Overdue
+                          </Typography>
+                        )}
+                      </ListItem>
+                    ))}
+                  </List>
+                ) : (
+                  <Typography>No books currently checked out.</Typography>
+                )}
               </CardContent>
             </Card>
           )}
           {activityTab === 1 && (
             <Card>
               <CardContent>
-                <Typography variant="h6" sx={{ mb: 2 }}>Holds</Typography>
+                <Typography variant="h6" sx={{ mb: 2 }}>
+                  Holds
+                </Typography>
                 <List>
                   {holds.map((hold, idx) => (
-                    <ListItem key={idx} secondaryAction={<Button size="small" variant="text">Cancel</Button>}>
-                      <ListItemText
-                        primary={hold.title}
-                        secondary={hold.status}
-                      />
+                    <ListItem key={ idx } 
+                    secondaryAction={
+                      <Button size="small" variant="text">
+                        Cancel
+                      </Button>}>
+                    <ListItemText
+                      primary={ hold.title }
+                      secondary={ hold.status }
+                    />
                     </ListItem>
                   ))}
                 </List>
@@ -153,8 +193,12 @@ function PatronDashboard() {
           {activityTab === 2 && (
             <Card>
               <CardContent>
-                <Typography variant="h6" sx={{ mb: 2 }}>Fines</Typography>
-                <Typography variant="body1">Outstanding Fees: ${fees.toFixed(2)}</Typography>
+                <Typography variant="h6" sx={{ mb: 2 }}>
+                  Fines
+                </Typography>
+                <Typography variant="body1">
+                  Outstanding Fees: ${fees.toFixed(2)}
+                </Typography>
                 <Button variant="contained" color="primary" sx={{ mt: 2 }}>
                   Pay Fees
                 </Button>
@@ -164,9 +208,13 @@ function PatronDashboard() {
           {activityTab === 3 && (
             <Card>
               <CardContent>
-                <Typography variant="h6" sx={{ mb: 2 }}>Notifications</Typography>
+                <Typography variant="h6" sx={{ mb: 2 }}>
+                  Notifications
+                </Typography>
                 {notifications.length === 0 ? (
-                  <Typography>No new notifications.</Typography>
+                  <Typography>
+                    No new notifications.
+                  </Typography>
                 ) : (
                   <List>
                     {notifications.map((note, idx) => (

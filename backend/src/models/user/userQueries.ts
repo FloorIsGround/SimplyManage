@@ -56,6 +56,27 @@ export async function getUserById(userId: string): Promise<User | null> {
   return mapUserRow(res.rows[0]);
 }
 
+// Gets all users, optionally filtered by role and/or card number
+export async function getUsersByFilter({ role, cardNumber }: { role?: string, cardNumber?: string }): Promise<User[]> {
+  let sql = `SELECT ${USER_COLUMNS} FROM users`;
+  const params: any[] = [];
+  const conditions: string[] = [];
+  if (role) {
+    conditions.push(`LOWER(role) = LOWER($${params.length + 1})`);
+    params.push(role);
+  }
+  if (cardNumber) {
+    conditions.push(`library_card_number = $${params.length + 1}`);
+    params.push(cardNumber);
+  }
+  if (conditions.length > 0) {
+    sql += ' WHERE ' + conditions.join(' AND ');
+  }
+  sql += ` ORDER BY last_name, first_name`;
+  const res = await query<UserRow>(sql, params);
+  return res.rows.map(mapUserRow);
+}
+
 // Get user by email for login
 export async function getUserByEmail(email: string): Promise<any | null> {
   const res = await query(

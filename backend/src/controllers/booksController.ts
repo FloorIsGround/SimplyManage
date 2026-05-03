@@ -13,12 +13,17 @@ export async function getBooks(_req: Request, res: Response, next: NextFunction)
   }
 }
 
-// Searches books by title, author, or genre.
+// Searches books by title, author, genre, audience, and rating.
 export async function searchBooks(req: Request, res: Response, next: NextFunction) {
   try {
-    let { searchQuery } = req.params;
-    if (Array.isArray(searchQuery)) searchQuery = searchQuery[0];
-    const books = await searchBooksByQuery(searchQuery);
+    const { searchQuery, genre, audience, rating, barcode } = req.query;
+    const books = await searchBooksByQuery({
+      searchQuery: typeof searchQuery === 'string' ? searchQuery : '',
+      genre: typeof genre === 'string' ? genre : '',
+      audience: typeof audience === 'string' ? audience : '',
+      rating: typeof rating === 'string' ? Number(rating) : undefined,
+      barcode: typeof barcode === 'string' ? barcode : undefined,
+    });
     return res.json(books);
   } catch (err) {
     next(err);
