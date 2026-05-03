@@ -23,10 +23,18 @@ function Footer() {
         >
           Contact Us
         </Typography>
-          <Typography component="a" href="#faq" sx={{ color: 'white', textDecoration: 'underline', cursor: 'pointer' }}>
+          <Typography
+            component={RouterLink}
+            to="/faqs"
+            sx={{ color: 'white', textDecoration: 'underline', cursor: 'pointer' }}
+          >
             Help/FAQ
           </Typography>
-          <Typography component="a" href="#hours" sx={{ color: 'white', textDecoration: 'underline', cursor: 'pointer' }}>
+          <Typography
+            component={RouterLink}
+            to="/hours-locations"
+            sx={{ color: 'white', textDecoration: 'underline', cursor: 'pointer' }}
+          >
             Hours & Location
           </Typography>
           {canAccessStaff && (
