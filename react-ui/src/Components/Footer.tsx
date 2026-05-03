@@ -16,13 +16,13 @@ function Footer() {
     }}>
       <Box sx={{ maxWidth: 1600, mx: 'auto', px: 3 }}>
         <Box sx={{ display: 'flex', justifyContent: 'center', gap: 3, mb: 1 }}>
-        <Typography
-          component={RouterLink}
-          to="/contact"
-          sx={{ color: 'white', textDecoration: 'underline', cursor: 'pointer' }}
-        >
-          Contact Us
-        </Typography>
+          <Typography
+            component={RouterLink}
+            to="/contact"
+            sx={{ color: 'white', textDecoration: 'underline', cursor: 'pointer' }}
+          >
+            Contact Us
+          </Typography>
           <Typography
             component={RouterLink}
             to="/faqs"
