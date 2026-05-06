@@ -55,7 +55,7 @@
       "response": []
     },
     {
-      "name": "Get Overdue Fee Rate Copy",
+      "name": "Change Overdue Fee Rate",
       "request": {
         "method": "PATCH",
         "header": [],
