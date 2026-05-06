@@ -4,6 +4,9 @@ import { createLoan, getActiveLoanByCopyId, getLoanById, getLoansByCopyId, getLo
 import { getCopyById } from "../models/copy/copyQueries.js";
 import { getUserById } from "../models/user/userQueries.js";
 import { getNextHoldInQueue, updateHoldStatus } from "../models/hold/holdQueries.js";
+import { createOverdueFee } from "../models/billing/billingQueries.js";
+import { calculateOverdueFeeCents } from "../models/billing/overdueFee.js";
+import { getOverdueFeeCentsPerDay } from "../services/billing_settings.js";
 
 // Checks out a copy to a user, creating a new loan record.
 // Validates that the user is ACTIVE and the copy is AVAILABLE with no existing active loan.
@@ -77,7 +80,20 @@ export async function patchLoanReturn(req: Request, res: Response, next: NextFun
             throw createHttpError(500, "Failed to process return.");
         }
 
-        // TODO: Fee generation: if loan.returnedAt > loan.dueAt, assess an OVERDUE fee.
+        if (!loan.returnedAt) {
+            throw createHttpError(500, "Returned loan is missing returnedAt timestamp.");
+        }
+
+        const feeCentsPerDay = getOverdueFeeCentsPerDay();
+        const overdueFeeCents = calculateOverdueFeeCents(loan.dueAt, loan.returnedAt, feeCentsPerDay);
+
+        if (overdueFeeCents > 0) {
+            await createOverdueFee({
+                userId: loan.userId,
+                loanId: loan.id,
+                amountCents: overdueFeeCents,
+            });
+        }
 
         const copy = await getCopyById(loan.copyId);
         if (copy) {

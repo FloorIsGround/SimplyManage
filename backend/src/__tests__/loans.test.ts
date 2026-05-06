@@ -48,6 +48,10 @@ vi.mock("../models/hold/holdQueries.js", () => ({
     getNextHoldInQueue: vi.fn(),
 }));
 
+vi.mock("../models/billing/billingQueries.js", () => ({
+    createOverdueFee: vi.fn(),
+}));
+
 import {
     createLoan,
     getActiveLoanByCopyId,
@@ -60,6 +64,7 @@ import {
 import { getCopyById } from "../models/copy/copyQueries.js";
 import { getUserById } from "../models/user/userQueries.js";
 import { getNextHoldInQueue, updateHoldStatus } from "../models/hold/holdQueries.js";
+import { createOverdueFee } from "../models/billing/billingQueries.js";
 
 const mockCreateLoan = vi.mocked(createLoan);
 const mockGetActiveLoanByCopyId = vi.mocked(getActiveLoanByCopyId);
@@ -72,6 +77,7 @@ const mockGetCopyById = vi.mocked(getCopyById);
 const mockGetUserById = vi.mocked(getUserById);
 const mockGetNextHoldInQueue = vi.mocked(getNextHoldInQueue);
 const mockUpdateHoldStatus = vi.mocked(updateHoldStatus);
+const mockCreateOverdueFee = vi.mocked(createOverdueFee);
 
 const app = createApp();
 
@@ -349,6 +355,37 @@ describe("PATCH /api/loans/:loanId/return", () => {
 
         expect(res.status).toBe(200);
         expect(mockUpdateHoldStatus).not.toHaveBeenCalled();
+    });
+
+    it("creates an overdue fee when a loan is returned late", async () => {
+        const returnedLoan = { ...sampleLoan, returnedAt: "2026-04-17T00:01:00.000Z" };
+        mockGetLoanById.mockResolvedValue(sampleLoan);
+        mockReturnLoan.mockResolvedValue(returnedLoan);
+        mockGetCopyById.mockResolvedValue(sampleCopy);
+        mockGetNextHoldInQueue.mockResolvedValue(null);
+        mockCreateOverdueFee.mockResolvedValue(null);
+
+        const res = await request(app).patch(`/api/loans/${LOAN_ID}/return`);
+
+        expect(res.status).toBe(200);
+        expect(mockCreateOverdueFee).toHaveBeenCalledWith({
+            userId: USER_ID,
+            loanId: LOAN_ID,
+            amountCents: 50,
+        });
+    });
+
+    it("does not create an overdue fee when a loan is returned on time", async () => {
+        const returnedLoan = { ...sampleLoan, returnedAt: "2026-04-16T00:00:00.000Z" };
+        mockGetLoanById.mockResolvedValue(sampleLoan);
+        mockReturnLoan.mockResolvedValue(returnedLoan);
+        mockGetCopyById.mockResolvedValue(sampleCopy);
+        mockGetNextHoldInQueue.mockResolvedValue(null);
+
+        const res = await request(app).patch(`/api/loans/${LOAN_ID}/return`);
+
+        expect(res.status).toBe(200);
+        expect(mockCreateOverdueFee).not.toHaveBeenCalled();
     });
 
     it("returns 404 when loan does not exist", async () => {
