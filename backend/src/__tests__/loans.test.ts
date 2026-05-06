@@ -97,7 +97,7 @@ const sampleCopy: Copy = {
     bookId: BOOK_ID,
     barcode: "BC00000001",
     conditionStatus: "AVAILABLE",
-    location: "Central Library",
+    branchId: 1,
     createdAt: "2026-01-01T00:00:00.000Z",
 };
 
@@ -106,6 +106,7 @@ const sampleUser: User = {
     email: "patron@example.com",
     firstName: "Carol",
     lastName: "Patron",
+    libraryCardNumber: "12345678",
     role: "PATRON",
     status: "ACTIVE",
     createdAt: "2026-01-01T00:00:00.000Z",
@@ -263,7 +264,7 @@ describe("GET /api/loans/:loanId", () => {
 // ---------------------------------------------------------------------------
 describe("GET /api/loans/user/:userId", () => {
     it("returns all loans for a user", async () => {
-        mockGetLoansByUserId.mockResolvedValue([sampleLoan]);
+        mockGetLoansByUserId.mockResolvedValue([{ ...sampleLoan, bookTitle: "Test Book" }]);
 
         const res = await request(app).get(`/api/loans/user/${USER_ID}`);
 

@@ -36,7 +36,7 @@ describe("billing_settings", () => {
 
     describe("getOverdueFeeCentsPerDay", () => {
         it("returns the current overdue fee rate", () => {
-            expect(getOverdueFeeCentsPerDay()).toBe(25);
+            expect(getOverdueFeeCentsPerDay()).toBe(DEFAULT_OVERDUE_FEE_CENTS_PER_DAY);
         });
     });
 
