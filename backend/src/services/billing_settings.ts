@@ -1,4 +1,4 @@
-export const DEFAULT_OVERDUE_FEE_CENTS_PER_DAY = 150;
+export const DEFAULT_OVERDUE_FEE_CENTS_PER_DAY = 25;
 
 export function parseInitialOverdueFeeRate(envValue: string | undefined): number {
     if (envValue === undefined || envValue === "") {
