@@ -38,3 +38,19 @@ export interface Receipt {
     paidAt: string;
     createdAt: string;
 }
+
+export interface ReceiptFeeInput {
+    feeId: string;
+    amountCents: number;
+}
+
+export interface CreateReceiptForFeesInput {
+    userId: string;
+    amountCents: number;
+    externalReceiptId: string;
+    externalTransactionId?: string | null;
+    paymentMethod?: PaymentMethod;
+    note?: string | null;
+    paidAt?: string;
+    fees: ReceiptFeeInput[];
+}
