@@ -7,6 +7,7 @@ vi.mock("../models/billing/billingQueries.js", () => ({
     getAssessedFeesByIdsForUser: vi.fn(),
     getFeesByUserId: vi.fn(),
     getOutstandingFeesByUserId: vi.fn(),
+    getReceiptById: vi.fn(),
 }));
 
 vi.mock("../models/user/userQueries.js", () => ({
@@ -20,25 +21,28 @@ vi.mock("../services/billing_settings.js", () => ({
 
 vi.mock("../services/receipt_service.js", () => ({
     createReceiptDocument: vi.fn(),
+    fetchReceiptPdf: vi.fn(),
     FILING_DEFAULTS: {
         issuedBy: "SimplyManage Library",
         currency: "$",
     },
 }));
 
-import { createReceiptForFees, getAssessedFeesByIdsForUser, getFeesByUserId, getOutstandingFeesByUserId } from "../models/billing/billingQueries.js";
+import { createReceiptForFees, getAssessedFeesByIdsForUser, getFeesByUserId, getOutstandingFeesByUserId, getReceiptById } from "../models/billing/billingQueries.js";
 import { getUserById } from "../models/user/userQueries.js";
 import { getOverdueFeeCentsPerDay, setOverdueFeeCentsPerDay } from "../services/billing_settings.js";
-import { createReceiptDocument } from "../services/receipt_service.js";
+import { createReceiptDocument, fetchReceiptPdf } from "../services/receipt_service.js";
 
 const mockCreateReceiptForFees = vi.mocked(createReceiptForFees);
 const mockGetAssessedFeesByIdsForUser = vi.mocked(getAssessedFeesByIdsForUser);
 const mockGetFeesByUserId = vi.mocked(getFeesByUserId);
 const mockGetOutstandingFeesByUserId = vi.mocked(getOutstandingFeesByUserId);
+const mockGetReceiptById = vi.mocked(getReceiptById);
 const mockGetUserById = vi.mocked(getUserById);
 const mockGetOverdueFeeCentsPerDay = vi.mocked(getOverdueFeeCentsPerDay);
 const mockSetOverdueFeeCentsPerDay = vi.mocked(setOverdueFeeCentsPerDay);
 const mockCreateReceiptDocument = vi.mocked(createReceiptDocument);
+const mockFetchReceiptPdf = vi.mocked(fetchReceiptPdf);
 
 const app = createApp();
 
@@ -212,6 +216,57 @@ describe("POST /api/billing/users/:userId/receipts", () => {
 
         expect(res.status).toBe(400);
         expect(mockGetAssessedFeesByIdsForUser).not.toHaveBeenCalled();
+    });
+});
+
+describe("GET /api/billing/receipts/:receiptId/pdf", () => {
+    it("proxies a receipt PDF using the stored external receipt id", async () => {
+        mockGetReceiptById.mockResolvedValue(sampleReceipt);
+        mockFetchReceiptPdf.mockResolvedValue({
+            content: Buffer.from("%PDF-1.4 fake pdf"),
+            contentType: "application/pdf",
+        });
+
+        const res = await request(app).get(`/api/billing/receipts/${RECEIPT_ID}/pdf`);
+
+        expect(res.status).toBe(200);
+        expect(res.headers["content-type"]).toContain("application/pdf");
+        expect(res.headers["content-disposition"]).toBe("inline; filename=\"receipt-REC-2026-0001.pdf\"");
+        expect(Buffer.from(res.body).toString()).toBe("%PDF-1.4 fake pdf");
+        expect(mockGetReceiptById).toHaveBeenCalledWith(RECEIPT_ID);
+        expect(mockFetchReceiptPdf).toHaveBeenCalledWith(sampleReceipt.externalReceiptId);
+    });
+
+    it("uses the local receipt id in the PDF filename when external transaction id is missing", async () => {
+        const receiptWithoutTransaction = { ...sampleReceipt, externalTransactionId: null };
+        mockGetReceiptById.mockResolvedValue(receiptWithoutTransaction);
+        mockFetchReceiptPdf.mockResolvedValue({
+            content: Buffer.from("%PDF-1.4 fake pdf"),
+            contentType: "application/pdf",
+        });
+
+        const res = await request(app).get(`/api/billing/receipts/${RECEIPT_ID}/pdf`);
+
+        expect(res.status).toBe(200);
+        expect(res.headers["content-disposition"]).toBe(`inline; filename="receipt-${RECEIPT_ID}.pdf"`);
+    });
+
+    it("returns 400 for an invalid receiptId", async () => {
+        const res = await request(app).get("/api/billing/receipts/not-a-uuid/pdf");
+
+        expect(res.status).toBe(400);
+        expect(mockGetReceiptById).not.toHaveBeenCalled();
+        expect(mockFetchReceiptPdf).not.toHaveBeenCalled();
+    });
+
+    it("returns 404 when the local receipt does not exist", async () => {
+        mockGetReceiptById.mockResolvedValue(null);
+
+        const res = await request(app).get(`/api/billing/receipts/${RECEIPT_ID}/pdf`);
+
+        expect(res.status).toBe(404);
+        expect(mockGetReceiptById).toHaveBeenCalledWith(RECEIPT_ID);
+        expect(mockFetchReceiptPdf).not.toHaveBeenCalled();
     });
 });
 

@@ -135,6 +135,18 @@ export async function getAssessedFeesByIdsForUser(userId: string, feeIds: string
     return res.rows.map(mapFeeRow);
 }
 
+export async function getReceiptById(receiptId: string): Promise<Receipt | null> {
+    const res = await query<ReceiptRow>(
+        `SELECT ${RECEIPT_COLUMNS}
+         FROM receipts
+         WHERE receipt_id = $1`,
+        [receiptId]
+    );
+
+    if (res.rows.length === 0) return null;
+    return mapReceiptRow(res.rows[0]);
+}
+
 export async function createReceiptForFees(input: CreateReceiptForFeesInput): Promise<Receipt> {
     if (input.fees.length === 0) {
         throw new Error("createReceiptForFees requires at least one fee.");

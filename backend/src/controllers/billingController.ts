@@ -1,10 +1,10 @@
 import type { NextFunction, Request, Response } from "express";
 import { createHttpError, getSingleValue, isUuid, requireUuid } from "./controllerHelpers.js";
-import { createReceiptForFees, getAssessedFeesByIdsForUser, getFeesByUserId, getOutstandingFeesByUserId } from "../models/billing/billingQueries.js";
+import { createReceiptForFees, getAssessedFeesByIdsForUser, getFeesByUserId, getOutstandingFeesByUserId, getReceiptById } from "../models/billing/billingQueries.js";
 import { FEE_STATUSES, PAYMENT_METHODS, type FeeStatus, type PaymentMethod } from "../models/billing/billing.js";
 import { getUserById } from "../models/user/userQueries.js";
 import { getOverdueFeeCentsPerDay, setOverdueFeeCentsPerDay } from "../services/billing_settings.js";
-import { createReceiptDocument, FILING_DEFAULTS } from "../services/receipt_service.js";
+import { createReceiptDocument, fetchReceiptPdf, FILING_DEFAULTS } from "../services/receipt_service.js";
 
 function parseFeeStatus(value: unknown): FeeStatus | null {
     const status = getSingleValue(value);
@@ -107,6 +107,24 @@ export async function createUserReceipt(req: Request, res: Response, next: NextF
             receipt,
             receiptPdfUrl: `/api/billing/receipts/${receipt.id}/pdf`,
         });
+    } catch (err) {
+        next(err);
+    }
+}
+
+export async function getReceiptPdf(req: Request, res: Response, next: NextFunction) {
+    try {
+        const receiptId = requireUuid(req.params.receiptId, "receiptId");
+        const receipt = await getReceiptById(receiptId);
+        if (!receipt) {
+            throw createHttpError(404, "Receipt not found.");
+        }
+
+        const pdf = await fetchReceiptPdf(receipt.externalReceiptId);
+        const filenameId = receipt.externalTransactionId || receipt.id;
+        res.setHeader("Content-Type", pdf.contentType || "application/pdf");
+        res.setHeader("Content-Disposition", `inline; filename="receipt-${filenameId}.pdf"`);
+        return res.send(pdf.content);
     } catch (err) {
         next(err);
     }
