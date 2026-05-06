@@ -11,6 +11,7 @@ import copiesRouter from "./copies.js";
 import usersRouter from "./users.js";
 import holdsRouter from "./holds.js";
 import loansRouter from "./loans.js";
+import billingRouter from "./billing.js";
 
 const router = Router();
 
@@ -69,6 +70,9 @@ router.use("/holds", holdsRouter);
 
 // Loans routes
 router.use("/loans", loansRouter);
+
+// Billing routes
+router.use("/billing", billingRouter);
 
 
 export default router;
