@@ -54,7 +54,7 @@ export async function getHoursLocations(): Promise<any[]> {
   return Object.values(librariesMap);
 }
 
-import { Pool, type QueryResult, type QueryResultRow } from "pg";
+import { Pool, type PoolClient, type QueryResult, type QueryResultRow } from "pg";
 import { Faq } from "../models/libraryInfo/faqs.js";
 
 // Use a global pool to prevent creating a new pool on every reload (dev).
@@ -85,6 +85,23 @@ export async function query<T extends QueryResultRow = any>(
   params?: unknown[]
 ): Promise<QueryResult<T>> {
   return pool.query<T>(text, params);
+}
+
+export async function withTransaction<T>(
+  callback: (client: PoolClient) => Promise<T>
+): Promise<T> {
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    const result = await callback(client);
+    await client.query("COMMIT");
+    return result;
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
+  }
 }
 
 export async function testConnection(): Promise<{ now: string }> {

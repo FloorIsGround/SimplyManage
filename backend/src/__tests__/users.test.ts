@@ -56,6 +56,7 @@ const sampleUser: User = {
   email: "test@example.com",
   firstName: "Test",
   lastName: "User",
+  libraryCardNumber: "12345678",
   role: "PATRON",
   status: "ACTIVE",
   createdAt: "2024-01-01T00:00:00.000Z",

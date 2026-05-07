@@ -1,0 +1,181 @@
+{
+  "info": {
+    "_postman_id": "5c841048-a237-4753-95ae-641e4f8b5fb9",
+    "name": "SimplyManageBilling",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "45518061"
+  },
+  "item": [
+    {
+      "name": "Get User Fees",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{link}}/api/billing/users/:userId/fees",
+          "host": [
+            "{{link}}"
+          ],
+          "path": [
+            "api",
+            "billing",
+            "users",
+            ":userId",
+            "fees"
+          ],
+          "variable": [
+            {
+              "key": "userId",
+              "value": "be37c785-6f51-4554-a166-7cef5cbdd643",
+              "description": "UUID"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Overdue Fee Rate",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{link}}/api/billing/settings/overdue-fee-rate",
+          "host": [
+            "{{link}}"
+          ],
+          "path": [
+            "api",
+            "billing",
+            "settings",
+            "overdue-fee-rate"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Change Overdue Fee Rate",
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"centsPerDay\": 25\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{link}}/api/billing/settings/overdue-fee-rate",
+          "host": [
+            "{{link}}"
+          ],
+          "path": [
+            "api",
+            "billing",
+            "settings",
+            "overdue-fee-rate"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Receipt Pdf",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{link}}/api/billing/receipts/:receiptId/pdf",
+          "host": [
+            "{{link}}"
+          ],
+          "path": [
+            "api",
+            "billing",
+            "receipts",
+            ":receiptId",
+            "pdf"
+          ],
+          "variable": [
+            {
+              "key": "receiptId",
+              "value": "7c4c6b81-a6bf-4ff2-9bf2-08df782c5de6"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create User Receipt for Payment",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"feeIds\": [\"6637fabe-c9fa-4203-86bd-919ff3a67c89\"],\r\n    \"paymentMethod\": \"MANUAL\",\r\n    \"note\": \"\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{link}}/api/billing/users/:userId/receipts",
+          "host": [
+            "{{link}}"
+          ],
+          "path": [
+            "api",
+            "billing",
+            "users",
+            ":userId",
+            "receipts"
+          ],
+          "variable": [
+            {
+              "key": "userId",
+              "value": "be37c785-6f51-4554-a166-7cef5cbdd643",
+              "description": "UUID"
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "link",
+      "value": ""
+    }
+  ]
+}

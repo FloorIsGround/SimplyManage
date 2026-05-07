@@ -11,6 +11,7 @@ import {
 import { Tabs, Tab } from "@mui/material";
 import { useState, useEffect } from "react";
 import type { User } from "../../../Models/User/User";
+import type { Fee } from "../../../Models/User/Fee";
 import type { Loan } from "../../../Models/Book/Loan";
 type LoanWithBookTitle = Loan & { bookTitle?: string };
 import axios from "../../../utils/axios-api";
@@ -21,7 +22,6 @@ function PatronDashboard() {
     { title: "To Kill a Mockingbird", status: "Ready for Pickup" },
     { title: "Brave New World", status: "Pending" },
   ];
-  const fees = 3.50;
   const notifications = [
     { type: "Due Soon", message: "'The Great Gatsby' is due in 2 days.", date: "2026-04-21" },
     { type: "Overdue", message: "'1984' is overdue! Please return it.", date: "2026-04-17" },
@@ -34,6 +34,10 @@ function PatronDashboard() {
   const [loadingUser, setLoadingUser] = useState(true);
   const [loans, setLoans] = useState<LoanWithBookTitle[]>([]);
   const [loadingLoans, setLoadingLoans] = useState(true);
+  const [fees, setFees] = useState<Fee[]>([]);
+  const [loadingFees, setLoadingFees] = useState(true);
+  const [feeError, setFeeError] = useState("");
+  const outstandingFeeCents = fees.reduce((sum, fee) => sum + fee.amountCents, 0);
 
   useEffect(() => {
     // Get token and decode userId
@@ -79,6 +83,13 @@ function PatronDashboard() {
         setLoans([]);
       })
       .finally(() => setLoadingLoans(false));
+    axios.get(`/billing/users/${userId}/fees`)
+      .then((res: any) => setFees(res.data || []))
+      .catch((err) => {
+        setFeeError(err?.response?.data?.error || "Failed to load fees.");
+        setFees([]);
+      })
+      .finally(() => setLoadingFees(false));
   }, []);
 
   return (
@@ -196,12 +207,32 @@ function PatronDashboard() {
                 <Typography variant="h6" sx={{ mb: 2 }}>
                   Fines
                 </Typography>
-                <Typography variant="body1">
-                  Outstanding Fees: ${fees.toFixed(2)}
-                </Typography>
-                <Button variant="contained" color="primary" sx={{ mt: 2 }}>
-                  Pay Fees
-                </Button>
+                {loadingFees ? (
+                  <Typography>Loading fees...</Typography>
+                ) : feeError ? (
+                  <Typography color="error">{feeError}</Typography>
+                ) : fees.length === 0 ? (
+                  <Typography>No outstanding overdue fees.</Typography>
+                ) : (
+                  <>
+                    <Typography variant="body1" sx={{ mb: 1 }}>
+                      Outstanding Fees: ${(outstandingFeeCents / 100).toFixed(2)}
+                    </Typography>
+                    <List>
+                      {fees.map((fee) => (
+                        <ListItem key={fee.id}>
+                          <ListItemText
+                            primary={fee.bookTitle || "Overdue library fee"}
+                            secondary={`${new Date(fee.assessedAt).toLocaleDateString()} • $${(fee.amountCents / 100).toFixed(2)}`}
+                          />
+                        </ListItem>
+                      ))}
+                    </List>
+                    <Typography variant="body2" sx={{ mt: 2 }}>
+                      Please pay at the circulation desk.
+                    </Typography>
+                  </>
+                )}
               </CardContent>
             </Card>
           )}

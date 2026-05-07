@@ -75,23 +75,29 @@ describe("GET /api/books", () => {
 });
 
 // ---------------------------------------------------------------------------
-// GET /api/books/search/:searchQuery
+// GET /api/books/search?searchQuery=:searchQuery
 // ---------------------------------------------------------------------------
-describe("GET /api/books/search/:searchQuery", () => {
+describe("GET /api/books/search", () => {
   it("returns matching books", async () => {
     mockSearchBooks.mockResolvedValue([sampleBook]);
 
-    const res = await request(app).get("/api/books/search/martian");
+    const res = await request(app).get("/api/books/search?searchQuery=martian");
 
     expect(res.status).toBe(200);
     expect(res.body).toEqual([sampleBook]);
-    expect(mockSearchBooks).toHaveBeenCalledWith("martian");
+    expect(mockSearchBooks).toHaveBeenCalledWith({
+      searchQuery: "martian",
+      genre: "",
+      audience: "",
+      rating: undefined,
+      barcode: undefined,
+    });
   });
 
   it("returns empty array when no books match", async () => {
     mockSearchBooks.mockResolvedValue([]);
 
-    const res = await request(app).get("/api/books/search/zzznomatch");
+    const res = await request(app).get("/api/books/search?searchQuery=zzznomatch");
 
     expect(res.status).toBe(200);
     expect(res.body).toEqual([]);
