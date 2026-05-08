@@ -49,7 +49,6 @@ const BooksPage: React.FC = () => {
                   </IconButton>
                 </Paper>
               </Box>
-
               <Button
                 variant="contained"
                 sx={{
@@ -66,11 +65,11 @@ const BooksPage: React.FC = () => {
                 Create Book
               </Button>
             </Box>
-
             <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-              This is where you can view, search, create, edit, and manage books in the library system. Use the search bar above to find books, or click "Create Book" to add a new one. You can also edit or delete existing books using the action buttons on the right.
+              This is where you can view, search, create, edit, and manage books in the library system. 
+              Use the search bar above to find books, or click "Create Book" to add a new one. 
+              You can also edit or delete existing books using the action buttons on the right.
             </Typography>
-
             <Box
               sx={{
                 height: 240,
